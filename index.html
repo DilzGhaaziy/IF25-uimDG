@@ -99,7 +99,6 @@
         }
         .event-box:hover { transform: scale(1.05); }
         
-        /* Efek Mengkilau */
         .event-box::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
@@ -174,7 +173,7 @@
         
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         
-        /* --- CARD STYLING --- */
+        /* --- CARD STYLING (FIXED) --- */
         .card {
             background: var(--card-bg); 
             border-radius: 15px; padding: 25px; text-align: center; 
@@ -184,8 +183,8 @@
             backdrop-filter: none !important; 
             -webkit-backdrop-filter: none !important;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            contain: content; 
-            content-visibility: auto; 
+            
+            /* --- FIX: REMOVED content-visibility & contain --- */
             will-change: transform;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
@@ -202,7 +201,7 @@
         }
 
         .card:hover::after { opacity: 1; }
-        .card:hover { transform: translateY(-5px); border-top: 5px solid #3498db; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .card:hover { transform: translateY(-5px); border-top: 5px solid #3498db; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 20; }
         .card.hidden-card { display: none; } 
 
         /* --- Animasi Khusus Kartu Owner --- */
@@ -600,11 +599,10 @@
     // --- KONFIGURASI REPO GITHUB ---
     const REPO_CONFIG = {
         owner: "DilzGhaaziy", 
-        name: "IF25-uimDG"        
+        name: "IF25_uimDG"        
     };
 
-    // --- DATA EVENTS (Feature 4) ---
-    // Tambahkan event baru disini dengan format {title: "...", prize: "..."}
+    // --- DATA EVENTS ---
     const eventsData = [
         { title: "Duel Game Naruto Storm 4", prize: "Rp 100.000" }
     ];
@@ -620,8 +618,8 @@
         {name: "Dela Nurcahyani", nim: "5520225003", gender: "P", dob: "15 Desember 2005", dospem: "Muawan Bisri, S.Kom., M.Kom"},
         {name: "Deri Farhan Syah", nim: "5520225008", gender: "L", dob: "10 November 2006", dospem: "Muawan Bisri, S.Kom., M.Kom", status: "Menghilang Dari Lane"},
         {name: "Dian Parwati", nim: "5520225014", gender: "P", dob: "8 Maret 2006", dospem: "Muawan Bisri, S.Kom., M.Kom"},
-        {name: "Dika Afriyogi", nim: "5520225018", gender: "L", dob: "30 September 2005", dospem: "Eko Aziz Apriadi, S.T., M.Kom.", role: "Keamanan IF1", ipk1: "3.50"}, // Hapus IPK utama
-        {name: "Fikri Julianda Laksono", nim: "5520225009", gender: "L", dob: "21 Juli 2005", dospem: "Muawan Bisri, S.Kom., M.Kom", role: "Ketua IF 1", ipk1: "3.80"}, // Hapus IPK utama
+        {name: "Dika Afriyogi", nim: "5520225018", gender: "L", dob: "30 September 2005", dospem: "Eko Aziz Apriadi, S.T., M.Kom.", role: "Keamanan IF1", ipk1: "3.50"}, 
+        {name: "Fikri Julianda Laksono", nim: "5520225009", gender: "L", dob: "21 Juli 2005", dospem: "Muawan Bisri, S.Kom., M.Kom", role: "Ketua IF 1", ipk1: "3.80"}, 
         {name: "Gilang Aidil Pratama", nim: "5520225023", gender: "L", dob: "24 Oktober 2006", dospem: "Eko Aziz Apriadi, S.T., M.Kom.", isOwner: true, status: "Calon Ketua Himatika"},
         {name: "Hafizd Khoirul Azizah", nim: "5520225002", gender: "P", dob: "29 Juli 2006", dospem: "Muawan Bisri, S.Kom., M.Kom", role: "Wakil 1 IF1"},
         {name: "Hanysa Maryani", nim: "5520225006", gender: "P", dob: "20 Maret 2007", dospem: "Muawan Bisri, S.Kom., M.Kom"},
@@ -648,7 +646,7 @@
         {name: "Ade Rustam Ananta", nim: "5520225055", gender: "L", dob: "19 Januari 2007", dospem: "Agus Komarudin, S.Kom.,M.T.I."},
         {name: "Ayidil Putra Mahkoara", nim: "5520225046", gender: "L", dob: "6 Januari 2006", dospem: "Ribut Julianto, S.Kom.,M.T.I."},
         {name: "Aziz Abdul Jabbar", nim: "5520225064", gender: "L", dob: "2 September 2006", dospem: "Agus Komarudin, S.Kom.,M.T.I.", role: "Wakil IF2"},
-        {name: "Cantyca Syahrani", nim: "5520225035", gender: "P", dob: "1 Juni 2007", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom.", ipk1: "3.67"}, // Hapus IPK utama
+        {name: "Cantyca Syahrani", nim: "5520225035", gender: "P", dob: "1 Juni 2007", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom.", ipk1: "3.67"}, 
         {name: "Cindy Naura Rafa Ayu", nim: "5520225053", gender: "P", dob: "4 Februari 2007", dospem: "Agus Komarudin, S.Kom.,M.T.I."},
         {name: "Dila Oktaviani", nim: "5520225036", gender: "P", dob: "29 Oktober 2005", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom."},
         {name: "Febri Diana Fitri", nim: "5520225042", gender: "P", dob: "1 Februari 2006", dospem: "Ribut Julianto, S.Kom.,M.T.I."},
@@ -664,7 +662,7 @@
         {name: "Reyhan", nim: "5520225047", gender: "L", dob: "5 Juni 2007", dospem: "Ribut Julianto, S.Kom.,M.T.I.", ipk: "0"},
         {name: "Rizki Agustin Maulana", nim: "5520225061", gender: "L", dob: "14 Mei 2007", dospem: "Agus Komarudin, S.Kom.,M.T.I.", ipk: "0"},
         {name: "Sendi Agustiansyah", nim: "5520225050", gender: "L", dob: "21 September 2005", dospem: "Ribut Julianto, S.Kom.,M.T.I.", ipk: "0"},
-        {name: "Widia Lestari", nim: "5520225040", gender: "P", dob: "23 Mei 2007", dospem: "Ribut Julianto, S.Kom.,M.T.I.", ipk1: "3.89"} // Hapus IPK utama
+        {name: "Widia Lestari", nim: "5520225040", gender: "P", dob: "23 Mei 2007", dospem: "Ribut Julianto, S.Kom.,M.T.I.", ipk1: "3.89"} 
     ];
 
     const allStudents = [...dataIF1.map(s=>({...s, class:'IF 1'})), ...dataIF2.map(s=>({...s, class:'IF 2'}))];
@@ -709,7 +707,7 @@
     const S_ISLAMI = "https://od.lk/s/NjhfMTYyNzYyNDE5Xw/Haaaaa%20Islami%20CUT.mp3";
     const S_FUNNY = "https://od.lk/s/NjhfMTYyNzYyNDIwXw/Alur%20Cerita%20FB%20CUT.mp3";
     const S_SAD = "https://od.lk/s/NjhfMTYyNzYyNDE4Xw/Sampai%20kini%20masih%20ku%20coba%20CUT.mp3";
-    const S_YALILI = "https://od.lk/s/NjhfMTYyNzYyNDE1Xw/Yalil%20Yalili%20CUT.mp3"; // Fixed Typo in URL
+    const S_YALILI = "https://od.lk/s/NjhfMTYyNzYyNDE1Xw/Yalil%20Yalili%20CUT.mp3";
     const CEO_NAMES = ["CEO MBG", "CEO Cendol", "CEO Ayam Potong", "CEO Gorengan", "CEO Ayam Geprek", "CEO Seblak", "CEO EpEp", "CEO Pecel Lele", "CEO Tahu Bulat"];
 
     window.onload = function() {
@@ -890,6 +888,7 @@
         }
     });
 
+    // --- EVENT LISTENER UTAMA (FIXED) ---
     document.getElementById('cardGrid').addEventListener('click', function(e) {
         const card = e.target.closest('.card');
         if (card) {
@@ -931,9 +930,9 @@
             statusRow.style.display = 'none';
         }
         
-        // Fitur 5: Hapus Detail IPK di Profile Utama (sudah dihapus dari object data, jadi ini safety saja)
+        // Fitur 5: Hapus Detail IPK di Profile Utama
         const ipkRow = document.getElementById('p-ipk-row');
-        ipkRow.style.display = 'none'; // Selalu sembunyikan karena sekarang pakai tombol "Lihat Detail IPK"
+        if(ipkRow) ipkRow.style.display = 'none';
 
         const profileCard = document.querySelector('.big-profile-card');
         const roleDiv = document.getElementById('p-role');
@@ -1014,24 +1013,18 @@
         const today = new Date();
 
         for (let i = 1; i <= 6; i++) {
-            // Get saved IPK from LocalStorage or Data
             let storedIPK = localStorage.getItem(`ipk_val_sem${i}_${currentProfile.nim}`);
             let nilai = storedIPK ? storedIPK : (i === 1 && currentProfile.ipk1 ? currentProfile.ipk1 : "0.00");
             let hasScore = parseFloat(nilai) > 0;
             
-            // Logic Edit Button
             let editButtonHtml = "";
             let canEdit = false;
 
             if (i === 1) {
-                // Semester 1: Editable sekali
                 const isEdited = localStorage.getItem(`ipk_edited_sem1_${currentProfile.nim}`);
                 if (!isEdited) canEdit = true;
             } else {
-                // Semester 2-6: Check Date
                 if (today >= ipkSchedule[i]) {
-                    // Assuming similar 'once' rule or just open
-                    // For now, let's make it editable if open
                      const isEdited = localStorage.getItem(`ipk_edited_sem${i}_${currentProfile.nim}`);
                      if (!isEdited) canEdit = true;
                 }
@@ -1053,7 +1046,6 @@
     function editIPK(sem) {
         const newVal = prompt(`Masukkan IPK Semester ${sem} (Contoh: 3.50):`);
         if (newVal && !isNaN(newVal) && newVal >= 0 && newVal <= 4) {
-            // Save to LocalStorage (User view only as per constraints)
             localStorage.setItem(`ipk_val_sem${sem}_${currentProfile.nim}`, parseFloat(newVal).toFixed(2));
             localStorage.setItem(`ipk_edited_sem${sem}_${currentProfile.nim}`, "true");
             
@@ -1068,7 +1060,7 @@
         document.getElementById('ipkModal').classList.remove('active');
     }
 
-    // --- EVENT BOX LOGIC (Feature 4) ---
+    // --- EVENT BOX LOGIC ---
     function openEventModal() {
         const modal = document.getElementById('eventModal');
         const list = document.getElementById('eventListContainer');
@@ -1091,7 +1083,6 @@
     let selectedDobValue = "";
 
     function initEditDOB() {
-        // Cek lock lagi untuk keamanan ganda
         if (localStorage.getItem(`dob_edited_${currentProfile.nim}`) === "true") {
              alert("Tanggal Lahir di Profil ini sudah pernah diubah");
              return;
@@ -1120,7 +1111,6 @@
         selectedDobValue = formatIndoDate(inputVal);
         document.getElementById('conf-dob-display').innerText = selectedDobValue;
         
-        // Hide picker, Show Confirm
         document.getElementById('datePickerModal').classList.remove('active');
         document.getElementById('dateConfirmModal').classList.add('active');
     }
@@ -1130,9 +1120,8 @@
         document.getElementById('datePickerModal').classList.add('active');
     }
 
-    // --- VERIFICATION LOGIC (Feature 3) ---
+    // --- VERIFICATION LOGIC ---
     function initVerification() {
-        // Triggered by Check Button in Confirm Modal
         document.getElementById('dateConfirmModal').classList.remove('active');
         document.getElementById('verifyModal').classList.add('active');
         document.getElementById('nim-verify-input').value = "";
@@ -1159,7 +1148,6 @@
         const dobElement = document.getElementById('p-dob');
         const originalText = dobElement.innerText;
         
-        // Close Verify Modal
         document.getElementById('verifyModal').classList.remove('active');
         
         dobElement.innerHTML = "<em>Menyimpan...</em>";
@@ -1181,13 +1169,11 @@
             if (response.ok) {
                 alert("Berhasil disimpan! Data di GitHub akan terupdate.");
                 
-                // LOCK EDIT (Feature 2)
                 localStorage.setItem(`dob_edited_${currentProfile.nim}`, "true");
                 const dobIcon = document.getElementById('dob-edit-icon');
                 dobIcon.classList.add('faded');
                 dobIcon.onclick = function() { alert("Tanggal Lahir di Profil ini sudah pernah diubah"); };
 
-                // Update UI Realtime
                 dobElement.innerText = selectedDobValue;
                 currentProfile.dob = selectedDobValue;
                 
