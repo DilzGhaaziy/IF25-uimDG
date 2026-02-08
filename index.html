@@ -86,7 +86,7 @@
         .pos-theme i { color: #f1c40f; }
         body.dark-mode .pos-theme i { color: #f39c12; }
 
-        /* --- EVENT BOX (NEW) --- */
+        /* --- EVENT BOX --- */
         .event-box {
             position: fixed; top: 70px; left: 20px; z-index: 999;
             background: linear-gradient(135deg, #ffd700 0%, #2ecc71 100%);
@@ -98,7 +98,6 @@
             display: flex; align-items: center; gap: 8px;
         }
         .event-box:hover { transform: scale(1.05); }
-        
         .event-box::before {
             content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
             background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
@@ -173,69 +172,38 @@
         
         .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
         
-        /* --- CARD STYLING (FIXED) --- */
+        /* --- CARD STYLING --- */
         .card {
             background: var(--card-bg); 
             border-radius: 15px; padding: 25px; text-align: center; 
             border-top: 5px solid transparent; cursor: pointer;
             position: relative; overflow: hidden;
-            
             backdrop-filter: none !important; 
             -webkit-backdrop-filter: none !important;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            
-            /* --- FIX: REMOVED content-visibility & contain --- */
             will-change: transform;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .card::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(600px circle at var(--x) var(--y), var(--glow-color), transparent 40%);
-            opacity: 0; 
-            transition: opacity 0.3s ease;
-            pointer-events: none; 
-            z-index: 2; 
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: 2; 
         }
 
         .card:hover::after { opacity: 1; }
         .card:hover { transform: translateY(-5px); border-top: 5px solid #3498db; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 20; }
         .card.hidden-card { display: none; } 
 
-        /* --- Animasi Khusus Kartu Owner --- */
-        @keyframes ownerGlowLoop {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+        @keyframes ownerGlowLoop { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
         .card.owner-card {
-            background: linear-gradient(
-                45deg, 
-                #059669, #10b981, 
-                #de7ed4cc, #e598ffcc, 
-                #10b981, #059669
-            );
-            background-size: 400% 400%;
-            animation: ownerGlowLoop 8s ease infinite; 
-            color: white !important; 
-            border: 2px solid #ffd700;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.6); 
+            background: linear-gradient(45deg, #059669, #10b981, #de7ed4cc, #e598ffcc, #10b981, #059669);
+            background-size: 400% 400%; animation: ownerGlowLoop 8s ease infinite; 
+            color: white !important; border: 2px solid #ffd700; text-shadow: 0 1px 4px rgba(0,0,0,0.6); 
         }
-
-        .card.owner-card .avatar, 
-        .card.owner-card h3, 
-        .card.owner-card .nim-badge {
-            position: relative;
-            z-index: 5;
-        }
-
-        .card.owner-card .owner-badge,
-        .card.owner-card .gender-tag {
-            z-index: 10;
-        }
+        .card.owner-card .avatar, .card.owner-card h3, .card.owner-card .nim-badge { position: relative; z-index: 5; }
+        .card.owner-card .owner-badge, .card.owner-card .gender-tag { z-index: 10; }
 
         /* --- STYLING CARD KHUSUS --- */
         .card.ketua-card { background: linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%); color: white !important; border: 2px solid #fff; }
@@ -332,9 +300,11 @@
         .ipk-btn:hover { transform: scale(1.02); }
 
         /* --- MODALS --- */
-        .modal-overlay, .date-picker-overlay, .date-confirm-overlay, .ipk-modal, .verify-modal, .event-modal {
+        .modal-overlay, .date-picker-overlay, .date-confirm-overlay, .ipk-modal, .verify-modal, .event-modal, .ipk-input-modal, .event-challenge-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
-            z-index: 3000; display: flex; align-items: center; justify-content: center; flex-direction: column;
+            /* FIX BUG 2: Z-Index lebih tinggi dari profile view (2000) */
+            z-index: 5000; 
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
             opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(5px);
         }
         .modal-overlay { z-index: 10000; }
@@ -351,9 +321,12 @@
         .semester-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.05); border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--text-color); border-left: 4px solid #ccc; }
         .semester-row.has-score { border-left: 4px solid #00b09b; background: rgba(0, 176, 155, 0.1); }
         .ipk-edit-btn { background: none; border: none; color: #f39c12; cursor: pointer; margin-left: 10px; font-size: 14px; }
-        
         .close-ipk { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; }
         .close-ipk:hover { background: #555; }
+
+        /* Modern IPK Input Modal */
+        .modern-input-field { width: 100%; padding: 15px; font-size: 24px; text-align: center; border: 2px solid #3498db; border-radius: 15px; background: white; color: #333; font-weight: bold; margin: 20px 0; outline: none; }
+        .modern-input-field:focus { box-shadow: 0 0 15px rgba(52, 152, 219, 0.4); }
 
         /* Date Picker & Confirmation */
         .date-input-container { margin: 20px 0; display: flex; justify-content: center; }
@@ -373,12 +346,17 @@
 
         /* Event Modal */
         .event-list { text-align: left; margin-top: 20px; }
-        .event-item { background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%); padding: 15px; border-radius: 10px; color: #8e44ad; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid #fff; }
+        .event-item { background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%); padding: 15px; border-radius: 10px; color: #8e44ad; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid #fff; animation: pulse 2s infinite; cursor: pointer; transition: transform 0.2s; }
+        .event-item:active { transform: scale(0.95); }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 181, 0, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(248, 181, 0, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 181, 0, 0); } }
         .event-title { font-weight: 800; font-size: 16px; margin-bottom: 5px; }
         .event-prize { font-size: 14px; font-weight: 600; color: #d35400; }
 
-        /* Jodoh Styles */
-        .jodoh-modal { z-index: 3000; }
+        /* Event Challenge Modal */
+        .wa-btn { background: #25D366; color: white; padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
+
+        /* Jodoh Styles (FIXED Z-Index & Centering) */
+        .jodoh-modal { z-index: 5000; }
         .choice-btn { padding: 15px 30px; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; color: white; margin: 0 10px; }
         .btn-if1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .btn-if2 { background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%); }
@@ -513,9 +491,20 @@
 <div class="event-modal" id="eventModal">
     <div class="modal-box">
         <h2 style="color: var(--text-color);"><i class="fas fa-calendar-alt"></i> Event Aktif</h2>
-        <div class="event-list" id="eventListContainer">
-            </div>
+        <div class="event-list" id="eventListContainer"></div>
         <button class="btn-conf-close" style="margin-top:20px;" onclick="closeEventModal()">Tutup</button>
+    </div>
+</div>
+
+<div class="event-challenge-modal" id="challengeModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); margin-bottom: 5px;">Duel Dengan Owner. Minat?</h2>
+        <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 20px;">Chat Pembuat Event Untuk Diskusi / Terima Tantangan</p>
+        <a href="https://wa.me/628311801213" target="_blank" class="wa-btn">
+            <i class="fab fa-whatsapp"></i> Terima Tantangan
+        </a>
+        <br><br>
+        <button class="btn-conf-close" onclick="closeChallengeModal()">Batal</button>
     </div>
 </div>
 
@@ -525,9 +514,22 @@
             <h2>Riwayat IPK</h2>
             <p id="ipk-nama-mhs">Nama Mahasiswa</p>
         </div>
-        <div class="semester-list" id="semesterList">
-        </div>
+        <div class="semester-list" id="semesterList"></div>
         <button class="close-ipk" onclick="closeIPKModal()">Tutup</button>
+    </div>
+</div>
+
+<div class="ipk-input-modal" id="ipkInputModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color);">Input Nilai IPK</h2>
+        <p style="font-size: 12px; color: #666;">Masukkan nilai antara 1.00 sampai 4.00</p>
+        
+        <input type="number" id="modern-ipk-input" class="modern-input-field" placeholder="0.00" step="0.01" min="1" max="4">
+        
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <button class="btn-conf-close" onclick="closeIpkInputModal()">Batal</button>
+            <button class="btn-conf-primary" onclick="confirmIPKInput()">Simpan</button>
+        </div>
     </div>
 </div>
 
@@ -553,9 +555,7 @@
         <p style="color: var(--text-color); margin-top: 10px; font-size: 14px;">
             masukkan 2 angka terakhir dari NIM mu, contohnya 55202250<span class="bold-ex">23</span>
         </p>
-        
         <input type="tel" id="nim-verify-input" class="verify-input" maxlength="2" placeholder="XX" autocomplete="off">
-        
         <div style="margin-top: 20px; display:flex; justify-content: center; gap: 10px;">
             <button class="btn-conf-close" onclick="closeVerifyModal()">Batal</button>
             <button class="btn-conf-primary" onclick="submitVerification()">Verifikasi</button>
@@ -567,11 +567,7 @@
     <div class="modal-box">
         <h2 style="color: var(--text-color); margin-bottom: 10px;">Konfirmasi</h2>
         <p style="color: var(--text-color); margin-bottom: 20px;">Tanggal Lahirnya Sudah Benar?</p>
-        
-        <div style="font-size: 20px; font-weight: bold; color: #3498db; margin-bottom: 30px;" id="conf-dob-display">
-            -
-        </div>
-
+        <div style="font-size: 20px; font-weight: bold; color: #3498db; margin-bottom: 30px;" id="conf-dob-display">-</div>
         <div class="confirm-btn-container">
             <button class="btn-cross" onclick="closeDateConfirm()"><i class="fas fa-times"></i></button>
             <button class="btn-check" onclick="initVerification()"><i class="fas fa-check"></i></button>
@@ -587,9 +583,7 @@
             <div style="font-size:12px; color:#aaa; margin-bottom:10px;">JODOH KAMU ADALAH</div>
             <div class="match-name" id="match-name-display">X</div>
         </div>
-        
         <div class="couple-display" id="final-couple-ui"></div>
-
         <br>
         <button class="close-match" onclick="closeJodoh()">Tutup</button>
     </div>
@@ -597,21 +591,16 @@
 
 <script>
     // --- KONFIGURASI REPO GITHUB ---
-    const REPO_CONFIG = {
-        owner: "DilzGhaaziy", 
-        name: "IF25_uimDG"        
-    };
+    const REPO_CONFIG = { owner: "DilzGhaaziy", name: "IF25-uimDG" };
 
     // --- DATA EVENTS ---
-    const eventsData = [
-        { title: "Duel Game Naruto Storm 4", prize: "Rp 100.000" }
-    ];
+    const eventsData = [{ title: "Duel Game Naruto Storm 4", prize: "Rp 100.000" }];
 
     // --- DATABASE ---
     const dataIF1 = [
         {name: "Ahmad Afrizal", nim: "5520225011", gender: "L", dob: "20 April 2007", dospem: "Muawan Bisri, S.Kom., M.Kom", role: "Keamanan IF1"},
-        {name: "Aisyah Nur Syifa", nim: "5520225021", gender: "P", dob: "27 Maret 2007", dospem: "Eko Aziz Apriadi, S.T., M.Kom."},
-        {name: "Alfian Febriansyah", nim: "5520225028", gender: "L", dob: "2 Januari 2007", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom."},
+        {name: "Aisyah Nur Syifa", nim: "5520225021", gender: "P", dob: "20 Maret 2007", dospem: "Eko Aziz Apriadi, S.T., M.Kom."},
+        {name: "Alfian Febriansyah", nim: "5520225028", gender: "L", dob: "13 Februari 2007", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom."},
         {name: "Amri Rahman", nim: "5520225005", gender: "L", dob: "27 April 2006", dospem: "Muawan Bisri, S.Kom., M.Kom"},
         {name: "Azizah Fastabila Putri", nim: "5520225030", gender: "P", dob: "15 November 2006", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom."},
         {name: "Bahtera Juliandi", nim: "5520225031", gender: "L", dob: "17 Januari 2005", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom.", role: "Keamanan IF1"},
@@ -645,7 +634,7 @@
         {name: "Ade Ahmad Fahrizal", nim: "5520225043", gender: "L", dob: "Saya Gak Tau", dospem: "Ribut Julianto, S.Kom.,M.T.I."},
         {name: "Ade Rustam Ananta", nim: "5520225055", gender: "L", dob: "19 Januari 2007", dospem: "Agus Komarudin, S.Kom.,M.T.I."},
         {name: "Ayidil Putra Mahkoara", nim: "5520225046", gender: "L", dob: "6 Januari 2006", dospem: "Ribut Julianto, S.Kom.,M.T.I."},
-        {name: "Aziz Abdul Jabbar", nim: "5520225064", gender: "L", dob: "2 September 2006", dospem: "Agus Komarudin, S.Kom.,M.T.I.", role: "Wakil IF2"},
+        {name: "Aziz Abdul Jabbar", nim: "5520225064", gender: "L", dob: "9 Februari 2006", dospem: "Agus Komarudin, S.Kom.,M.T.I.", role: "Wakil IF2"},
         {name: "Cantyca Syahrani", nim: "5520225035", gender: "P", dob: "1 Juni 2007", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom.", ipk1: "3.67"}, 
         {name: "Cindy Naura Rafa Ayu", nim: "5520225053", gender: "P", dob: "4 Februari 2007", dospem: "Agus Komarudin, S.Kom.,M.T.I."},
         {name: "Dila Oktaviani", nim: "5520225036", gender: "P", dob: "29 Oktober 2005", dospem: "Fathoni Dwi Atmoko, S.Kom.,M.Kom."},
@@ -682,6 +671,7 @@
     let currentBgmIndex = -1;
     let currentJodohSongIndex = -1;
     let isMuted = false;
+    let userInteracted = false; // To handle autoplay policy
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     const bgmPlaylist = [
@@ -729,15 +719,14 @@
     };
 
     function preloadAudio() {
-        jodohSongs.forEach(url => {
-            const tempAudio = new Audio();
-            tempAudio.src = url;
-            tempAudio.preload = 'none'; 
-        });
+        jodohSongs.forEach(url => { const t = new Audio(); t.src = url; t.preload = 'none'; });
+        bgmPlaylist.forEach(t => { const a = new Audio(); a.src = t.url; a.preload = 'none'; });
     }
 
-    // --- BGM PLAYER LOGIC ---
+    // --- BGM PLAYER LOGIC (FIXED) ---
     function playRandomBGM() {
+        if (!userInteracted) return; // Prevent autoplay error
+
         bgmAudio.pause();
         let newIdx;
         do { newIdx = Math.floor(Math.random() * bgmPlaylist.length); } while (newIdx === currentBgmIndex && bgmPlaylist.length > 1);
@@ -745,10 +734,17 @@
         currentBgmIndex = newIdx;
         bgmAudio.src = bgmPlaylist[currentBgmIndex].url;
         bgmAudio.volume = 0; 
-        bgmAudio.play().then(() => {
-            fadeInBGM();
-            showNowPlaying(bgmPlaylist[currentBgmIndex].title);
-        }).catch(e => console.log("Autoplay blocked"));
+        
+        const playPromise = bgmAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                fadeInBGM();
+                showNowPlaying(bgmPlaylist[currentBgmIndex].title);
+            }).catch(error => {
+                console.log("Autoplay blocked or load error. Waiting for interaction.");
+            });
+        }
         
         bgmAudio.onended = playRandomBGM;
     }
@@ -765,11 +761,17 @@
         }, 100);
     }
 
+    let npTimeout;
     function showNowPlaying(title) {
         const box = document.getElementById('now-playing-box');
+        // Reset animation
+        box.classList.remove('show');
+        void box.offsetWidth; // Trigger reflow
+        clearTimeout(npTimeout);
+        
         document.getElementById('np-title').innerText = title;
         box.classList.add('show');
-        setTimeout(() => { box.classList.remove('show'); }, 5000); 
+        npTimeout = setTimeout(() => { box.classList.remove('show'); }, 5000); 
     }
 
     function toggleMute() {
@@ -815,6 +817,12 @@
     }
 
     function loadClassData(type) {
+        // Unlock Audio Context on first interaction
+        if (!userInteracted) {
+            userInteracted = true;
+            if(bgmAudio.paused) playRandomBGM();
+        }
+
         const grid = document.getElementById('cardGrid');
         grid.innerHTML = "";
         currentClassData = (type === 'IF1') ? dataIF1 : dataIF2;
@@ -872,10 +880,8 @@
         
         grid.appendChild(fragment); 
         document.getElementById('selectionModal').classList.remove('active');
-        if(bgmAudio.paused) playRandomBGM();
     }
 
-    // --- EVENT LISTENER UNTUK EFEK GLOW MOUSE ---
     document.getElementById('cardGrid').addEventListener('mousemove', function(e) {
         const card = e.target.closest('.card');
         if (card) {
@@ -888,7 +894,6 @@
         }
     });
 
-    // --- EVENT LISTENER UTAMA (FIXED) ---
     document.getElementById('cardGrid').addEventListener('click', function(e) {
         const card = e.target.closest('.card');
         if (card) {
@@ -911,7 +916,6 @@
         document.getElementById('p-dob').innerText = s.dob;
         document.getElementById('p-dospem').innerText = s.dospem;
         
-        // Cek Status Lock DOB
         const hasEdited = localStorage.getItem(`dob_edited_${s.nim}`);
         const dobIcon = document.getElementById('dob-edit-icon');
         if (hasEdited === "true") {
@@ -930,18 +934,15 @@
             statusRow.style.display = 'none';
         }
         
-        // Fitur 5: Hapus Detail IPK di Profile Utama
         const ipkRow = document.getElementById('p-ipk-row');
         if(ipkRow) ipkRow.style.display = 'none';
 
         const profileCard = document.querySelector('.big-profile-card');
         const roleDiv = document.getElementById('p-role');
         
-        // Reset kelas profil
         profileCard.className = 'big-profile-card'; 
         roleDiv.className = 'owner-role';
         
-        // Reset style manual roleDiv
         roleDiv.style.background = ""; roleDiv.style.color = ""; roleDiv.style.border = "";
 
         if (s.isOwner) {
@@ -991,8 +992,7 @@
         setTimeout(() => { document.getElementById('profile-view').style.display = 'none'; document.getElementById('main-view').style.display = 'block'; setTimeout(() => document.getElementById('main-view').style.opacity = '1', 50); }, 300);
     }
     
-    // --- FITUR IPK LOGIC (Feature 1) ---
-    // Jadwal Edit IPK
+    // --- FITUR IPK LOGIC (IMPROVED) ---
     const ipkSchedule = {
         2: new Date('2026-07-05'),
         3: new Date('2027-01-24'),
@@ -1000,6 +1000,8 @@
         5: new Date('2028-01-23'),
         6: new Date('2028-07-09')
     };
+
+    let editingSem = 0;
 
     function openIPKModal() {
         if (!currentProfile) return;
@@ -1031,7 +1033,7 @@
             }
 
             if (canEdit) {
-                editButtonHtml = `<button class="ipk-edit-btn" onclick="editIPK(${i})"><i class="fas fa-pencil-alt"></i></button>`;
+                editButtonHtml = `<button class="ipk-edit-btn" onclick="openIpkInputModal(${i})"><i class="fas fa-pencil-alt"></i></button>`;
             }
 
             const row = document.createElement('div');
@@ -1043,17 +1045,35 @@
         modal.classList.add('active');
     }
 
-    function editIPK(sem) {
-        const newVal = prompt(`Masukkan IPK Semester ${sem} (Contoh: 3.50):`);
-        if (newVal && !isNaN(newVal) && newVal >= 0 && newVal <= 4) {
-            localStorage.setItem(`ipk_val_sem${sem}_${currentProfile.nim}`, parseFloat(newVal).toFixed(2));
-            localStorage.setItem(`ipk_edited_sem${sem}_${currentProfile.nim}`, "true");
-            
-            alert(`IPK Semester ${sem} berhasil disimpan!`);
-            openIPKModal(); // Refresh modal
-        } else if (newVal) {
-            alert("Input tidak valid. Masukkan angka 0.00 - 4.00");
+    // --- MODERN IPK INPUT ---
+    function openIpkInputModal(sem) {
+        editingSem = sem;
+        document.getElementById('modern-ipk-input').value = "";
+        document.getElementById('ipkModal').classList.remove('active');
+        document.getElementById('ipkInputModal').classList.add('active');
+    }
+
+    function closeIpkInputModal() {
+        document.getElementById('ipkInputModal').classList.remove('active');
+        document.getElementById('ipkModal').classList.add('active');
+    }
+
+    function confirmIPKInput() {
+        const input = document.getElementById('modern-ipk-input');
+        const val = parseFloat(input.value);
+
+        if (isNaN(val) || val < 1.00 || val > 4.00) {
+            alert("Nilai tidak valid! Masukkan angka antara 1.00 sampai 4.00");
+            return;
         }
+
+        const fixedVal = val.toFixed(2);
+        localStorage.setItem(`ipk_val_sem${editingSem}_${currentProfile.nim}`, fixedVal);
+        localStorage.setItem(`ipk_edited_sem${editingSem}_${currentProfile.nim}`, "true");
+        
+        alert(`IPK Semester ${editingSem} berhasil disimpan!`);
+        closeIpkInputModal();
+        openIPKModal(); // Refresh list
     }
 
     function closeIPKModal() {
@@ -1069,15 +1089,28 @@
         eventsData.forEach(ev => {
             const item = document.createElement('div');
             item.className = 'event-item';
+            // Added onclick event
+            item.onclick = openChallengeModal;
             item.innerHTML = `<div class="event-title">${ev.title}</div><div class="event-prize">Hadiah: ${ev.prize}</div>`;
             list.appendChild(item);
         });
         
         modal.classList.add('active');
     }
+    
     function closeEventModal() {
         document.getElementById('eventModal').classList.remove('active');
     }
+
+    function openChallengeModal() {
+        document.getElementById('eventModal').classList.remove('active');
+        document.getElementById('challengeModal').classList.add('active');
+    }
+
+    function closeChallengeModal() {
+        document.getElementById('challengeModal').classList.remove('active');
+    }
+
 
     // --- FITUR EDIT DOB REALTIME ---
     let selectedDobValue = "";
@@ -1302,12 +1335,10 @@
         for(let i=0;i<25;i++){ 
             const d=document.createElement('div'); 
             d.className='firefly'; 
-            
             const startX = Math.random() * 100;
             const startY = Math.random() * 100;
             d.style.left = startX + 'vw';
             d.style.top = startY + 'vh';
-            
             const s=Math.random()*4+4; 
             d.style.width=s+'px'; 
             d.style.height=s+'px'; 
