@@ -1237,80 +1237,98 @@
     
 function cekJodoh() {
         if (!currentProfile) return;
+
+        // 1. SIAPKAN POOL UMUM (Untuk Animasi "Putaran")
+        // Secara default, animasi akan menampilkan lawan jenis + hal-hal unik
+        const myGender = currentProfile.gender;
+        const targetGender = myGender === 'L' ? 'P' : 'L';
         
-        // --- KONFIGURASI CHANCE / SETTINGAN KHUSUS ---
-        // Kamu bisa tambah orang di sini dengan format if/else
-        let customCandidates = null; // Default null (pakai logika normal)
+        // Pool dasar (Lawan jenis normal)
+        let normalPool = allStudents.filter(s => s.gender === targetGender).map(s => ({ type: 'student', ...s }));
         
-        // 1. FIKRI (100% ke Aisyah)
+        // Tambahan item unik ke pool animasi biar seru
+        normalPool.push({ type: 'special', subtype: 'kematian', name: "Kematian" });
+        normalPool.push({ type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" });
+        normalPool.push({ type: 'special', subtype: 'ceo', name: "CEO" });
+
+        // Variable penentu
+        let animationCandidates = [...normalPool]; // Yang dilihat mata saat berputar
+        let finalResult = null; // Hasil akhir (Takdir)
+
+        // --- 2. LOGIKA CHANCE (TAKDIR) ---
+
+        // KASUS 1: FIKRI (100% ke Aisyah)
         if (currentProfile.name === "Fikri Julianda Laksono") {
-            customCandidates = [{ type: 'student', name: "Aisyah Nur Syifa", gender: "P" }];
+            // Animasi tetap random cewek-cewek, tapi hasil akhir dikunci
+            finalResult = { type: 'student', name: "Aisyah Nur Syifa", gender: "P" };
         }
         
-        // 2. AISYAH (100% ke Fikri)
+        // KASUS 2: AISYAH (100% ke Fikri)
         else if (currentProfile.name === "Aisyah Nur Syifa") {
-            customCandidates = [{ type: 'student', name: "Fikri Julianda Laksono", gender: "L" }];
+            // Animasi tetap random cowok-cowok, tapi hasil akhir dikunci
+            finalResult = { type: 'student', name: "Fikri Julianda Laksono", gender: "L" };
         }
 
-        // 3. LENI (70% Se-hun, 30% Jodoh Unik)
-        else if (currentProfile.name.includes("Leni")) { // Pakai includes untuk jaga-jaga
+        // KASUS 3: LENI (70% Se-hun, 30% Unik)
+        else if (currentProfile.name.includes("Leni")) {
             const rng = Math.random();
             if (rng < 0.7) { // 70%
-                // Kita anggap Se-hun sebagai 'student' agar muncul animasi love & gif
-                customCandidates = [{ type: 'student', name: "Se-hun", gender: "L" }]; 
+                finalResult = { type: 'student', name: "Se-hun", gender: "L" };
             } else { // 30%
-                customCandidates = [
+                const uniqueOptions = [
                     { type: 'special', subtype: 'kematian', name: "Kematian" },
                     { type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" },
                     { type: 'special', subtype: 'ceo', name: "CEO" },
                     { type: 'special', subtype: 'halu', name: "Dih Ngarepin Siapa Sih, Halu!" },
                     { type: 'special', subtype: 'korea', name: "Cowo Korea" }
                 ];
+                finalResult = uniqueOptions[Math.floor(Math.random() * uniqueOptions.length)];
             }
+            // Animasi Leni tetap cowok-cowok normal (sudah diatur di animationCandidates default)
         }
 
-        // 4. AMRI (70% Cowok/Sesama Jenis, 30% Cewek/Normal) - Exclude Gilang
+        // KASUS 4: AMRI (70% Cowok, 30% Cewek) - EXCLUDE GILANG
         else if (currentProfile.name === "Amri Rahman") {
             const rng = Math.random();
-            if (rng < 0.7) { // 70% Sesama Jenis (Laki-laki)
-                // Filter semua cowok, TAPI exclude Gilang Aidil Pratama
-                customCandidates = allStudents
+            if (rng < 0.7) { 
+                // 70% DAPAT COWOK (Sesama Jenis)
+                // Kita ubah animasinya biar yang lewat cowok semua (biar Amri deg-degan)
+                const boyPool = allStudents
                     .filter(s => s.gender === 'L' && s.name !== "Gilang Aidil Pratama" && s.name !== "Amri Rahman")
                     .map(s => ({ type: 'student', ...s }));
-            } else { // 30% Normal (Perempuan)
-                customCandidates = allStudents
-                    .filter(s => s.gender === 'P')
-                    .map(s => ({ type: 'student', ...s }));
-            }
-        }
-
-        // --- LOGIKA UTAMA (JANGAN DIUBAH BAGIAN BAWAH INI KECUALI PAHAM) ---
-        
-        // Jika tidak ada settingan khusus, pakai logika standar
-        if (!customCandidates) {
-            const gender = currentProfile.gender;
-            const targetGender = gender === 'L' ? 'P' : 'L'; 
-            
-            // Ambil data mahasiswa normal
-            customCandidates = allStudents.filter(s => s.gender === targetGender).map(s => ({ type: 'student', ...s }));
-            
-            // Tambahkan jodoh spesial (hanya untuk user normal)
-            customCandidates.push({ type: 'special', subtype: 'kematian', name: "Kematian" });
-            customCandidates.push({ type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" });
-            customCandidates.push({ type: 'special', subtype: 'ceo', name: "CEO" }); 
-            customCandidates.push({ type: 'special', subtype: 'halu', name: "Dih Ngarepin Siapa Sih, Halu!" });
-
-            if (gender === 'L') {
-                customCandidates.push({ type: 'special', subtype: 'ukthi', name: "Ukthi Yalil Yalili" });
+                
+                animationCandidates = boyPool; 
+                finalResult = boyPool[Math.floor(Math.random() * boyPool.length)];
             } else {
-                customCandidates.push({ type: 'special', subtype: 'korea', name: "Cowo Korea" });
-                customCandidates.push({ type: 'special', subtype: 'cina', name: "Cowo Cina" });
+                // 30% DAPAT CEWEK
+                // Animasi & Hasil pakai pool cewek
+                const girlPool = allStudents.filter(s => s.gender === 'P').map(s => ({ type: 'student', ...s }));
+                animationCandidates = girlPool;
+                finalResult = girlPool[Math.floor(Math.random() * girlPool.length)];
             }
         }
 
-        // Gunakan list kandidat yang sudah diproses di atas
-        let candidates = customCandidates;
+        // KASUS DEFAULT (ORANG BIASA)
+        if (!finalResult) {
+            // Tambahkan sisa item unik ke pool kemungkinan
+            let fullPool = [...animationCandidates];
+            fullPool.push({ type: 'special', subtype: 'halu', name: "Dih Ngarepin Siapa Sih, Halu!" });
+            
+            if (myGender === 'L') {
+                fullPool.push({ type: 'special', subtype: 'ukthi', name: "Ukthi Yalil Yalili" });
+            } else {
+                fullPool.push({ type: 'special', subtype: 'korea', name: "Cowo Korea" });
+                fullPool.push({ type: 'special', subtype: 'cina', name: "Cowo Cina" });
+            }
 
+            // Update animasi agar mencakup item unik baru
+            animationCandidates = fullPool;
+            // Pilih hasil acak murni
+            finalResult = fullPool[Math.floor(Math.random() * fullPool.length)];
+        }
+
+
+        // --- 3. EKSEKUSI ANIMASI ---
         const modal = document.getElementById('jodohModal');
         const searchUI = document.getElementById('searching-ui');
         const finalUI = document.getElementById('final-couple-ui');
@@ -1321,20 +1339,22 @@ function cekJodoh() {
         modal.classList.add('active');
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
-        // Animasi Acak Nama
+        // STEP A: Animasi "Mengacak" (Menggunakan animationCandidates)
+        // Ini menciptakan ilusi bahwa sistem sedang mencari
         matchInterval = setInterval(() => {
-            const r = candidates[Math.floor(Math.random() * candidates.length)];
-            // Handle nama CEO agar random
+            const r = animationCandidates[Math.floor(Math.random() * animationCandidates.length)];
+            // Handle nama CEO agar random saat animasi
             nameDisplay.innerText = r.subtype === 'ceo' ? CEO_NAMES[Math.floor(Math.random()*CEO_NAMES.length)] : r.name;
             nameDisplay.style.color = "#ccc"; 
             playTick();
         }, 100);
 
+        // STEP B: Menampilkan Hasil (Menggunakan finalResult)
         setTimeout(() => {
             clearInterval(matchInterval);
             
-            // Pilih Pemenang
-            let result = candidates[Math.floor(Math.random() * candidates.length)];
+            // Kita pakai hasil yang sudah ditentukan di logika CHANCE di atas
+            let result = finalResult;
             
             searchUI.style.display = 'none';
             finalUI.style.display = 'block';
@@ -1351,13 +1371,13 @@ function cekJodoh() {
                 // Jika Cowok (bukan Fikri) dapet Aisyah
                 if (currentProfile.gender === 'L' && currentProfile.name !== "Fikri Julianda Laksono" && result.name === "Aisyah Nur Syifa") {
                     content.text = "Mau Dihantam Fikri Lu?";
-                    content.gif = "https://media.tenor.com/NBexh7vX1rAAAAAi/slap-hand.gif"; // Opsional: Gif tamparan
+                    content.gif = "https://media.tenor.com/NBexh7vX1rAAAAAi/slap-hand.gif"; 
                 }
                 
                 // Jika Cewek (bukan Aisyah) dapet Fikri
                 else if (currentProfile.gender === 'P' && currentProfile.name !== "Aisyah Nur Syifa" && result.name === "Fikri Julianda Laksono") {
                     content.text = "Mau Ditampar Syifa Lu?";
-                    content.gif = "https://media.tenor.com/NBexh7vX1rAAAAAi/slap-hand.gif"; // Opsional: Gif tamparan
+                    content.gif = "https://media.tenor.com/NBexh7vX1rAAAAAi/slap-hand.gif"; 
                 }
 
                 htmlContent = `
@@ -1371,7 +1391,7 @@ function cekJodoh() {
                 `;
                 playRandomJodohSong(); 
             } else {
-                // LOGIKA SPECIAL (CEO, TUHAN, KEMATIAN, DLL)
+                // LOGIKA SPECIAL
                 let title = result.name;
                 let sub = "";
                 let soundToPlay = "";
