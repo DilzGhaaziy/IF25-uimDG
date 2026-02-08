@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IF25 Terkece Biodata</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* --- CSS VARIABLES & RESET --- */
+        :root {
+            --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            --text-color: #333;
+            --card-bg: rgba(230, 230, 254, 0.95);
+            --nim-bg: #ecf0f1;
+            --nim-text: #2c3e50;
+            --fixed-bg: rgba(255, 255, 255, 0.85);
+            --fixed-text: #2c3e50;
+            --firefly-color: #ffeb3b; 
+            --glow-color: rgba(52, 152, 219, 0.3); 
+        }
+
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            --text-color: #e0e0e0;
+            --card-bg: rgba(43, 63, 118, 0.96); 
+            --nim-bg: #1a1a2e;
+            --nim-text: #bdc3c7;
+            --fixed-bg: rgba(15, 52, 96, 0.85);
+            --fixed-text: #e0e0e0;
+            --firefly-color: #76ff03;
+            --glow-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            background: var(--bg-gradient); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            position: relative;
+            -webkit-overflow-scrolling: touch; 
+        }
+
+        /* --- BACKGROUND LAYERS --- */
+        #fireflies-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 0; overflow: hidden;
+            transform: translateZ(0); 
+        }
+        
+        .firefly {
+            position: absolute; border-radius: 50%;
+            background-color: var(--firefly-color);
+            box-shadow: 0 0 6px var(--firefly-color);
+            opacity: 0;
+            will-change: transform, opacity; 
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
+            20% { opacity: 0.8; transform: translate(20px, -20px) scale(1.1); }
+            80% { opacity: 0.2; transform: translate(80px, -80px) scale(0.8); }
+            100% { opacity: 0; transform: translate(100px, -100px) scale(0.5); }
+        }
+
+        /* --- FIXED ELEMENTS --- */
+        .fixed-element {
+            position: fixed; top: 20px; z-index: 1000;
+            background: var(--fixed-bg); padding: 10px 20px;
+            border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: var(--fixed-text);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 14px; font-weight: 600;
+            transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .pos-left { left: 20px; }
+        .pos-right { right: 20px; }
+        .pos-theme { right: 180px; width: 45px; height: 45px; padding: 0; cursor: pointer; border: none; font-size: 18px; }
+        .pos-right i { color: #ff0000; font-size: 18px; margin-right: 8px; }
+        .pos-theme i { color: #f1c40f; }
+        body.dark-mode .pos-theme i { color: #f39c12; }
+
+        /* --- NOW PLAYING BOX --- */
+        .now-playing-box {
+            position: fixed; bottom: 20px; right: -350px;
+            z-index: 9999;
+            background: var(--fixed-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 15px;
+            transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 300px;
+        }
+        .now-playing-box.show { right: 20px; }
+        .np-icon {
+            width: 35px; height: 35px; background: #e91e63; color: white;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 14px; animation: spin 3s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .np-info { display: flex; flex-direction: column; overflow: hidden; }
+        .np-label { font-size: 10px; color: var(--text-color); opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .np-title { font-size: 13px; font-weight: 700; color: var(--fixed-text); white-space: nowrap; }
+        .np-mute {
+            background: transparent; border: none; color: var(--fixed-text);
+            cursor: pointer; font-size: 16px; transition: 0.3s;
+        }
+        .np-mute:hover { color: #e91e63; }
+
+        /* --- MOBILE LAYOUT --- */
+        .mobile-layout-controls {
+            display: none; position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
+            z-index: 990; background: var(--fixed-bg); padding: 4px; border-radius:
