@@ -67,7 +67,7 @@
             100% { opacity: 0; transform: translate(100px, -100px) scale(0.5); }
         }
 
-        /* --- FIXED ELEMENTS --- */
+        /* --- FIXED ELEMENTS (HEADER BUTTONS) --- */
         .fixed-element {
             position: fixed; top: 20px; z-index: 1000;
             background: var(--fixed-bg); padding: 10px 20px;
@@ -88,7 +88,7 @@
 
         /* --- EVENT BOX --- */
         .event-box {
-            position: fixed; top: 70px; left: 20px; z-index: 999;
+            position: fixed; top: 80px; left: 20px; z-index: 999;
             background: linear-gradient(135deg, #ffd700 0%, #2ecc71 100%);
             padding: 8px 20px; border-radius: 30px;
             color: #fff; font-size: 13px; font-weight: 700;
@@ -137,7 +137,7 @@
 
         /* --- MOBILE LAYOUT --- */
         .mobile-layout-controls {
-            display: none; position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
+            display: none; position: fixed; top: 85px; left: 50%; transform: translateX(-50%);
             z-index: 990; background: var(--fixed-bg); padding: 4px; border-radius: 50px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px);
             border: 1px solid rgba(255,255,255,0.1);
@@ -151,7 +151,7 @@
 
         /* --- UTAMA --- */
         #main-view { position: relative; z-index: 10; transition: opacity 0.5s; min-height: 100vh; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px 20px; padding-top: 120px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px 20px; padding-top: 130px; }
         header { text-align: center; margin-bottom: 30px; }
         
         h1 { 
@@ -302,7 +302,7 @@
         /* --- MODALS --- */
         .modal-overlay, .date-picker-overlay, .date-confirm-overlay, .ipk-modal, .verify-modal, .event-modal, .ipk-input-modal, .event-challenge-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
-            /* FIX BUG 2: Z-Index lebih tinggi dari profile view (2000) */
+            /* Z-Index Sangat Tinggi agar di atas Profile (2000) */
             z-index: 5000; 
             display: flex; align-items: center; justify-content: center; flex-direction: column;
             opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(5px);
@@ -356,11 +356,17 @@
         .wa-btn { background: #25D366; color: white; padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
 
         /* Jodoh Styles (FIXED Z-Index & Centering) */
-        .jodoh-modal { z-index: 5000; }
+        .jodoh-modal { 
+            /* Z-INDEX TERTINGGI untuk mengatasi halaman Profil */
+            z-index: 10005 !important; 
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.95);
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
         .choice-btn { padding: 15px 30px; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; color: white; margin: 0 10px; }
         .btn-if1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
         .btn-if2 { background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%); }
-        .match-result-box { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; overflow: hidden; }
+        .match-result-box { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; overflow: hidden; position: relative; z-index: 10006; }
         .match-name { font-size: 24px; font-weight: bold; color: #2c3e50; margin: 15px 0; min-height: 60px; display: flex; align-items: center; justify-content: center;}
         .couple-display { display: none; margin-top: 10px; animation: slideUp 0.5s ease; }
         .couple-container { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; margin-bottom: 10px; }
@@ -377,16 +383,26 @@
         @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Media Query Mobile */
+        /* Media Query Mobile (FIXED BUTTONS) */
         @media (max-width: 600px) {
             .mobile-layout-controls { display: flex; }
             .grid-container { grid-template-columns: 1fr; padding: 0 10px; }
             .search-box { padding: 0 10px; }
+            
+            /* -- FIX POSISI TOMBOL MOBILE -- */
+            /* Nama Karya di Kiri */
             .pos-left { font-size: 10px; padding: 6px 10px; left: 10px; top: 15px; width: auto; max-width: 150px; }
+            
+            /* Tombol Youtube di Kanan Paling Ujung */
             .pos-right { font-size: 0; padding: 8px 12px; right: 10px; top: 15px; }
             .pos-right i { margin: 0; font-size: 18px; }
-            .pos-theme { right: 75px; width: 35px; height: 35px; font-size: 16px; top: 15px; }
-            .event-box { top: 60px; left: 10px; padding: 6px 12px; font-size: 11px; }
+            
+            /* Tombol Tema di Sebelah Kiri Tombol Youtube */
+            .pos-theme { right: 70px; width: 35px; height: 35px; font-size: 16px; top: 15px; }
+            
+            /* Tombol Event Turun ke Bawah sedikit */
+            .event-box { top: 70px; left: 10px; padding: 6px 12px; font-size: 11px; }
+            
             h1 { font-size: 1.8rem; }
             .grid-container.mobile-grid-active { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
             .grid-container.mobile-grid-active .card { padding: 15px 10px; }
@@ -591,7 +607,7 @@
 
 <script>
     // --- KONFIGURASI REPO GITHUB ---
-    const REPO_CONFIG = { owner: "DilzGhaaziy", name: "IF25-uimDG" };
+    const REPO_CONFIG = { owner: "DilzGhaaziy", name: "IF@%-uimDG" };
 
     // --- DATA EVENTS ---
     const eventsData = [{ title: "Duel Game Naruto Storm 4", prize: "Rp 100.000" }];
@@ -671,7 +687,7 @@
     let currentBgmIndex = -1;
     let currentJodohSongIndex = -1;
     let isMuted = false;
-    let userInteracted = false; // To handle autoplay policy
+    let userInteracted = false; 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     const bgmPlaylist = [
@@ -723,9 +739,9 @@
         bgmPlaylist.forEach(t => { const a = new Audio(); a.src = t.url; a.preload = 'none'; });
     }
 
-    // --- BGM PLAYER LOGIC (FIXED) ---
+    // --- BGM PLAYER LOGIC ---
     function playRandomBGM() {
-        if (!userInteracted) return; // Prevent autoplay error
+        if (!userInteracted) return; 
 
         bgmAudio.pause();
         let newIdx;
@@ -764,9 +780,8 @@
     let npTimeout;
     function showNowPlaying(title) {
         const box = document.getElementById('now-playing-box');
-        // Reset animation
         box.classList.remove('show');
-        void box.offsetWidth; // Trigger reflow
+        void box.offsetWidth; 
         clearTimeout(npTimeout);
         
         document.getElementById('np-title').innerText = title;
@@ -817,7 +832,6 @@
     }
 
     function loadClassData(type) {
-        // Unlock Audio Context on first interaction
         if (!userInteracted) {
             userInteracted = true;
             if(bgmAudio.paused) playRandomBGM();
@@ -992,7 +1006,7 @@
         setTimeout(() => { document.getElementById('profile-view').style.display = 'none'; document.getElementById('main-view').style.display = 'block'; setTimeout(() => document.getElementById('main-view').style.opacity = '1', 50); }, 300);
     }
     
-    // --- FITUR IPK LOGIC (IMPROVED) ---
+    // --- FITUR IPK LOGIC ---
     const ipkSchedule = {
         2: new Date('2026-07-05'),
         3: new Date('2027-01-24'),
@@ -1045,7 +1059,6 @@
         modal.classList.add('active');
     }
 
-    // --- MODERN IPK INPUT ---
     function openIpkInputModal(sem) {
         editingSem = sem;
         document.getElementById('modern-ipk-input').value = "";
@@ -1073,7 +1086,7 @@
         
         alert(`IPK Semester ${editingSem} berhasil disimpan!`);
         closeIpkInputModal();
-        openIPKModal(); // Refresh list
+        openIPKModal(); 
     }
 
     function closeIPKModal() {
@@ -1089,7 +1102,6 @@
         eventsData.forEach(ev => {
             const item = document.createElement('div');
             item.className = 'event-item';
-            // Added onclick event
             item.onclick = openChallengeModal;
             item.innerHTML = `<div class="event-title">${ev.title}</div><div class="event-prize">Hadiah: ${ev.prize}</div>`;
             list.appendChild(item);
@@ -1110,7 +1122,6 @@
     function closeChallengeModal() {
         document.getElementById('challengeModal').classList.remove('active');
     }
-
 
     // --- FITUR EDIT DOB REALTIME ---
     let selectedDobValue = "";
