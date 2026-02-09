@@ -2097,24 +2097,40 @@
         }, 150); 
     }
 
-// --- STEGANOGRAPHY LOGIC (SECURE HASHING) ---
+// --- STEGANOGRAPHY LOGIC (VERSI STABIL & OFFLINE) ---
     
-    // Hash SHA-256 dari "GIBRAN WAPRES SAMPAH" (Huruf Besar Semua)
-    // Jawaban asli tidak lagi ada di sini, hanya jejak digitalnya.
-    const SECRET_HASH = "b682664fd71295964de0685501d516744838634567c295796a5f98642a849f57"; 
+    // --- 1. SETTING KUNCI JAWABAN ---
+    // Ganti kode angka di bawah ini dengan kode yang muncul saat Mode Setup
+    const SECRET_HASH_CODE = "-430950083"; 
+    
+    // Ubah jadi 'true' untuk melihat kode jawabanmu. 
+    // Ubah jadi 'false' jika web sudah siap disebar.
+    const SETUP_MODE = false; 
 
-    // Fungsi Pembantu untuk mengubah Teks menjadi Hash
-    async function sha256(message) {
-        const msgBuffer = new TextEncoder().encode(message);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+    // --- 2. MESIN PENGACAK (HASHING) ---
+    // Mengubah teks menjadi angka acak agar tidak bisa dibaca di Inspect Element
+    function generateSafeHash(str) {
+        let hash = 0;
+        if (str.length === 0) return hash.toString();
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash.toString();
     }
 
+    // --- 3. FUNGSI LOGIKA ---
     function openStegoModal() {
         document.getElementById('eventModal').classList.remove('active');
         document.getElementById('stegoModal').classList.add('active');
         document.getElementById('stegoAnswerInput').value = "";
+        
+        // Hint visual jika mode setup aktif
+        if(SETUP_MODE) {
+            document.getElementById('stegoAnswerInput').placeholder = "[MODE SETUP AKTIF] Ketik Jawaban Benar...";
+        }
     }
 
     function closeStegoModal() {
@@ -2122,32 +2138,31 @@
         document.getElementById('eventModal').classList.add('active');
     }
 
-    function openStegoImage() {
-        document.getElementById('stegoImageModal').classList.add('active');
-    }
-
-    function closeStegoImage() {
-        document.getElementById('stegoImageModal').classList.remove('active');
-    }
-
-    // Fungsi cek jawaban diubah menjadi ASYNC karena hashing butuh waktu proses (milidetik)
-    async function checkStegoAnswer() {
+    function checkStegoAnswer() {
         const input = document.getElementById('stegoAnswerInput').value;
         
-        // 1. Bersihkan input dan jadikan huruf besar (agar tidak case sensitive)
+        // 1. Bersihkan input & jadikan huruf besar semua
         const cleanInput = input.trim().toUpperCase(); 
+        
+        // 2. Ubah teks menjadi Kode Hash
+        const userHash = generateSafeHash(cleanInput);
 
-        // 2. Ubah input user menjadi Hash
-        const userHash = await sha256(cleanInput);
+        // --- FITUR MODE SETUP (UNTUK MENDAPATKAN KODE) ---
+        if (SETUP_MODE) {
+            console.log("JAWABAN:", cleanInput);
+            console.log("KODE HASH:", userHash);
+            alert(`KODE HASH UNTUK "${cleanInput}" ADALAH:\n\n${userHash}\n\nSalin angka tersebut dan masukkan ke const SECRET_HASH_CODE di codingan, lalu ubah SETUP_MODE jadi false.`);
+            return; // Berhenti disini agar tidak nge-cek jawaban dulu
+        }
 
-        // 3. Bandingkan Hash user dengan Hash Rahasia
-        if (userHash === SECRET_HASH) {
+        // 3. Cek Jawaban (Bandingkan Angka)
+        if (userHash === SECRET_HASH_CODE) {
             // JIKA BENAR
             document.getElementById('stegoModal').classList.remove('active');
             document.getElementById('stegoSuccessModal').classList.add('active');
             
             if(!isMuted) {
-                // Play sound logic here if needed
+                // Play success sound if needed
             }
         } else {
             // JIKA SALAH
@@ -2159,18 +2174,9 @@
         }
     }
 
-    function closeStegoSuccess() {
-        document.getElementById('stegoSuccessModal').classList.remove('active');
-    }
-    
-    // --- GENERATOR HASH (Hapus bagian ini nanti jika sudah live) ---
-    // Cara pakai: Buka Console browser (F12), ketik: generateHash("JAWABAN BARU")
-    window.generateHash = async function(text) {
-        const hash = await sha256(text.toUpperCase());
-        console.log(`Hash untuk "${text.toUpperCase()}":`);
-        console.log(hash);
-        alert("Cek Console (F12) untuk melihat kode Hash barumu");
-    }
+    function openStegoImage() { document.getElementById('stegoImageModal').classList.add('active'); }
+    function closeStegoImage() { document.getElementById('stegoImageModal').classList.remove('active'); }
+    function closeStegoSuccess() { document.getElementById('stegoSuccessModal').classList.remove('active'); }
 </script>
 </body>
 </html>
