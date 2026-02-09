@@ -686,11 +686,11 @@
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     const bgmPlaylist = [
-        {title: "Streaming Radio", url: "https://s7.alhastream.com/radio/8350/live"},
-        {title: "Streaming Radio", url: "https://s7.alhastream.com/radio/8350/live"},
-        {title: "Streaming Radio", url: "https://s7.alhastream.com/radio/8350/live"}, 
-        {title: "Streaming Radio", url: "https://s7.alhastream.com/radio/8350/live"},
-        {title: "Streaming Radio", url: "https://s7.alhastream.com/radio/8350/live"},
+        {title: "iSWARA Jakarta FM", url: "https://n13.radiojar.com/4ywdgup3bnzuv?rj-ttl=5&rj-tok=AAABnECWuWQAm41UJbq3s9BypA"},
+        {title: "iSWARA Banjarmasin FM", url: "https://stream.radiojar.com/qfqd2aw80k8uv"},
+        {title: "SmartFM", url: "https://cast2.my-control-panel.com/proxy/radioso3/stream"}, 
+        {title: "Mettaswara Dangdut FM", url: "http://mettaswara.com:8700/d4d"},
+        {title: "Mettaswara Koplo FM", url: "http://mettaswara.com:8700/koplo"},
         {title: "Streaming Radio", url: "https://s7.alhastream.com/radio/8350/live"},
         {title: "JGRP Radio Live", url: "https://s7.alhastream.com/radio/8350/live"},
         {title: "JGRP Radio Live", url: "https://s7.alhastream.com/radio/8350/live"}
@@ -1238,43 +1238,46 @@
 function cekJodoh() {
         if (!currentProfile) return;
 
+        // Reset Tombol Tutup ke keadaan awal (jaga-jaga)
+        const closeBtn = document.querySelector('.close-match');
+        closeBtn.innerText = "Tutup";
+        closeBtn.disabled = false;
+        closeBtn.style.background = "#333";
+        closeBtn.style.cursor = "pointer";
+
         // 1. SIAPKAN POOL UMUM (Untuk Animasi "Putaran")
-        // Secara default, animasi akan menampilkan lawan jenis + hal-hal unik
         const myGender = currentProfile.gender;
         const targetGender = myGender === 'L' ? 'P' : 'L';
         
         // Pool dasar (Lawan jenis normal)
-        let normalPool = allStudents.filter(s => s.gender === targetGender).map(s => ({ type: 'student', ...s }));
+        let animationCandidates = allStudents.filter(s => s.gender === targetGender).map(s => ({ type: 'student', ...s }));
         
-        // Tambahan item unik ke pool animasi biar seru
-        normalPool.push({ type: 'special', subtype: 'kematian', name: "Kematian" });
-        normalPool.push({ type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" });
-        normalPool.push({ type: 'special', subtype: 'ceo', name: "CEO" });
+        // Tambahkan item unik ke pool animasi
+        animationCandidates.push({ type: 'special', subtype: 'kematian', name: "Kematian" });
+        animationCandidates.push({ type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" });
+        animationCandidates.push({ type: 'special', subtype: 'ceo', name: "CEO" });
 
-        // Variable penentu
-        let animationCandidates = [...normalPool]; // Yang dilihat mata saat berputar
-        let finalResult = null; // Hasil akhir (Takdir)
+        // Variable Hasil Akhir
+        let finalResult = null; 
 
         // --- 2. LOGIKA CHANCE (TAKDIR) ---
 
         // KASUS 1: FIKRI (100% ke Aisyah)
         if (currentProfile.name === "Fikri Julianda Laksono") {
-            // Animasi tetap random cewek-cewek, tapi hasil akhir dikunci
             finalResult = { type: 'student', name: "Aisyah Nur Syifa", gender: "P" };
         }
         
         // KASUS 2: AISYAH (100% ke Fikri)
         else if (currentProfile.name === "Aisyah Nur Syifa") {
-            // Animasi tetap random cowok-cowok, tapi hasil akhir dikunci
             finalResult = { type: 'student', name: "Fikri Julianda Laksono", gender: "L" };
         }
 
         // KASUS 3: LENI (70% Se-hun, 30% Unik)
         else if (currentProfile.name.includes("Leni")) {
             const rng = Math.random();
-            if (rng < 0.7) { // 70%
+            if (rng < 0.7) { 
                 finalResult = { type: 'student', name: "Se-hun", gender: "L" };
-            } else { // 30%
+            } else { 
                 const uniqueOptions = [
                     { type: 'special', subtype: 'kematian', name: "Kematian" },
                     { type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" },
@@ -1284,7 +1287,6 @@ function cekJodoh() {
                 ];
                 finalResult = uniqueOptions[Math.floor(Math.random() * uniqueOptions.length)];
             }
-            // Animasi Leni tetap cowok-cowok normal (sudah diatur di animationCandidates default)
         }
 
         // KASUS 4: AMRI (70% Cowok, 30% Cewek) - EXCLUDE GILANG
@@ -1292,16 +1294,14 @@ function cekJodoh() {
             const rng = Math.random();
             if (rng < 0.7) { 
                 // 70% DAPAT COWOK (Sesama Jenis)
-                // Kita ubah animasinya biar yang lewat cowok semua (biar Amri deg-degan)
                 const boyPool = allStudents
                     .filter(s => s.gender === 'L' && s.name !== "Gilang Aidil Pratama" && s.name !== "Amri Rahman")
                     .map(s => ({ type: 'student', ...s }));
                 
-                animationCandidates = boyPool; 
+                animationCandidates = boyPool; // Animasi jadi cowok semua
                 finalResult = boyPool[Math.floor(Math.random() * boyPool.length)];
             } else {
                 // 30% DAPAT CEWEK
-                // Animasi & Hasil pakai pool cewek
                 const girlPool = allStudents.filter(s => s.gender === 'P').map(s => ({ type: 'student', ...s }));
                 animationCandidates = girlPool;
                 finalResult = girlPool[Math.floor(Math.random() * girlPool.length)];
@@ -1310,7 +1310,6 @@ function cekJodoh() {
 
         // KASUS DEFAULT (ORANG BIASA)
         if (!finalResult) {
-            // Tambahkan sisa item unik ke pool kemungkinan
             let fullPool = [...animationCandidates];
             fullPool.push({ type: 'special', subtype: 'halu', name: "Dih Ngarepin Siapa Sih, Halu!" });
             
@@ -1321,9 +1320,7 @@ function cekJodoh() {
                 fullPool.push({ type: 'special', subtype: 'cina', name: "Cowo Cina" });
             }
 
-            // Update animasi agar mencakup item unik baru
             animationCandidates = fullPool;
-            // Pilih hasil acak murni
             finalResult = fullPool[Math.floor(Math.random() * fullPool.length)];
         }
 
@@ -1339,21 +1336,18 @@ function cekJodoh() {
         modal.classList.add('active');
         if (audioCtx.state === 'suspended') audioCtx.resume();
 
-        // STEP A: Animasi "Mengacak" (Menggunakan animationCandidates)
-        // Ini menciptakan ilusi bahwa sistem sedang mencari
+        // STEP A: Animasi "Mengacak"
         matchInterval = setInterval(() => {
             const r = animationCandidates[Math.floor(Math.random() * animationCandidates.length)];
-            // Handle nama CEO agar random saat animasi
             nameDisplay.innerText = r.subtype === 'ceo' ? CEO_NAMES[Math.floor(Math.random()*CEO_NAMES.length)] : r.name;
             nameDisplay.style.color = "#ccc"; 
             playTick();
         }, 100);
 
-        // STEP B: Menampilkan Hasil (Menggunakan finalResult)
+        // STEP B: Menampilkan Hasil
         setTimeout(() => {
             clearInterval(matchInterval);
             
-            // Kita pakai hasil yang sudah ditentukan di logika CHANCE di atas
             let result = finalResult;
             
             searchUI.style.display = 'none';
@@ -1362,19 +1356,38 @@ function cekJodoh() {
             
             bgmAudio.pause(); 
             
+            // --- FITUR COUNTDOWN TOMBOL TUTUP (IMPROVISASI) ---
+            closeBtn.disabled = true;
+            closeBtn.style.background = "#7f8c8d"; // Warna abu-abu
+            closeBtn.style.cursor = "not-allowed";
+            
+            let countdown = 3;
+            closeBtn.innerText = `Tutup (${countdown})`;
+            
+            const countInterval = setInterval(() => {
+                countdown--;
+                if (countdown > 0) {
+                    closeBtn.innerText = `Tutup (${countdown})`;
+                } else {
+                    clearInterval(countInterval);
+                    closeBtn.innerText = "Tutup";
+                    closeBtn.disabled = false;
+                    closeBtn.style.background = "#333"; // Balikin warna hitam
+                    closeBtn.style.cursor = "pointer";
+                }
+            }, 1000);
+            // --------------------------------------------------
+
             let htmlContent = "";
 
             if (result.type === 'student') {
                 let content = getStudentCoupleContent();
 
-                // --- LOGIKA MOCK (PROTEKSI FIKRI & AISYAH) ---
-                // Jika Cowok (bukan Fikri) dapet Aisyah
+                // LOGIKA MOCK (PROTEKSI FIKRI & AISYAH)
                 if (currentProfile.gender === 'L' && currentProfile.name !== "Fikri Julianda Laksono" && result.name === "Aisyah Nur Syifa") {
                     content.text = "Mau Dihantam Fikri Lu?";
                     content.gif = "https://media.tenor.com/NBexh7vX1rAAAAAi/slap-hand.gif"; 
                 }
-                
-                // Jika Cewek (bukan Aisyah) dapet Fikri
                 else if (currentProfile.gender === 'P' && currentProfile.name !== "Aisyah Nur Syifa" && result.name === "Fikri Julianda Laksono") {
                     content.text = "Mau Ditampar Syifa Lu?";
                     content.gif = "https://media.tenor.com/NBexh7vX1rAAAAAi/slap-hand.gif"; 
@@ -1485,4 +1498,5 @@ function cekJodoh() {
 </script>
 </body>
 </html>
+
 
