@@ -9,11 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-/* --- 1. SETTING DASAR & WARNA (Halaman Utama Kembali Normal) --- */
+/* --- 1. SETTING DASAR & WARNA --- */
         :root {
-            --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            /* Background ditangani oleh div terpisah, jadi transparan disini */
+            --bg-gradient: transparent; 
             --text-color: #333;
-            --card-bg: rgba(230, 230, 254, 0.95);
+            --card-bg: rgba(230, 230, 254, 0.85); /* Sedikit lebih transparan agar background terlihat */
             --nim-bg: #ecf0f1;
             --nim-text: #2c3e50;
             --fixed-bg: rgba(255, 255, 255, 0.85);
@@ -23,9 +24,8 @@
         }
 
         body.dark-mode {
-            --bg-gradient: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
             --text-color: #e0e0e0;
-            --card-bg: rgba(43, 63, 118, 0.96); 
+            --card-bg: rgba(43, 63, 118, 0.85); 
             --nim-bg: #1a1a2e;
             --nim-text: #bdc3c7;
             --fixed-bg: rgba(15, 52, 96, 0.85);
@@ -38,88 +38,153 @@
         
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: var(--bg-gradient); /* Ini yang bikin halaman utama berwarna */
             min-height: 100vh; 
             overflow-x: hidden; 
             position: relative;
+            background-color: #f0f0f0; /* Fallback color */
             -webkit-overflow-scrolling: touch; 
         }
 
-        /* --- 2. PERBAIKAN ANIMASI PROFIL --- */
+/* =========================================
+   BACKGROUND SYSTEMS (Global Fixed Layers)
+   ========================================= */
+
+        /* Container Umum untuk Background */
+        .global-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -9999; /* Paling belakang */
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* --- A. LIGHT MODE BACKGROUND (AURORA) --- */
+        #bg-light-mode {
+            background-color: #000510;
+            background-image: linear-gradient(135deg, #001233 0%, #003060 100%);
+            display: block;
+        }
+        
+        /* Sembunyikan Light Mode BG saat Dark Mode aktif */
+        body.dark-mode #bg-light-mode { display: none; }
+
+        .glow {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.7; mix-blend-mode: screen;
+        }
+        .glow-1 {
+            width: 80vw; height: 80vh; background: linear-gradient(45deg, #00fff2, #00a2ff);
+            bottom: -20%; left: -20%; transform: rotate(20deg) skewX(-20deg);
+            animation: drift 10s infinite alternate ease-in-out;
+        }
+        .glow-2 {
+            width: 90vw; height: 70vh; background: linear-gradient(120deg, #0061ff, #001eff);
+            top: -10%; right: -10%; transform: rotate(-30deg); opacity: 0.6;
+            animation: drift 15s infinite alternate-reverse ease-in-out;
+        }
+        .glow-3 {
+            width: 100vw; height: 40vh;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 234, 0.4), transparent 70%);
+            top: 30%; left: 10%; transform: rotate(-45deg) scaleY(0.5);
+            filter: blur(60px); opacity: 0.5;
+        }
+        .stars-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #a3d5ff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 200px 200px, #ffffff, rgba(0,0,0,0));
+            background-size: 250px 250px; 
+            opacity: 0.6;
+            animation: moveUpSmall 20s linear infinite;
+        }
+        .stars-sm-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 100px 50px, #fff, transparent),
+                radial-gradient(1px 1px at 200px 150px, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 300px 250px, #00fff2, transparent);
+            background-size: 350px 350px;
+            opacity: 0.4;
+            animation: moveUpLarge 30s linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) rotate(20deg) skewX(-20deg); }
+            100% { transform: translate(20px, -20px) rotate(25deg) skewX(-15deg); }
+        }
+        @keyframes moveUpSmall { from { background-position: 0 0; } to { background-position: 0 -250px; } }
+        @keyframes moveUpLarge { from { background-position: 0 0; } to { background-position: 0 -350px; } }
+
+
+        /* --- B. DARK MODE BACKGROUND (SPACE & METEORS) --- */
+        #bg-dark-mode {
+            background: radial-gradient(ellipse at bottom, #0B1026 0%, #000000 100%);
+            display: none; /* Default hidden until dark mode active */
+            perspective: 1000px;
+        }
+
+        /* Tampilkan Dark Mode BG saat class dark-mode ada di body */
+        body.dark-mode #bg-dark-mode { display: block; }
+
+        .star-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent; will-change: transform;
+        }
+        .star-field {
+            width: 2px; height: 2px; background: transparent; border-radius: 50%;
+        }
+        @keyframes moveStars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-2000px); }
+        }
+        .layer-1 { animation: moveStars 100s linear infinite; opacity: 0.6; }
+        .layer-2 { animation: moveStars 50s linear infinite; opacity: 0.8; }
+        .layer-3 { animation: moveStars 25s linear infinite; opacity: 1; }
+
+        .meteor {
+            position: absolute; opacity: 0; transform-origin: left center;
+            pointer-events: none; z-index: 10;
+            background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 500px; will-change: transform, opacity;
+        }
+        .meteor-head {
+            position: absolute; left: 0; top: 50%; transform: translate(-50%, -50%);
+            border-radius: 50%; background: #fff;
+            box-shadow: 0 0 10px 2px rgba(100, 200, 255, 0.8);
+        }
+        @keyframes shooting {
+            0% { transform: translate(0, 0) rotate(-45deg); opacity: 1; }
+            100% { transform: translate(-150vh, 150vh) rotate(-45deg); opacity: 0; }
+        }
+
+/* =========================================
+   END BACKGROUND SYSTEMS
+   ========================================= */
+
+        /* --- 2. LAYOUT UTAMA --- */
         
         /* Container Profil */
         #profile-view {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
             display: none; opacity: 0;
             transition: opacity 0.3s ease; overflow-y: auto; 
-            background: transparent !important; /* Transparan agar animasi di bawahnya terlihat */
+            background: transparent !important; 
             will-change: opacity;
-        }
-
-        /* Layer Khusus Animasi (Di belakang konten) */
-        .profile-bg-layer {
-            position: fixed; /* Mengunci background agar tidak ikut scroll */
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1; /* Pastikan di paling belakang */
-            overflow: hidden;
         }
 
         /* Konten Profil (Di depan animasi) */
         .profile-content { 
             position: relative; 
-            z-index: 5; /* Pastikan di atas background */
+            z-index: 5; 
             width: 100%; min-height: 100%; 
             display: flex; flex-direction: column; 
             align-items: center; justify-content: center; 
             padding: 40px 20px; 
         }
-
-        /* TEMA GELAP: Blue Space Dust */
-        .bg-dust {
-            display: none;
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-            width: 100%; height: 100%;
-            position: absolute; top: 0; left: 0;
-        }
-        body.dark-mode .bg-dust { display: block; } /* Muncul saat dark mode */
-
-        .dust-particles { position: absolute; width: 100%; height: 100%; background: transparent; }
-        .dust-particles::after {
-            content: " "; position: absolute; top: 2000px; width: 1px; height: 1px; background: transparent;
-            box-shadow: 10vw 10vh #fff, 20vw 80vh #fff, 30vw 30vh #fff, 40vw 50vh #fff, 50vw 90vh #fff, 60vw 20vh #fff, 70vw 60vh #fff, 80vw 40vh #fff, 90vw 10vh #fff, 55vw 55vh #fff, 15vw 85vh #fff, 25vw 15vh #fff, 85vw 75vh #fff, 35vw 95vh #fff, 45vw 25vh #fff, 75vw 35vh #fff;
-            animation: spaceDust 50s linear infinite;
-        }
-
-        /* TEMA TERANG: Blue Light Aurora */
-        .bg-aurora {
-            display: none;
-            width: 100%; height: 100%;
-            position: absolute; top: 0; left: 0;
-            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #bae6fd 100%);
-            background-size: 400% 400%;
-            animation: auroraFlow 15s ease infinite;
-        }
-        body:not(.dark-mode) .bg-aurora { display: block; } /* Muncul saat light mode */
-
-        .aurora-glow {
-            position: absolute; width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255,255,255,0) 70%);
-            top: -100px; left: -100px; border-radius: 50%; filter: blur(50px);
-            animation: auroraFloat 10s infinite alternate;
-        }
-        .aurora-glow:nth-child(2) {
-            top: auto; bottom: -100px; left: auto; right: -100px;
-            background: radial-gradient(circle, rgba(125, 211, 252, 0.4) 0%, rgba(255,255,255,0) 70%);
-            animation-delay: -5s;
-        }
-
-        @keyframes spaceDust { from { transform: translateY(0); } to { transform: translateY(-2000px); } }
-        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes auroraFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
-
-        /* Sembunyikan galaxy lama agar tidak bentrok */
-        .galaxy-bg { display: none !important; }
 
         /* --- FIXED ELEMENTS (DESKTOP) --- */
         .fixed-element {
@@ -401,23 +466,6 @@
         .nim-badge { background: var(--nim-bg); color: var(--nim-text); padding: 4px 12px; border-radius: 15px; font-size: 13px; font-weight: 500; position: relative; z-index: 5; }
 
 /* --- PROFIL VIEW (THEMED) --- */
-        #profile-view {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
-            display: none; opacity: 0;
-            transition: opacity 0.3s ease; overflow-y: auto; 
-            
-            /* Background mengikuti tema (bukan hitam pekat lagi) */
-            background: var(--bg-gradient); 
-            will-change: opacity;
-        }
-
-        /* Sembunyikan bintang galaxy jika di mode terang agar tidak aneh */
-        body:not(.dark-mode) .galaxy-bg {
-            display: none;
-        }
-
-        .profile-content { position: relative; width: 100%; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
-        
         .big-profile-card {
             /* Background box mengikuti tema card */
             background: var(--card-bg);
@@ -674,8 +722,8 @@
             .grid-container.mobile-grid-active .nim-badge { font-size: 10px; padding: 3px 8px; }
             .now-playing-box { bottom: 70px; max-width: 250px; }
         }
-		
-		/* --- SAFETY FIX: Mencegah Gambar Meledak di Modal --- */
+        
+        /* --- SAFETY FIX: Mencegah Gambar Meledak di Modal --- */
         .modal-box img {
             max-width: 100%; /* Gambar tidak boleh lebih lebar dari kotak */
             height: auto;
@@ -695,104 +743,23 @@
             width: 100%;
             box-sizing: border-box; /* Penting agar padding tidak melebarkan box */
         }
-		
-		/* --- BACKGROUND PROFILE VIEW ANIMATIONS --- */
-        
-        /* Container untuk background agar tidak menimpa konten */
-        .profile-bg-layer {
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1; /* Di belakang konten profil */
-            overflow: hidden;
-        }
-
-        /* 1. TEMA GELAP: BLUE SPACE DUST */
-        .bg-dust {
-            display: none; /* Sembunyi di light mode */
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-            width: 100%; height: 100%;
-            position: absolute;
-        }
-
-        /* Efek Debu Bintang */
-        .dust-particles {
-            position: absolute;
-            width: 100%; height: 100%;
-            background: transparent;
-        }
-        .dust-particles::after {
-            content: " ";
-            position: absolute;
-            top: 2000px;
-            width: 1px; height: 1px;
-            background: transparent;
-            box-shadow: 
-                10vw 10vh #fff, 20vw 80vh #fff, 30vw 30vh #fff, 40vw 50vh #fff, 
-                50vw 90vh #fff, 60vw 20vh #fff, 70vw 60vh #fff, 80vw 40vh #fff, 
-                90vw 10vh #fff, 55vw 55vh #fff, 15vw 85vh #fff, 25vw 15vh #fff,
-                85vw 75vh #fff, 35vw 95vh #fff, 45vw 25vh #fff, 75vw 35vh #fff;
-            animation: spaceDust 50s linear infinite;
-        }
-
-        /* Tampilkan Dust hanya saat Dark Mode */
-        body.dark-mode .bg-dust { display: block; }
-
-        /* 2. TEMA TERANG: BLUE LIGHT AURORA */
-        .bg-aurora {
-            display: none; /* Sembunyi di dark mode */
-            width: 100%; height: 100%;
-            position: absolute;
-            /* Gradasi Aurora Biru Muda */
-            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #bae6fd 100%);
-            background-size: 400% 400%;
-            animation: auroraFlow 15s ease infinite;
-        }
-        
-        /* Elemen bias cahaya aurora */
-        .aurora-glow {
-            position: absolute;
-            width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255,255,255,0) 70%);
-            top: -100px; left: -100px;
-            border-radius: 50%;
-            filter: blur(50px);
-            animation: auroraFloat 10s infinite alternate;
-        }
-        .aurora-glow:nth-child(2) {
-            top: auto; bottom: -100px; left: auto; right: -100px;
-            background: radial-gradient(circle, rgba(125, 211, 252, 0.4) 0%, rgba(255,255,255,0) 70%);
-            animation-delay: -5s;
-        }
-
-        /* Tampilkan Aurora hanya saat Light Mode (Body TIDAK dark-mode) */
-        body:not(.dark-mode) .bg-aurora { display: block; }
-
-        /* --- ANIMASI KEYFRAMES --- */
-        @keyframes spaceDust {
-            from { transform: translateY(0); }
-            to { transform: translateY(-2000px); }
-        }
-
-        @keyframes auroraFlow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        @keyframes auroraFloat {
-            0% { transform: translate(0, 0) scale(1); }
-            100% { transform: translate(50px, 50px) scale(1.1); }
-        }
-
-        /* PENTING: Hapus background gradient statis di #profile-view agar transparan */
-        #profile-view {
-            background: transparent !important; /* Timpa CSS sebelumnya */
-        }
     </style>
 </head>
 <body>
 
+<div class="global-bg" id="bg-light-mode">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    <div class="stars-bg"></div>
+    <div class="stars-sm-bg"></div>
+</div>
+
+<div class="global-bg" id="bg-dark-mode">
+    <div class="star-layer layer-1" id="stars1"></div>
+    <div class="star-layer layer-2" id="stars2"></div>
+    <div class="star-layer layer-3" id="stars3"></div>
+</div>
 <div id="fireflies-container"></div>
 <div id="copy-tooltip" class="copy-tooltip">NIM Disalin!</div>
 
@@ -866,21 +833,7 @@
 
 <div id="profile-view">
     
-    <div class="profile-bg-layer">
-        
-        <div class="bg-dust">
-            <div class="dust-particles"></div>
-            <div class="dust-particles" style="animation-delay: -25s; opacity: 0.5;"></div> 
-        </div>
-
-        <div class="bg-aurora">
-            <div class="aurora-glow"></div>
-            <div class="aurora-glow"></div>
-        </div>
-
-    </div>
-
-    <button class="back-btn-float" onclick="closeProfile()"><i class="fas fa-arrow-left"></i> Kembali</button>
+    <button class="back-btn-float" onclick="closeProfile()" style="position: absolute; top: 20px; left: 20px; padding: 10px 20px; background: var(--fixed-bg); border: none; border-radius: 20px; color: var(--fixed-text); font-weight: bold; cursor: pointer; z-index: 2005;"><i class="fas fa-arrow-left"></i> Kembali</button>
 
     <div class="profile-content">
         <div class="big-profile-card">
@@ -929,7 +882,7 @@
 
 <div class="event-challenge-modal" id="challengeModal">
     <div class="modal-box">
-        <h2 style="color: var(--text-color); margin-bottom: 5px;">Duel Dengan Owner. Minat?</h2>
+        <h2 style="color: var(--text-color); margin-bottom: 5px;">Duel Dengan Owner. GRATIS KOK</h2>
         <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 20px;">Chat Pembuat Event Untuk Diskusi / Terima Tantangan</p>
         <a href="https://wa.me/628311801213" target="_blank" class="wa-btn">
             <i class="fab fa-whatsapp"></i> Terima Tantangan
@@ -1024,11 +977,11 @@
     <div class="modal-box">
         <h2 style="color: var(--text-color); margin-bottom: 5px;">Yakin Kamu Bisa?</h2>
         <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 20px;">
-            Cari Jawaban Yang Benar Untuk Mengisi Kolom Dibawah Ini
+            Hanya Calon Hacker & Detekif Yang Bisa
         </p>
         
         <div class="stego-hint-wrapper">
-            <div class="stego-hint-text">CARI JAWABANNYA BERAWAL DARI GAMBAR INI</div>
+            <div class="stego-hint-text">CARI PETUNJUKNYA DI GAMBAR INI</div>
             <i class="fas fa-arrow-right arrow-anim"></i>
             
             <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" 
@@ -1062,7 +1015,7 @@
         </div>
         
         <p style="font-size: 14px; font-weight: bold; color: var(--text-color); margin-bottom: 20px;">
-            Screenshot & Kirim Ke Owner Web
+            Selamat, Kamu Dapat 200 Ribu !<br>Screenshot & Kirim Ke Owner Web<br><br>Jelaskan Step-Stepmu Saat Menyelesaikannya.
         </p>
         
         <a href="https://wa.me/628311801213?text=Halo%20Min,%20saya%20berhasil%20memecahkan%20tantangan%20Steganography!" target="_blank" class="wa-btn">
@@ -1080,8 +1033,8 @@
 
     // --- DATA EVENTS (UPDATED) ---
     const eventsData = [
-        { title: "Duel Game Naruto Storm 4", prize: "Rp 100.000", theme: "normal" },
-        { title: "Steganography", prize: "Rp 150.000", theme: "fire" } 
+        { title: "Duel Game Naruto Storm 4", prize: "Rp 60.000", theme: "normal" },
+        { title: "Steganography", prize: "Rp 200.000", theme: "fire" } 
     ];
 
     // --- DATABASE ---
@@ -1192,9 +1145,13 @@
         document.getElementById('selectionModal').classList.add('active');
         
         requestAnimationFrame(() => {
-            createStars(); 
-            createFireflies(); 
+            // createStars(); // --- DIGANTI OLEH LOGIKA BACKGROUND BARU
+            // createFireflies(); // Bisa diaktifkan jika ingin kunang-kunang di atas aurora
         });
+
+        // Initialize Background Systems
+        createBackgroundStars();
+        meteorLoop(); // Mulai loop meteor
 
         if(localStorage.getItem('theme')==='dark') { document.body.classList.add('dark-mode'); document.querySelector('#themeToggle i').classList.replace('fa-moon','fa-sun'); }
         if(localStorage.getItem('mobileLayout')==='grid') setMobileGrid();
@@ -1205,6 +1162,102 @@
             setTimeout(preloadAudio, 3000);
         }
     };
+
+    /* =========================================
+       NEW BACKGROUND LOGIC
+       ========================================= */
+       
+    // --- 1. STARS FOR DARK MODE ---
+    function createBackgroundStars() {
+        createStarLayer('stars1', 400, 1);
+        createStarLayer('stars2', 100, 2);
+        createStarLayer('stars3', 20, 3);
+    }
+
+    function createStarLayer(containerId, count, size) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        
+        const star = document.createElement('div');
+        star.classList.add('star-field');
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+
+        let boxShadows = [];
+        for (let i = 0; i < count; i++) {
+            const x = Math.floor(Math.random() * window.innerWidth);
+            const y = Math.floor(Math.random() * 2000); 
+            boxShadows.push(`${x}px ${y}px #FFF`);
+        }
+        star.style.boxShadow = boxShadows.join(', ');
+        
+        const clone = star.cloneNode(true);
+        clone.style.position = 'absolute';
+        clone.style.top = '2000px'; 
+        
+        container.appendChild(star);
+        container.appendChild(clone);
+    }
+
+    // --- 2. METEOR SYSTEM (SMART OPTIMIZATION) ---
+    let isTabActive = true;
+    let meteorTimeout;
+    const scene = document.getElementById('bg-dark-mode'); // Container Meteor
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            isTabActive = false;
+        } else {
+            isTabActive = true;
+            meteorLoop(); 
+        }
+    });
+
+    function spawnMeteor() {
+        // HANYA Spawn jika Tab Aktif DAN Mode Gelap Aktif
+        if (!isTabActive || !document.body.classList.contains('dark-mode')) return;
+
+        const meteor = document.createElement('div');
+        meteor.classList.add('meteor');
+
+        const headSize = Math.random() * 3 + 2; 
+        const tailLength = headSize * (Math.random() * 50 + 50);
+        const startX = Math.random() * 120 + 20; 
+        const duration = Math.random() * 1.5 + 0.8;
+
+        meteor.style.width = tailLength + 'px';
+        meteor.style.height = (headSize * 0.7) + 'px';
+        meteor.style.left = startX + 'vw';
+        meteor.style.top = '-100px';
+        meteor.style.animation = `shooting ${duration}s linear forwards`;
+
+        const head = document.createElement('div');
+        head.classList.add('meteor-head');
+        head.style.width = headSize + 'px';
+        head.style.height = headSize + 'px';
+        head.style.boxShadow = `0 0 ${headSize * 4}px ${headSize}px rgba(100, 200, 255, 0.9)`;
+        
+        meteor.appendChild(head);
+
+        meteor.addEventListener('animationend', () => {
+            meteor.remove();
+        });
+
+        if(scene) scene.appendChild(meteor);
+    }
+
+    function meteorLoop() {
+        clearTimeout(meteorTimeout);
+        if (isTabActive && document.body.classList.contains('dark-mode')) {
+            spawnMeteor();
+        }
+        const randomDelay = Math.random() * 2000 + 500;
+        meteorTimeout = setTimeout(meteorLoop, randomDelay);
+    }
+
+    /* =========================================
+       END NEW BACKGROUND LOGIC
+       ========================================= */
 
     function preloadAudio() {
         jodohSongs.forEach(url => { const t = new Audio(); t.src = url; t.preload = 'none'; });
@@ -2014,39 +2067,19 @@
     function copyNIM() { navigator.clipboard.writeText(document.getElementById('p-nim').innerText).then(() => { document.getElementById('copy-tooltip').classList.add('show'); setTimeout(() => document.getElementById('copy-tooltip').classList.remove('show'), 1500); }); }
     function setMobileList() { document.getElementById('cardGrid').classList.remove('mobile-grid-active'); document.getElementById('btnList').classList.add('active'); document.getElementById('btnGrid').classList.remove('active'); localStorage.setItem('mobileLayout', 'list'); }
     function setMobileGrid() { document.getElementById('cardGrid').classList.add('mobile-grid-active'); document.getElementById('btnGrid').classList.add('active'); document.getElementById('btnList').classList.remove('active'); localStorage.setItem('mobileLayout', 'grid'); }
-    function toggleTheme() { document.body.classList.toggle('dark-mode'); localStorage.setItem('theme', document.body.classList.contains('dark-mode')?'dark':'light'); document.querySelector('#themeToggle i').className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon'; }
+    function toggleTheme() { 
+        document.body.classList.toggle('dark-mode'); 
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode')?'dark':'light'); 
+        document.querySelector('#themeToggle i').className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon'; 
+        
+        // Trigger meteor check
+        if(document.body.classList.contains('dark-mode')) {
+            meteorLoop();
+        }
+    }
     function getInitials(n) { let p=n.split(" "); return p.length>1?(p[0][0]+p[1][0]).toUpperCase():p[0].substring(0,2).toUpperCase(); }
     
-    function createFireflies() { 
-        const c=document.getElementById('fireflies-container'); 
-        const fragment = document.createDocumentFragment();
-        for(let i=0;i<25;i++){ 
-            const d=document.createElement('div'); 
-            d.className='firefly'; 
-            const startX = Math.random() * 100;
-            const startY = Math.random() * 100;
-            d.style.left = startX + 'vw';
-            d.style.top = startY + 'vh';
-            const s=Math.random()*4+4; 
-            d.style.width=s+'px'; 
-            d.style.height=s+'px'; 
-            d.style.animationName = 'drift';
-            d.style.animationDuration=`${Math.random()*15+15}s`; 
-            d.style.animationDelay=`-${Math.random()*20}s`; 
-            d.style.animationIterationCount = 'infinite';
-            d.style.animationTimingFunction = 'ease-in-out';
-            fragment.appendChild(d); 
-        } 
-        c.appendChild(fragment);
-    }
-    
-    function createStars() { 
-        const s=document.getElementById('stars'); 
-        let b=""; 
-        for(let i=0;i<150;i++) b+=`${Math.floor(Math.random()*2000)}px ${Math.floor(Math.random()*2000)}px #FFF, `; 
-        s.style.boxShadow=b.slice(0,-2); 
-    }
-    
+    // --- FUNGSI SEARCH ---
     let searchTimeout;
     function filterNames() { 
         clearTimeout(searchTimeout);
@@ -2064,27 +2097,31 @@
         }, 150); 
     }
 
-    // --- STEGANOGRAPHY LOGIC ---
+// --- STEGANOGRAPHY LOGIC (SECURE HASHING) ---
     
-    // GANTI JAWABAN DISINI (Huruf Besar Semua)
-    const SECRET_ANSWER = "AKU SUKA KODING"; 
+    // Hash SHA-256 dari "GIBRAN WAPRES SAMPAH" (Huruf Besar Semua)
+    // Jawaban asli tidak lagi ada di sini, hanya jejak digitalnya.
+    const SECRET_HASH = "b682664fd71295964de0685501d516744838634567c295796a5f98642a849f57"; 
+
+    // Fungsi Pembantu untuk mengubah Teks menjadi Hash
+    async function sha256(message) {
+        const msgBuffer = new TextEncoder().encode(message);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
 
     function openStegoModal() {
-        // Tutup menu event utama dulu
         document.getElementById('eventModal').classList.remove('active');
-        // Buka modal input stego
         document.getElementById('stegoModal').classList.add('active');
-        // Reset input
         document.getElementById('stegoAnswerInput').value = "";
     }
 
     function closeStegoModal() {
         document.getElementById('stegoModal').classList.remove('active');
-        // Buka kembali menu event utama (opsional)
         document.getElementById('eventModal').classList.add('active');
     }
 
-    // --- FUNGSI POPUP GAMBAR STEGO ---
     function openStegoImage() {
         document.getElementById('stegoImageModal').classList.add('active');
     }
@@ -2093,18 +2130,22 @@
         document.getElementById('stegoImageModal').classList.remove('active');
     }
 
-    function checkStegoAnswer() {
+    // Fungsi cek jawaban diubah menjadi ASYNC karena hashing butuh waktu proses (milidetik)
+    async function checkStegoAnswer() {
         const input = document.getElementById('stegoAnswerInput').value;
         
-        // Ubah input user jadi huruf besar semua & hilangkan spasi berlebih
+        // 1. Bersihkan input dan jadikan huruf besar (agar tidak case sensitive)
         const cleanInput = input.trim().toUpperCase(); 
 
-        if (cleanInput === SECRET_ANSWER) {
+        // 2. Ubah input user menjadi Hash
+        const userHash = await sha256(cleanInput);
+
+        // 3. Bandingkan Hash user dengan Hash Rahasia
+        if (userHash === SECRET_HASH) {
             // JIKA BENAR
             document.getElementById('stegoModal').classList.remove('active');
             document.getElementById('stegoSuccessModal').classList.add('active');
             
-            // Efek suara menang (pakai lagu jodoh yang happy sebagai sfx sementara)
             if(!isMuted) {
                 // Play sound logic here if needed
             }
@@ -2120,6 +2161,15 @@
 
     function closeStegoSuccess() {
         document.getElementById('stegoSuccessModal').classList.remove('active');
+    }
+    
+    // --- GENERATOR HASH (Hapus bagian ini nanti jika sudah live) ---
+    // Cara pakai: Buka Console browser (F12), ketik: generateHash("JAWABAN BARU")
+    window.generateHash = async function(text) {
+        const hash = await sha256(text.toUpperCase());
+        console.log(`Hash untuk "${text.toUpperCase()}":`);
+        console.log(hash);
+        alert("Cek Console (F12) untuk melihat kode Hash barumu");
     }
 </script>
 </body>
