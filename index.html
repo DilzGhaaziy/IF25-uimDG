@@ -105,133 +105,135 @@
         }
         @keyframes shine { 100% { left: 200%; } }
 
-/* --- NOW PLAYING BOX (REVAMPED) --- */
-    .now-playing-box {
-        position: fixed; 
-        bottom: 20px; 
-        right: 0; /* Selalu menempel di kanan */
-        z-index: 9999;
-        background: var(--fixed-bg);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
-        padding: 8px; /* Padding lebih kecil agar icon pas */
-        padding-right: 20px;
-        border-top-left-radius: 50px;
-        border-bottom-left-radius: 50px;
-        box-shadow: -5px 5px 20px rgba(0,0,0,0.2);
-        display: flex; 
-        align-items: center; 
-        gap: 15px;
-        /* LOGIKA PEEK (MENGINTIP) */
-        width: 300px; /* Lebar penuh */
-        transform: translateX(calc(100% - 50px)); /* Geser ke kanan, sisakan 50px (icon) */
-        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efek membal */
-    }
+        /* --- NOW PLAYING BOX (REVAMPED - PEEK MODE) --- */
+        .now-playing-box {
+            position: fixed; 
+            bottom: 20px; 
+            right: 0; /* Selalu menempel di kanan */
+            z-index: 9999;
+            background: var(--fixed-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px; /* Padding lebih kecil agar icon pas */
+            padding-right: 20px;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.2);
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            /* LOGIKA PEEK (MENGINTIP) */
+            width: 300px; /* Lebar penuh */
+            transform: translateX(calc(100% - 50px)); /* Geser ke kanan, sisakan 50px (icon) */
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efek membal */
+        }
 
-    /* Kelas untuk membuka box sepenuhnya */
-    .now-playing-box.expanded {
-        transform: translateX(0);
-    }
+        /* Kelas untuk membuka box sepenuhnya */
+        .now-playing-box.expanded {
+            transform: translateX(0);
+        }
 
-    .np-icon {
-        width: 35px; height: 35px; flex-shrink: 0; /* Agar tidak gepeng */
-        background: #e91e63; color: white;
-        border-radius: 50%; 
-        display: flex; align-items: center; justify-content: center;
-        font-size: 14px; 
-        animation: spin 3s linear infinite;
-        cursor: pointer; /* Indikator bisa diklik */
-        box-shadow: 0 0 10px rgba(233, 30, 99, 0.6);
-        position: relative;
-        z-index: 2;
-    }
-    
-    /* Efek pulse saat mode "mengintip" agar user sadar */
-    .now-playing-box:not(.expanded) .np-icon {
-        animation: spin 3s linear infinite, pulseIcon 2s infinite;
-    }
-    
-    @keyframes pulseIcon { 0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(233, 30, 99, 0); } 100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); } }
+        .np-icon {
+            width: 35px; height: 35px; flex-shrink: 0; /* Agar tidak gepeng */
+            background: #e91e63; color: white;
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; 
+            animation: spin 3s linear infinite;
+            cursor: pointer; /* Indikator bisa diklik */
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Efek pulse saat mode "mengintip" agar user sadar */
+        .now-playing-box:not(.expanded) .np-icon {
+            animation: spin 3s linear infinite, pulseIcon 2s infinite;
+        }
+        
+        @keyframes pulseIcon { 0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(233, 30, 99, 0); } 100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); } }
 
-    .np-content {
-        display: flex; align-items: center; justify-content: space-between;
-        width: 100%; overflow: hidden; opacity: 0; transition: opacity 0.2s;
-    }
-    
-    /* Konten hanya muncul saat expanded agar rapi */
-    .now-playing-box.expanded .np-content { opacity: 1; transition-delay: 0.2s; }
+        .np-content {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; overflow: hidden; opacity: 0; transition: opacity 0.2s;
+        }
+        
+        /* Konten hanya muncul saat expanded agar rapi */
+        .now-playing-box.expanded .np-content { opacity: 1; transition-delay: 0.2s; }
 
-    .np-info { display: flex; flex-direction: column; overflow: hidden; max-width: 140px; }
-    .np-label { font-size: 9px; color: var(--text-color); opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
-    .np-title { font-size: 12px; font-weight: 700; color: var(--fixed-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .np-info { display: flex; flex-direction: column; overflow: hidden; max-width: 140px; }
+        .np-label { font-size: 9px; color: var(--text-color); opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .np-title { font-size: 12px; font-weight: 700; color: var(--fixed-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .np-controls { display: flex; gap: 8px; }
-    .np-btn {
-        background: rgba(0,0,0,0.05); border: none; color: var(--fixed-text);
-        width: 28px; height: 28px; border-radius: 50%;
-        cursor: pointer; font-size: 12px; transition: 0.3s;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .np-btn:hover { background: #e91e63; color: white; }
-    .np-btn.active-list { background: #3498db; color: white; }
+        .np-controls { display: flex; gap: 8px; }
+        .np-btn {
+            background: rgba(0,0,0,0.05); border: none; color: var(--fixed-text);
+            width: 28px; height: 28px; border-radius: 50%;
+            cursor: pointer; font-size: 12px; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .np-btn:hover { background: #e91e63; color: white; }
+        .np-btn.active-list { background: #3498db; color: white; }
 
-    /* --- PLAYLIST BOX (NEON RGB) --- */
-    .playlist-box {
-        position: fixed;
-        bottom: 80px; right: 20px;
-        width: 280px; max-height: 400px;
-        background: var(--card-bg); /* Sesuai Tema */
-        border-radius: 15px;
-        z-index: 9998;
-        padding: 3px; /* Space untuk border RGB */
-        opacity: 0; visibility: hidden; transform: translateY(20px);
-        transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        overflow: hidden; /* Penting untuk masking border */
-    }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
 
-    .playlist-box.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        /* --- PLAYLIST BOX (NEON RGB) --- */
+        .playlist-box {
+            position: fixed;
+            bottom: 80px; right: 20px;
+            width: 280px; max-height: 400px;
+            background: var(--card-bg); /* Sesuai Tema */
+            border-radius: 15px;
+            z-index: 9998;
+            padding: 3px; /* Space untuk border RGB */
+            opacity: 0; visibility: hidden; transform: translateY(20px);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden; /* Penting untuk masking border */
+        }
 
-    /* RGB BORDER ANIMATION */
-    .playlist-box::before {
-        content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-        background: conic-gradient(transparent, transparent, transparent, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
-        animation: rotateRGB 4s linear infinite;
-        z-index: 0;
-    }
-    
-    @keyframes rotateRGB { 100% { transform: rotate(360deg); } }
+        .playlist-box.show { opacity: 1; visibility: visible; transform: translateY(0); }
 
-    .playlist-inner {
-        position: relative; z-index: 1;
-        background: var(--card-bg); /* Timpa background RGB di tengah */
-        width: 100%; height: 100%;
-        border-radius: 12px;
-        display: flex; flex-direction: column;
-    }
+        /* RGB BORDER ANIMATION */
+        .playlist-box::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            animation: rotateRGB 4s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes rotateRGB { 100% { transform: rotate(360deg); } }
 
-    .playlist-header { padding: 12px 15px; font-weight: bold; border-bottom: 1px solid rgba(128,128,128,0.2); color: var(--text-color); display: flex; justify-content: space-between; align-items: center; }
-    .playlist-scroll { padding: 10px; overflow-y: auto; max-height: 300px; }
-    
-    .track-item {
-        display: flex; align-items: center; gap: 10px;
-        padding: 8px 10px; border-radius: 8px;
-        cursor: pointer; transition: 0.2s;
-        margin-bottom: 5px;
-    }
-    .track-item:hover { background: rgba(0,0,0,0.05); }
-    .track-item.playing { background: rgba(52, 152, 219, 0.15); border-left: 3px solid #3498db; }
-    
-    .track-icon { font-size: 12px; color: #7f8c8d; width: 20px; text-align: center; }
-    .track-item.playing .track-icon { color: #3498db; animation: pulse 1s infinite; }
-    
-    .track-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
-    .track-name { font-size: 12px; font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .track-status { font-size: 10px; color: #aaa; }
-    
-    /* Scrollbar Tipis */
-    .playlist-scroll::-webkit-scrollbar { width: 4px; }
-    .playlist-scroll::-webkit-scrollbar-track { background: transparent; }
-    .playlist-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        .playlist-inner {
+            position: relative; z-index: 1;
+            background: var(--card-bg); /* Timpa background RGB di tengah */
+            width: 100%; height: 100%;
+            border-radius: 12px;
+            display: flex; flex-direction: column;
+        }
+
+        .playlist-header { padding: 12px 15px; font-weight: bold; border-bottom: 1px solid rgba(128,128,128,0.2); color: var(--text-color); display: flex; justify-content: space-between; align-items: center; }
+        .playlist-scroll { padding: 10px; overflow-y: auto; max-height: 300px; }
+        
+        .track-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
+            margin-bottom: 5px;
+        }
+        .track-item:hover { background: rgba(0,0,0,0.05); }
+        .track-item.playing { background: rgba(52, 152, 219, 0.15); border-left: 3px solid #3498db; }
+        
+        .track-icon { font-size: 12px; color: #7f8c8d; width: 20px; text-align: center; }
+        .track-item.playing .track-icon { color: #3498db; animation: pulse 1s infinite; }
+        
+        .track-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .track-name { font-size: 12px; font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-status { font-size: 10px; color: #aaa; }
+        
+        /* Scrollbar Tipis */
+        .playlist-scroll::-webkit-scrollbar { width: 4px; }
+        .playlist-scroll::-webkit-scrollbar-track { background: transparent; }
+        .playlist-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
 
         /* --- MOBILE LAYOUT --- */
         .mobile-layout-controls {
@@ -543,6 +545,16 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="selectionModal">
+    <div class="modal-box">
+        <h2 style="margin-bottom:20px; color:var(--text-color);">Mau Liat Kelas IF Berapa?</h2>
+        <div style="display:flex; justify-content:center;">
+            <button class="choice-btn btn-if1" onclick="loadClassData('IF1')">IF 1</button>
+            <button class="choice-btn btn-if2" onclick="loadClassData('IF2')">IF 2</button>
+        </div>
+    </div>
+</div>
+
 <div class="mobile-layout-controls">
     <button class="mobile-btn active" onclick="setMobileList()" id="btnList"><i class="fas fa-list"></i> List</button>
     <button class="mobile-btn" onclick="setMobileGrid()" id="btnGrid"><i class="fas fa-th-large"></i> Petak</button>
@@ -845,8 +857,8 @@
         bgmPlaylist.forEach(t => { const a = new Audio(); a.src = t.url; a.preload = 'none'; });
     }
 
-// --- FITUR NOW PLAYING BARU ---
-
+    // --- BGM PLAYER LOGIC (NEW REVISED) ---
+    
     // 1. Toggle Box (Expand/Collapse)
     function toggleNPBox() {
         const box = document.getElementById('now-playing-box');
@@ -900,12 +912,12 @@
         });
     }
 
-    // 4. Play Specific Song (Dari List) - OPTIMISASI AUDIO
+    // 4. Play Specific Song (Dari List)
     function playSpecificBGM(index) {
         if (currentBgmIndex === index && !bgmAudio.paused) {
              // Jika klik lagu yg sama, pause saja
              bgmAudio.pause();
-             renderPlaylist(); // Update icon jadi pause
+             renderPlaylist(); 
              return;
         }
 
@@ -921,23 +933,19 @@
         if (playPromise !== undefined) {
             playPromise.then(() => {
                 updateNPUI(bgmPlaylist[currentBgmIndex].title);
-                renderPlaylist(); // Update highlight di list
+                renderPlaylist(); 
             }).catch(e => console.log("Error play:", e));
         }
 
-        bgmAudio.onended = playRandomBGM; // Lanjut random setelah ini
+        bgmAudio.onended = playRandomBGM; 
     }
 
-    // 5. Update UI Now Playing (Pengganti showNowPlaying lama)
+    // 5. Update UI Now Playing
     function updateNPUI(title) {
         document.getElementById('np-title').innerText = title;
-        // Otomatis expand box saat lagu baru mulai (opsional, bisa dihapus jika ingin tetap hidden)
-        // document.getElementById('now-playing-box').classList.add('expanded'); 
+        // Opsional: document.getElementById('now-playing-box').classList.add('expanded'); 
     }
 
-    // --- MODIFIKASI FUNGSI LAMA ---
-
-    // Ganti fungsi playRandomBGM yang lama dengan ini:
     function playRandomBGM() {
         if (!userInteracted) return;
 
@@ -947,7 +955,7 @@
         
         currentBgmIndex = newIdx;
         bgmAudio.src = bgmPlaylist[currentBgmIndex].url;
-        bgmAudio.volume = 0; // Mulai dari 0 untuk fade in
+        bgmAudio.volume = 0; 
         
         const playPromise = bgmAudio.play();
         
@@ -955,20 +963,38 @@
             playPromise.then(() => {
                 fadeInBGM();
                 updateNPUI(bgmPlaylist[currentBgmIndex].title);
-                renderPlaylist(); // Sync playlist UI
+                renderPlaylist(); 
                 
-                // Animasi expand sebentar lalu tutup lagi (memberi tahu user lagu ganti)
+                // Animasi expand sebentar
                 const box = document.getElementById('now-playing-box');
                 box.classList.add('expanded');
-                // Uncomment baris bawah jika ingin otomatis nutup lagi setelah 5 detik
-                // setTimeout(() => box.classList.remove('expanded'), 5000); 
-
+                
             }).catch(error => {
                 console.log("Autoplay blocked. Waiting for interaction.");
             });
         }
         
         bgmAudio.onended = playRandomBGM;
+    }
+
+    function fadeInBGM() {
+        let vol = 0;
+        const fade = setInterval(() => { 
+            if(vol < 1.0) { 
+                vol += 0.1; 
+                if(!isMuted) bgmAudio.volume = Math.min(vol, 1.0); 
+            } else { 
+                clearInterval(fade); 
+            }
+        }, 100);
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        bgmAudio.muted = isMuted;
+        jodohAudio.muted = isMuted;
+        const icon = document.getElementById('mute-icon');
+        icon.className = isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
     }
 
     // --- JODOH PLAYER LOGIC ---
@@ -1413,7 +1439,7 @@
 
     let matchInterval;
     
-function cekJodoh() {
+    function cekJodoh() {
         if (!currentProfile) return;
 
         // --- 0. SIAPKAN TOMBOL TUTUP (LOGIKA BARU) ---
@@ -1672,5 +1698,3 @@ function cekJodoh() {
 </script>
 </body>
 </html>
-
-
