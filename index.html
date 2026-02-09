@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* --- 1. SETTING DASAR & WARNA --- */
+/* --- 1. SETTING DASAR & WARNA (Halaman Utama Kembali Normal) --- */
         :root {
             --bg-gradient: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             --text-color: #333;
@@ -38,36 +38,90 @@
         
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: var(--bg-gradient); 
+            background: var(--bg-gradient); /* Ini yang bikin halaman utama berwarna */
             min-height: 100vh; 
             overflow-x: hidden; 
             position: relative;
             -webkit-overflow-scrolling: touch; 
         }
 
-        /* --- BACKGROUND LAYERS --- */
-        #fireflies-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 0; overflow: hidden;
-            transform: translateZ(0); 
-        }
+        /* --- 2. PERBAIKAN ANIMASI PROFIL --- */
         
-        .firefly {
-            position: absolute; border-radius: 50%;
-            background-color: var(--firefly-color);
-            box-shadow: 0 0 6px var(--firefly-color);
-            opacity: 0;
-            will-change: transform, opacity; 
+        /* Container Profil */
+        #profile-view {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
+            display: none; opacity: 0;
+            transition: opacity 0.3s ease; overflow-y: auto; 
+            background: transparent !important; /* Transparan agar animasi di bawahnya terlihat */
+            will-change: opacity;
         }
 
-        @keyframes drift {
-            0% { transform: translate(0, 0) scale(0.8); opacity: 0; }
-            20% { opacity: 0.8; transform: translate(20px, -20px) scale(1.1); }
-            80% { opacity: 0.2; transform: translate(80px, -80px) scale(0.8); }
-            100% { opacity: 0; transform: translate(100px, -100px) scale(0.5); }
+        /* Layer Khusus Animasi (Di belakang konten) */
+        .profile-bg-layer {
+            position: fixed; /* Mengunci background agar tidak ikut scroll */
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; /* Pastikan di paling belakang */
+            overflow: hidden;
         }
 
-        /* --- FIXED ELEMENTS --- */
+        /* Konten Profil (Di depan animasi) */
+        .profile-content { 
+            position: relative; 
+            z-index: 5; /* Pastikan di atas background */
+            width: 100%; min-height: 100%; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding: 40px 20px; 
+        }
+
+        /* TEMA GELAP: Blue Space Dust */
+        .bg-dust {
+            display: none;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
+        }
+        body.dark-mode .bg-dust { display: block; } /* Muncul saat dark mode */
+
+        .dust-particles { position: absolute; width: 100%; height: 100%; background: transparent; }
+        .dust-particles::after {
+            content: " "; position: absolute; top: 2000px; width: 1px; height: 1px; background: transparent;
+            box-shadow: 10vw 10vh #fff, 20vw 80vh #fff, 30vw 30vh #fff, 40vw 50vh #fff, 50vw 90vh #fff, 60vw 20vh #fff, 70vw 60vh #fff, 80vw 40vh #fff, 90vw 10vh #fff, 55vw 55vh #fff, 15vw 85vh #fff, 25vw 15vh #fff, 85vw 75vh #fff, 35vw 95vh #fff, 45vw 25vh #fff, 75vw 35vh #fff;
+            animation: spaceDust 50s linear infinite;
+        }
+
+        /* TEMA TERANG: Blue Light Aurora */
+        .bg-aurora {
+            display: none;
+            width: 100%; height: 100%;
+            position: absolute; top: 0; left: 0;
+            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #bae6fd 100%);
+            background-size: 400% 400%;
+            animation: auroraFlow 15s ease infinite;
+        }
+        body:not(.dark-mode) .bg-aurora { display: block; } /* Muncul saat light mode */
+
+        .aurora-glow {
+            position: absolute; width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255,255,255,0) 70%);
+            top: -100px; left: -100px; border-radius: 50%; filter: blur(50px);
+            animation: auroraFloat 10s infinite alternate;
+        }
+        .aurora-glow:nth-child(2) {
+            top: auto; bottom: -100px; left: auto; right: -100px;
+            background: radial-gradient(circle, rgba(125, 211, 252, 0.4) 0%, rgba(255,255,255,0) 70%);
+            animation-delay: -5s;
+        }
+
+        @keyframes spaceDust { from { transform: translateY(0); } to { transform: translateY(-2000px); } }
+        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        @keyframes auroraFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
+
+        /* Sembunyikan galaxy lama agar tidak bentrok */
+        .galaxy-bg { display: none !important; }
+
+        /* --- FIXED ELEMENTS (DESKTOP) --- */
         .fixed-element {
             position: fixed; top: 20px; z-index: 1000;
             background: var(--fixed-bg); padding: 10px 20px;
@@ -80,7 +134,7 @@
             transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.1);
         }
         .pos-left { left: 20px; }
-        .pos-right { right: 20px; } 
+        .pos-right { right: 20px; } /* Youtube Desktop */
         .pos-theme { right: 180px; width: 45px; height: 45px; padding: 0; cursor: pointer; border: none; font-size: 18px; }
         .pos-right i { color: #ff0000; font-size: 18px; margin-right: 8px; }
         .pos-theme i { color: #f1c40f; }
@@ -104,6 +158,150 @@
             transform: skewX(-25deg); animation: shine 3s infinite;
         }
         @keyframes shine { 100% { left: 200%; } }
+
+        /* --- NOW PLAYING BOX (REVAMPED - PEEK MODE) --- */
+        .now-playing-box {
+            position: fixed; 
+            bottom: 20px; 
+            right: 0; /* Selalu menempel di kanan */
+            z-index: 9999;
+            background: var(--fixed-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px; /* Padding lebih kecil agar icon pas */
+            padding-right: 20px;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.2);
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            /* LOGIKA PEEK (MENGINTIP) */
+            width: 300px; /* Lebar penuh */
+            transform: translateX(calc(100% - 50px)); /* Geser ke kanan, sisakan 50px (icon) */
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efek membal */
+        }
+
+        /* Kelas untuk membuka box sepenuhnya */
+        .now-playing-box.expanded {
+            transform: translateX(0);
+        }
+
+        .np-icon {
+            width: 35px; height: 35px; flex-shrink: 0; /* Agar tidak gepeng */
+            background: #e91e63; color: white;
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; 
+            animation: spin 3s linear infinite;
+            cursor: pointer; /* Indikator bisa diklik */
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Efek pulse saat mode "mengintip" agar user sadar */
+        .now-playing-box:not(.expanded) .np-icon {
+            animation: spin 3s linear infinite, pulseIcon 2s infinite;
+        }
+        
+        @keyframes pulseIcon { 0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(233, 30, 99, 0); } 100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); } }
+
+        .np-content {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; overflow: hidden; opacity: 0; transition: opacity 0.2s;
+        }
+        
+        /* Konten hanya muncul saat expanded agar rapi */
+        .now-playing-box.expanded .np-content { opacity: 1; transition-delay: 0.2s; }
+
+        .np-info { display: flex; flex-direction: column; overflow: hidden; max-width: 140px; }
+        .np-label { font-size: 9px; color: var(--text-color); opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .np-title { font-size: 12px; font-weight: 700; color: var(--fixed-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .np-controls { display: flex; gap: 8px; }
+        .np-btn {
+            background: rgba(0,0,0,0.05); border: none; color: var(--fixed-text);
+            width: 28px; height: 28px; border-radius: 50%;
+            cursor: pointer; font-size: 12px; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .np-btn:hover { background: #e91e63; color: white; }
+        .np-btn.active-list { background: #3498db; color: white; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- PLAYLIST BOX (NEON RGB) --- */
+        .playlist-box {
+            position: fixed;
+            bottom: 80px; right: 20px;
+            width: 280px; max-height: 400px;
+            background: var(--card-bg); /* Sesuai Tema */
+            border-radius: 15px;
+            z-index: 9998;
+            padding: 3px; /* Space untuk border RGB */
+            opacity: 0; visibility: hidden; transform: translateY(20px);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden; /* Penting untuk masking border */
+        }
+
+        .playlist-box.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        /* RGB BORDER ANIMATION */
+        .playlist-box::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            animation: rotateRGB 4s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes rotateRGB { 100% { transform: rotate(360deg); } }
+
+        .playlist-inner {
+            position: relative; z-index: 1;
+            background: var(--card-bg); /* Timpa background RGB di tengah */
+            width: 100%; height: 100%;
+            border-radius: 12px;
+            display: flex; flex-direction: column;
+        }
+
+        .playlist-header { padding: 12px 15px; font-weight: bold; border-bottom: 1px solid rgba(128,128,128,0.2); color: var(--text-color); display: flex; justify-content: space-between; align-items: center; }
+        .playlist-scroll { padding: 10px; overflow-y: auto; max-height: 300px; }
+        
+        .track-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
+            margin-bottom: 5px;
+        }
+        .track-item:hover { background: rgba(0,0,0,0.05); }
+        .track-item.playing { background: rgba(52, 152, 219, 0.15); border-left: 3px solid #3498db; }
+        
+        .track-icon { font-size: 12px; color: #7f8c8d; width: 20px; text-align: center; }
+        .track-item.playing .track-icon { color: #3498db; animation: pulse 1s infinite; }
+        
+        .track-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .track-name { font-size: 12px; font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-status { font-size: 10px; color: #aaa; }
+        
+        /* Scrollbar Tipis */
+        .playlist-scroll::-webkit-scrollbar { width: 4px; }
+        .playlist-scroll::-webkit-scrollbar-track { background: transparent; }
+        .playlist-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+        /* --- MOBILE LAYOUT --- */
+        .mobile-layout-controls {
+            display: none; position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
+            z-index: 990; background: var(--fixed-bg); padding: 4px; border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .mobile-btn {
+            background: transparent; border: none; color: var(--fixed-text);
+            padding: 6px 15px; border-radius: 20px; cursor: pointer;
+            font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: 0.3s;
+        }
+        .mobile-btn.active { background: #3498db; color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
 
         /* --- UTAMA --- */
         #main-view { position: relative; z-index: 10; transition: opacity 0.5s; min-height: 100vh; }
@@ -202,86 +400,48 @@
         .card h3 { font-size: 17px; font-weight: 600; color: var(--text-color); min-height: 50px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; }
         .nim-badge { background: var(--nim-bg); color: var(--nim-text); padding: 4px 12px; border-radius: 15px; font-size: 13px; font-weight: 500; position: relative; z-index: 5; }
 
-        /* --- PROFIL VIEW (FIXED) --- */
+/* --- PROFIL VIEW (THEMED) --- */
         #profile-view {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
             display: none; opacity: 0;
             transition: opacity 0.3s ease; overflow-y: auto; 
-            background: transparent !important; /* PENTING: Transparan agar animasi di belakang terlihat */
+            
+            /* Background mengikuti tema (bukan hitam pekat lagi) */
+            background: var(--bg-gradient); 
             will-change: opacity;
         }
 
-        /* Layer Khusus Animasi Background */
-        .profile-bg-layer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1; /* Di belakang konten */
-            overflow: hidden;
-            pointer-events: none;
+        /* Sembunyikan bintang galaxy jika di mode terang agar tidak aneh */
+        body:not(.dark-mode) .galaxy-bg {
+            display: none;
         }
 
-        /* 1. TEMA GELAP: BLUE SPACE DUST */
-        .bg-dust {
-            display: none; /* Sembunyi di light mode */
-            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
-            width: 100%; height: 100%;
-            position: absolute; top: 0; left: 0;
-        }
-        body.dark-mode .bg-dust { display: block; } 
-
-        .dust-particles { position: absolute; width: 100%; height: 100%; background: transparent; }
-        .dust-particles::after {
-            content: " "; position: absolute; top: 2000px; width: 1px; height: 1px; background: transparent;
-            box-shadow: 10vw 10vh #fff, 20vw 80vh #fff, 30vw 30vh #fff, 40vw 50vh #fff, 50vw 90vh #fff, 60vw 20vh #fff, 70vw 60vh #fff, 80vw 40vh #fff, 90vw 10vh #fff, 55vw 55vh #fff, 15vw 85vh #fff, 25vw 15vh #fff, 85vw 75vh #fff, 35vw 95vh #fff, 45vw 25vh #fff, 75vw 35vh #fff;
-            animation: spaceDust 50s linear infinite;
-        }
-
-        /* 2. TEMA TERANG: BLUE LIGHT AURORA */
-        .bg-aurora {
-            display: none; /* Sembunyi di dark mode */
-            width: 100%; height: 100%;
-            position: absolute; top: 0; left: 0;
-            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #bae6fd 100%);
-            background-size: 400% 400%;
-            animation: auroraFlow 15s ease infinite;
-        }
-        body:not(.dark-mode) .bg-aurora { display: block; } 
-
-        .aurora-glow {
-            position: absolute; width: 500px; height: 500px;
-            background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255,255,255,0) 70%);
-            top: -100px; left: -100px; border-radius: 50%; filter: blur(50px);
-            animation: auroraFloat 10s infinite alternate;
-        }
-        .aurora-glow:nth-child(2) {
-            top: auto; bottom: -100px; left: auto; right: -100px;
-            background: radial-gradient(circle, rgba(125, 211, 252, 0.4) 0%, rgba(255,255,255,0) 70%);
-            animation-delay: -5s;
-        }
-
-        @keyframes spaceDust { from { transform: translateY(0); } to { transform: translateY(-2000px); } }
-        @keyframes auroraFlow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-        @keyframes auroraFloat { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(50px, 50px) scale(1.1); } }
-
-        .profile-content { position: relative; width: 100%; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; z-index: 5; }
-        .back-btn-float {
-            position: fixed; top: 20px; left: 20px; z-index: 2001; background: rgba(255,255,255,0.15); backdrop-filter: blur(5px);
-            color: white; padding: 10px 20px; border-radius: 30px; border: 1px solid rgba(255,255,255,0.2); cursor: pointer; font-weight: 600; transition: 0.2s;
-        }
+        .profile-content { position: relative; width: 100%; min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; }
         
-        /* CARD PROFILE THEMED */
         .big-profile-card {
+            /* Background box mengikuti tema card */
             background: var(--card-bg);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 40px; border-radius: 30px; text-align: center; color: var(--text-color); width: 100%; max-width: 500px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.1); position: relative; overflow: hidden; animation: zoomIn 0.3s ease;
+            padding: 40px; border-radius: 30px; text-align: center; 
+            
+            /* Warna teks mengikuti tema */
+            color: var(--text-color); 
+            
+            width: 100%; max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1); /* Shadow lebih halus */
+            position: relative; overflow: hidden; animation: zoomIn 0.3s ease;
         }
-        
+
+        /* Penyesuaian warna label di dalam profil */
         .info-label { color: var(--text-color); opacity: 0.7; text-align: left; }
         .info-val { font-weight: 600; text-align: right; display: flex; align-items: center; gap: 8px; justify-content: flex-end; color: var(--fixed-text); }
+        .quote-box { color: var(--text-color); border-left: 4px solid #f1c40f; background: rgba(0,0,0,0.05); }
         .big-profile-card #p-nim { color: var(--text-color); opacity: 0.8; }
-        
+
+        /* Pertahankan warna khusus untuk Owner/Ketua meskipun di light mode */
         .big-profile-card.owner-profile { background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%); color: white !important; }
         .big-profile-card.owner-profile .info-label, .big-profile-card.owner-profile .info-val, .big-profile-card.owner-profile #p-nim { color: #e0f2fe !important; }
+        
         .big-profile-card.ketua-profile { background: linear-gradient(135deg, rgba(41, 128, 185, 0.9) 0%, rgba(109, 213, 250, 0.9) 100%); color: white !important; }
         .big-profile-card.ketua-profile .info-label, .big-profile-card.ketua-profile .info-val, .big-profile-card.ketua-profile #p-nim { color: #e0f2fe !important; }
 
@@ -303,12 +463,15 @@
         
         .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
         .info-row:last-child { border-bottom: none; }
+        .info-label { color: #aaa; text-align: left; }
+        .big-profile-card.owner-profile .info-label, .big-profile-card.ketua-profile .info-label, .big-profile-card.wakil-if2-profile .info-label { color: #e0f2fe; } 
+        .info-val { font-weight: 600; text-align: right; display: flex; align-items: center; gap: 8px; justify-content: flex-end;}
         
         .edit-icon { cursor: pointer; color: #3498db; margin-left: 8px; font-size: 14px; transition: 0.3s; }
         .edit-icon.faded { color: #7f8c8d; opacity: 0.5; cursor: default; }
 
         .jodoh-btn { margin-top: 30px; width: 100%; padding: 15px; background: linear-gradient(90deg, #ff512f, #dd2476); border: none; border-radius: 50px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(221, 36, 118, 0.4); transition: transform 0.2s; position: relative; overflow: hidden; }
-        .quote-box { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.05); border-radius: 15px; font-size: 13px; font-style: italic; color: var(--text-color); border-left: 4px solid #f1c40f; text-align: center; }
+        .quote-box { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 15px; font-size: 13px; font-style: italic; color: #ddd; border-left: 4px solid #f1c40f; text-align: center; }
         .ipk-btn { margin-top: 15px; width: 100%; padding: 12px; background: linear-gradient(135deg, #00b09b, #96c93d); border: none; border-radius: 50px; color: white; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .ipk-btn:hover { transform: scale(1.02); }
 
@@ -365,14 +528,15 @@
         .event-title { font-weight: 800; font-size: 16px; margin-bottom: 5px; }
         .event-prize { font-size: 14px; font-weight: 600; color: #d35400; }
 
-        /* --- FIRE EVENT STYLE --- */
+/* --- FIRE EVENT STYLE (FIXED - NO INNER GLOW) --- */
         .event-item.fire-theme {
             position: relative;
-            background: #000; 
+            background: #000; /* Warna dasar hitam pekat */
             color: #fff;
             border: none;
             overflow: hidden;
             z-index: 1;
+            /* Shadow hanya di luar, tidak di dalam */
             box-shadow: 0 0 15px rgba(255, 69, 0, 0.5); 
             animation: none;
         }
@@ -380,31 +544,41 @@
         .event-item.fire-theme .event-title, 
         .event-item.fire-theme .event-prize {
             position: relative;
-            z-index: 5;
+            z-index: 5; /* Pastikan teks paling atas */
             text-shadow: 2px 2px 4px #000;
         }
+        
         .event-item.fire-theme .event-prize { color: #ffd700; }
 
-        /* Layer Animasi Border */
+        /* LAYER 1: Animasi Border Mengalir (Berada paling belakang) */
         .event-item.fire-theme::before {
-            content: ''; position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
+            content: ''; 
+            position: absolute;
+            top: -50%; left: -50%; 
+            width: 200%; height: 200%;
+            /* Gradient warna api */
             background: conic-gradient(transparent, #ff0000, #ff4500, #ffff00, #ff0000);
             animation: rotateFireBorder 3s linear infinite;
             z-index: -2; 
         }
 
-        /* Layer Background GIF (Solid) */
+        /* LAYER 2: Penutup Tengah (Background GIF) */
         .event-item.fire-theme::after {
-            content: ''; position: absolute;
+            content: ''; 
+            position: absolute;
+            /* Jarak 3px dari tepi untuk menciptakan efek border */
             top: 3px; left: 3px; right: 3px; bottom: 3px;
+            
+            /* PENTING: Background hitam solid + GIF */
             background-color: #000; 
             background-image: url('https://media1.tenor.com/m/PEDzvMlrdi0AAAAC/fire.gif');
             background-repeat: no-repeat;
             background-position: center center;
             background-size: 100% 100%;
+            
             border-radius: 8px;
             z-index: -1; 
+            /* Opacity dihapus agar tidak tembus pandang ke animasi border di belakangnya */
         }
 
         @keyframes rotateFireBorder {
@@ -412,43 +586,48 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* --- SAFETY FIX: Mencegah Gambar Meledak di Modal --- */
-        .modal-box img { max-width: 100%; height: auto; }
-        
-        /* STEGO HINT STYLE */
-        .stego-hint-wrapper {
-            display: flex; align-items: center; justify-content: space-between;
-            gap: 10px; margin-bottom: 20px;
-            background: rgba(100, 100, 100, 0.2); 
-            padding: 8px 12px; border-radius: 10px; border: 1px dashed #ffd700;
-            width: 100%; box-sizing: border-box;
-        }
-        .stego-hint-text {
-            font-size: 11px; font-weight: bold; color: #ffd700; text-align: right;
-            line-height: 1.2; flex: 1;
-        }
-        .arrow-anim { color: #fff; font-size: 18px; animation: pointRight 1s infinite alternate; }
-        @keyframes pointRight { from { transform: translateX(0); } to { transform: translateX(5px); } }
-
         /* --- STEGANOGRAPHY INPUT STYLE --- */
         .stego-input {
-            width: 100%; padding: 15px; font-size: 18px; font-weight: bold; text-align: center;
-            border-radius: 15px; border: none; outline: none; color: #fff; 
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 15px;
+            border: none;
+            outline: none;
+            color: #fff; /* Warna Teks Putih */
+            
+            /* Gradasi Emas ke Emerald */
             background: linear-gradient(45deg, #ffd700, #50c878, #ffd700, #009b77);
             background-size: 300% 300%;
+            
+            /* Efek Animasi Berkilau */
             animation: shimmerEffect 3s ease infinite;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
-        .stego-input::placeholder { color: rgba(255, 255, 255, 0.7); font-style: italic; font-weight: normal; }
-        @keyframes shimmerEffect { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .stego-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        @keyframes shimmerEffect {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
         /* Event Challenge Modal */
         .wa-btn { background: #25D366; color: white; padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
 
-        /* --- JODOH MODAL --- */
+        /* --- JODOH MODAL (FIXED POSITION & Z-INDEX) --- */
         .jodoh-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9); z-index: 10000 !important; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 10000 !important; /* Paling atas */
             display: flex; align-items: center; justify-content: center; flex-direction: column;
             opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
         }
@@ -474,15 +653,18 @@
         @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
-        /* Media Query Mobile */
+        /* Media Query Mobile (FIXED POSITIONING) */
         @media (max-width: 600px) {
             .mobile-layout-controls { display: flex; }
             .grid-container { grid-template-columns: 1fr; padding: 0 10px; }
             .search-box { padding: 0 10px; }
+            
+            /* Button Fixes */
             .pos-left { font-size: 10px; padding: 6px 10px; left: 10px; top: 15px; width: auto; max-width: 150px; }
             .pos-right { font-size: 0; padding: 8px 12px; right: 15px; top: 15px; }
             .pos-right i { margin: 0; font-size: 18px; }
             .pos-theme { right: 55px; width: 35px; height: 35px; font-size: 16px; top: 15px; padding: 0; }
+            
             .event-box { top: 60px; left: 10px; padding: 6px 12px; font-size: 11px; }
             h1 { font-size: 1.8rem; }
             .grid-container.mobile-grid-active { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
@@ -491,6 +673,121 @@
             .grid-container.mobile-grid-active h3 { font-size: 13px; min-height: 40px; line-height: 1.2; margin-bottom: 5px; }
             .grid-container.mobile-grid-active .nim-badge { font-size: 10px; padding: 3px 8px; }
             .now-playing-box { bottom: 70px; max-width: 250px; }
+        }
+		
+		/* --- SAFETY FIX: Mencegah Gambar Meledak di Modal --- */
+        .modal-box img {
+            max-width: 100%; /* Gambar tidak boleh lebih lebar dari kotak */
+            height: auto;
+        }
+        
+        /* Pastikan wrapper hint tidak melar */
+        .stego-hint-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Rapi kanan-kiri */
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(100, 100, 100, 0.2); /* Sedikit lebih gelap agar terlihat */
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px dashed #ffd700;
+            width: 100%;
+            box-sizing: border-box; /* Penting agar padding tidak melebarkan box */
+        }
+		
+		/* --- BACKGROUND PROFILE VIEW ANIMATIONS --- */
+        
+        /* Container untuk background agar tidak menimpa konten */
+        .profile-bg-layer {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; /* Di belakang konten profil */
+            overflow: hidden;
+        }
+
+        /* 1. TEMA GELAP: BLUE SPACE DUST */
+        .bg-dust {
+            display: none; /* Sembunyi di light mode */
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            width: 100%; height: 100%;
+            position: absolute;
+        }
+
+        /* Efek Debu Bintang */
+        .dust-particles {
+            position: absolute;
+            width: 100%; height: 100%;
+            background: transparent;
+        }
+        .dust-particles::after {
+            content: " ";
+            position: absolute;
+            top: 2000px;
+            width: 1px; height: 1px;
+            background: transparent;
+            box-shadow: 
+                10vw 10vh #fff, 20vw 80vh #fff, 30vw 30vh #fff, 40vw 50vh #fff, 
+                50vw 90vh #fff, 60vw 20vh #fff, 70vw 60vh #fff, 80vw 40vh #fff, 
+                90vw 10vh #fff, 55vw 55vh #fff, 15vw 85vh #fff, 25vw 15vh #fff,
+                85vw 75vh #fff, 35vw 95vh #fff, 45vw 25vh #fff, 75vw 35vh #fff;
+            animation: spaceDust 50s linear infinite;
+        }
+
+        /* Tampilkan Dust hanya saat Dark Mode */
+        body.dark-mode .bg-dust { display: block; }
+
+        /* 2. TEMA TERANG: BLUE LIGHT AURORA */
+        .bg-aurora {
+            display: none; /* Sembunyi di dark mode */
+            width: 100%; height: 100%;
+            position: absolute;
+            /* Gradasi Aurora Biru Muda */
+            background: linear-gradient(135deg, #e0f2fe 0%, #ffffff 50%, #bae6fd 100%);
+            background-size: 400% 400%;
+            animation: auroraFlow 15s ease infinite;
+        }
+        
+        /* Elemen bias cahaya aurora */
+        .aurora-glow {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.4) 0%, rgba(255,255,255,0) 70%);
+            top: -100px; left: -100px;
+            border-radius: 50%;
+            filter: blur(50px);
+            animation: auroraFloat 10s infinite alternate;
+        }
+        .aurora-glow:nth-child(2) {
+            top: auto; bottom: -100px; left: auto; right: -100px;
+            background: radial-gradient(circle, rgba(125, 211, 252, 0.4) 0%, rgba(255,255,255,0) 70%);
+            animation-delay: -5s;
+        }
+
+        /* Tampilkan Aurora hanya saat Light Mode (Body TIDAK dark-mode) */
+        body:not(.dark-mode) .bg-aurora { display: block; }
+
+        /* --- ANIMASI KEYFRAMES --- */
+        @keyframes spaceDust {
+            from { transform: translateY(0); }
+            to { transform: translateY(-2000px); }
+        }
+
+        @keyframes auroraFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes auroraFloat {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, 50px) scale(1.1); }
+        }
+
+        /* PENTING: Hapus background gradient statis di #profile-view agar transparan */
+        #profile-view {
+            background: transparent !important; /* Timpa CSS sebelumnya */
         }
     </style>
 </head>
@@ -514,6 +811,7 @@
     <div class="np-icon" onclick="toggleNPBox()">
         <i class="fas fa-music"></i>
     </div>
+    
     <div class="np-content">
         <div class="np-info">
             <div class="np-label">Sedang Memutar</div>
@@ -567,15 +865,19 @@
 </div>
 
 <div id="profile-view">
+    
     <div class="profile-bg-layer">
+        
         <div class="bg-dust">
             <div class="dust-particles"></div>
             <div class="dust-particles" style="animation-delay: -25s; opacity: 0.5;"></div> 
         </div>
+
         <div class="bg-aurora">
             <div class="aurora-glow"></div>
             <div class="aurora-glow"></div>
         </div>
+
     </div>
 
     <button class="back-btn-float" onclick="closeProfile()"><i class="fas fa-arrow-left"></i> Kembali</button>
@@ -652,7 +954,9 @@
     <div class="modal-box">
         <h2 style="color: var(--text-color);">Input Nilai IPK</h2>
         <p style="font-size: 12px; color: #666;">Masukkan nilai antara 1.00 sampai 4.00</p>
+        
         <input type="number" id="modern-ipk-input" class="modern-input-field" placeholder="0.00" step="0.01" min="1" max="4">
+        
         <div style="display:flex; justify-content:center; gap:10px;">
             <button class="btn-conf-close" onclick="closeIpkInputModal()">Batal</button>
             <button class="btn-conf-primary" onclick="confirmIPKInput()">Simpan</button>
@@ -664,9 +968,11 @@
     <div class="modal-box">
         <h2 style="color: var(--text-color); margin-bottom: 15px;">Ubah Tanggal Lahir</h2>
         <p class="warning-text">Tanggal Lahir hanya bisa diubah sekali!</p>
+        
         <div class="date-input-container">
             <input type="date" id="newDobInput" class="custom-date-input">
         </div>
+
         <div style="display: flex; justify-content: center; gap: 10px;">
             <button class="btn-conf-close" onclick="closeDatePicker()">Batal</button>
             <button class="btn-conf-primary" onclick="confirmDateSelection()">Konfirmasi</button>
@@ -725,7 +1031,7 @@
             <div class="stego-hint-text">CARI JAWABANNYA BERAWAL DARI GAMBAR INI</div>
             <i class="fas fa-arrow-right arrow-anim"></i>
             
-            <img src="" id="stego-dynamic-img" 
+            <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" 
                  onclick="openStegoImage()" 
                  title="Klik untuk memperbesar" 
                  style="width: 60px !important; height: 60px !important; min-width: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #fff; cursor: pointer; background: #000;">
@@ -742,7 +1048,7 @@
 
 <div class="modal-overlay" id="stegoImageModal" style="z-index: 11000;" onclick="closeStegoImage()">
     <div class="modal-box" style="background: transparent; box-shadow: none; max-width: 95%;">
-        <img src="" id="stego-full-img" style="max-width: 100%; max-height: 80vh; border-radius: 10px; border: 4px solid #fff; box-shadow: 0 0 30px rgba(0,0,0,0.8);">
+        <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" class="stego-thumb" onclick="openStegoImage()" title="Klik untuk memperbesar">
         <p style="color: white; margin-top: 15px; font-weight: bold; text-shadow: 0 2px 4px #000;">Klik dimana saja untuk menutup</p>
     </div>
 </div>
@@ -772,7 +1078,7 @@
     // --- KONFIGURASI REPO GITHUB ---
     const REPO_CONFIG = { owner: "DilzGhaaziy", name: "IF25-uimDG" };
 
-    // --- DATA EVENTS ---
+    // --- DATA EVENTS (UPDATED) ---
     const eventsData = [
         { title: "Duel Game Naruto Storm 4", prize: "Rp 100.000", theme: "normal" },
         { title: "Steganography", prize: "Rp 150.000", theme: "fire" } 
@@ -1758,34 +2064,23 @@
         }, 150); 
     }
 
-    // --- STEGANOGRAPHY LOGIC (UPDATED: LOAD IMAGE ON DEMAND) ---
+    // --- STEGANOGRAPHY LOGIC ---
     
-    const STEGO_IMG_URL = "https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png";
+    // GANTI JAWABAN DISINI (Huruf Besar Semua)
     const SECRET_ANSWER = "AKU SUKA KODING"; 
 
     function openStegoModal() {
-        // Tutup menu event utama
+        // Tutup menu event utama dulu
         document.getElementById('eventModal').classList.remove('active');
-        
-        // LOAD GAMBAR HANYA SAAT DIBUKA (Mencegah muncul di background lain)
-        document.getElementById('stego-dynamic-img').src = STEGO_IMG_URL;
-        document.getElementById('stego-full-img').src = STEGO_IMG_URL;
-
         // Buka modal input stego
         document.getElementById('stegoModal').classList.add('active');
+        // Reset input
         document.getElementById('stegoAnswerInput').value = "";
     }
 
     function closeStegoModal() {
         document.getElementById('stegoModal').classList.remove('active');
-        
-        // HAPUS GAMBAR SAAT DITUTUP (Agar hilang dari memori tampilan)
-        setTimeout(() => {
-            document.getElementById('stego-dynamic-img').src = "";
-            document.getElementById('stego-full-img').src = "";
-        }, 300); // Delay sedikit agar tidak kedip saat animasi tutup
-
-        // Buka kembali menu event utama
+        // Buka kembali menu event utama (opsional)
         document.getElementById('eventModal').classList.add('active');
     }
 
