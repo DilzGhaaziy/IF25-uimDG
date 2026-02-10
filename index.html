@@ -707,7 +707,7 @@
     
     // --- TAMBAHAN UNTUK RADIO ---
     // Pastikan URL ini valid dan support HTTPS jika hosting kamu HTTPS
-    const dbfmUrl = "http://stream.dbfmradio.id:8000/stream"; // GANTI DENGAN URL STREAMING ASLI DBFM
+    const dbfmUrl = "https://pu.klikhost.com/proxy/dbfm/stream"; // GANTI DENGAN URL STREAMING ASLI DBFM
     let firstRun = true;
 
     const jodohSongs = [
@@ -759,7 +759,7 @@
 
         // --- SKENARIO 1: PEMUTARAN PERTAMA (RADIO) ---
         if (firstRun) {
-            console.log("Mencoba menghubungkan ke DBFM...");
+            console.log("Menghubungkan ke DBFM...");
             showNowPlaying("Menghubungkan DBFM...");
             
             bgmAudio.src = dbfmUrl;
@@ -771,7 +771,7 @@
             // Jika dalam 5 detik server radio tidak merespon, paksa pindah ke playlist
             const connectionTimeout = setTimeout(() => {
                 if (bgmAudio.readyState < 2) { 
-                    console.log("DBFM tidak merespon (Timeout). Pindah ke Playlist.");
+                    console.log("DBFM tidak merespon. Pindah ke Playlist.");
                     playRandomBGM(); 
                 }
             }, 5000);
@@ -786,7 +786,7 @@
                 
             }).catch(e => {
                 clearTimeout(connectionTimeout);
-                console.log("DBFM Error/Blocked. Pindah ke Playlist.");
+                console.log("DBFM Error. Pindah ke Playlist.");
                 playRandomBGM(); 
             });
 
@@ -1236,3 +1236,4 @@
 </script>
 </body>
 </html>
+
