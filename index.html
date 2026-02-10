@@ -44,7 +44,7 @@
             position: relative;
             background-color: #f0f0f0; 
             -webkit-overflow-scrolling: touch; 
-            overscroll-behavior-y: none; /* Mencegah refresh pull di mobile yang ganggu animasi */
+            overscroll-behavior-y: none; 
         }
 
 /* =========================================
@@ -55,7 +55,6 @@
             z-index: -9999;
             overflow: hidden;
             pointer-events: none;
-            /* Hardware Acceleration */
             transform: translateZ(0);
         }
 
@@ -70,7 +69,7 @@
         .glow {
             position: absolute; border-radius: 50%;
             filter: blur(80px); opacity: 0.7; mix-blend-mode: screen;
-            will-change: transform; /* Optimasi Animasi */
+            will-change: transform; 
         }
         .glow-1 {
             width: 80vw; height: 80vh; background: linear-gradient(45deg, #00fff2, #00a2ff);
@@ -93,11 +92,10 @@
             opacity: 0.6;
             will-change: transform;
         }
-        /* Menggunakan satu keyframe untuk performa lebih baik */
         .stars-bg {
             background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0));
             background-size: 250px 250px; 
-            animation: moveUpSmall 40s linear infinite; /* Diperlambat agar tidak pusing */
+            animation: moveUpSmall 40s linear infinite; 
         }
 
         @keyframes drift {
@@ -168,7 +166,7 @@
             position: fixed; top: 20px; z-index: 1000;
             background: var(--fixed-bg); padding: 10px 20px;
             border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            backdrop-filter: blur(8px); /* Berat di HP Low-end, tapi visual diminta tetap */
+            backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             color: var(--fixed-text);
             display: flex; align-items: center; justify-content: center;
@@ -293,10 +291,12 @@
             background: var(--card-bg); color: var(--text-color);
         }
         
-        /* Grid Container - Content Visibility Auto untuk performa */
+        /* Grid Container - PERBAIKAN BUG CARD TERPOTONG */
         .grid-container { 
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; 
-            content-visibility: auto; contain-intrinsic-size: 200px;
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+            padding: 10px; /* Tambahan padding agar shadow/hover tidak terpotong */
         }
         
         /* CARD STYLING */
@@ -305,9 +305,8 @@
             border-radius: 15px; padding: 25px; text-align: center; 
             border-top: 5px solid transparent; cursor: pointer;
             position: relative; overflow: hidden;
-            /* Hapus backdrop-filter jika berat */
             box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
-            will-change: transform; /* Optimasi */
+            will-change: transform; 
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
@@ -478,7 +477,7 @@
         .event-item.fire-theme::after {
             content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px;
             background-color: #000; 
-            background-image: url('https://media.tenor.com/qxyNYoXRT6wAAAAj/fuego.gif');
+            background-image: url('https://media1.tenor.com/m/PEDzvMlrdi0AAAAC/fire.gif');
             background-repeat: no-repeat; background-position: center center; background-size: 100% 100%;
             border-radius: 8px; z-index: -1; 
         }
@@ -542,6 +541,66 @@
         
         .modal-box img { max-width: 100%; height: auto; }
         .stego-hint-wrapper { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 20px; background: rgba(100, 100, 100, 0.2); padding: 8px 12px; border-radius: 10px; border: 1px dashed #ffd700; width: 100%; box-sizing: border-box; }
+
+        /* --- UPDATE CSS EVENT & COUNTDOWN --- */
+        .event-item-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .event-left { text-align: left; }
+
+        .event-right {
+            text-align: right;
+            background: rgba(0,0,0,0.4);
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .timer-label { font-size: 10px; color: #ffd700; text-transform: uppercase; margin-bottom: 2px; }
+        .timer-digit { font-size: 14px; font-weight: 800; font-family: monospace; color: white; }
+
+        .surrender-count-badge {
+            margin-top: 5px;
+            font-size: 11px;
+            background: #fff;
+            color: #c0392b;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: bold;
+            display: inline-block;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- CSS MODAL NYERAH --- */
+        .flag-emoji {
+            font-size: 80px; 
+            animation: waveFlag 2s infinite ease-in-out;
+            margin: 20px 0;
+        }
+
+        @keyframes waveFlag {
+            0% { transform: rotate(0deg); }
+            25% { transform: rotate(-10deg); }
+            50% { transform: rotate(10deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .btn-giveup {
+            background: #e74c3c;
+            color: white;
+            padding: 12px 25px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 15px;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
+        }
+        .btn-giveup:hover { transform: scale(1.05); }
     </style>
 </head>
 <body>
@@ -791,7 +850,7 @@
         <input type="text" id="stegoAnswerInput" class="stego-input" placeholder="Masukkan 3 Kata Rahasia..." autocomplete="off">
         
         <div style="margin-top: 20px; display:flex; justify-content: center; gap: 10px;">
-            <button class="btn-conf-close" onclick="closeStegoModal()">Batal</button>
+            <button class="btn-conf-close" onclick="openSurrenderModal()" style="background:#e74c3c; color:white;">Nyerah 🏳️</button>
             <button class="btn-conf-primary" onclick="checkStegoAnswer()">Konfirmasi</button>
         </div>
     </div>
@@ -822,6 +881,21 @@
         
         <br><br>
         <button class="btn-conf-close" onclick="closeStegoSuccess()">Tutup</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="surrenderModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); margin-bottom: 5px;">Gak Sanggup? Hehe</h2>
+        <div class="flag-emoji">🏳️</div>
+        <p style="color: var(--text-color); margin-bottom: 20px; font-size: 13px;">
+            Yakin mau nyerah? Kesempatan dapet 200rb hilang lho.
+        </p>
+        
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <button class="btn-conf-close" onclick="closeSurrenderModal()">Gak Jadi</button>
+            <button class="btn-giveup" onclick="confirmSurrender()">Iya Saya Menyerah</button>
+        </div>
     </div>
 </div>
 
@@ -1306,23 +1380,126 @@
     }
     function closeIPKModal() { document.getElementById('ipkModal').classList.remove('active'); }
 
-    // Event & Stego
+    // --- VARIABEL COUNTDOWN & SURRENDER ---
+    const targetDate = new Date("February 15, 2026 15:00:00").getTime();
+    let stegoInterval;
+
     function openEventModal() {
         const modal = document.getElementById('eventModal');
         const list = document.getElementById('eventListContainer');
         list.innerHTML = "";
+        
         eventsData.forEach(ev => {
             const item = document.createElement('div');
-            if (ev.theme === 'fire') { item.className = 'event-item fire-theme'; } else { item.className = 'event-item'; }
-            if (ev.title === "Steganography") { item.onclick = openStegoModal; } else { item.onclick = openChallengeModal; }
-            item.innerHTML = `<div class="event-title">${ev.title}</div><div class="event-prize">Hadiah: ${ev.prize}</div>`;
+            
+            if (ev.theme === 'fire') { 
+                item.className = 'event-item fire-theme'; 
+                
+                // LOGIKA KHUSUS TAMPILAN STEGANOGRAPHY
+                // Ambil jumlah yang nyerah dari LocalStorage
+                let surrenderCount = localStorage.getItem('stego_surrender_count') || 0;
+
+                item.innerHTML = `
+                <div class="event-item-content">
+                    <div class="event-left">
+                        <div class="event-title">${ev.title}</div>
+                        <div class="event-prize">Hadiah: ${ev.prize}</div>
+                        <div class="surrender-count-badge">
+                            🏳️ ${surrenderCount} Orang Nyerah
+                        </div>
+                    </div>
+                    <div class="event-right">
+                        <div class="timer-label">Waktu Tersisa</div>
+                        <div id="stego-countdown" class="timer-digit">Loading...</div>
+                    </div>
+                </div>`;
+                
+                // Jalankan Countdown
+                startStegoCountdown();
+
+            } else { 
+                // Tampilan Event Biasa
+                item.className = 'event-item'; 
+                item.innerHTML = `<div class="event-title">${ev.title}</div><div class="event-prize">Hadiah: ${ev.prize}</div>`;
+            }
+            
+            // Klik Handler
+            if (ev.title === "Steganography") { 
+                item.onclick = (e) => {
+                    // Mencegah klik jika yang diklik adalah area timer (opsional, tapi bagus UX nya)
+                    openStegoModal(); 
+                }; 
+            } else { 
+                item.onclick = openChallengeModal; 
+            }
+
             list.appendChild(item);
         });
+        
         modal.classList.add('active');
     }
+
     function closeEventModal() { document.getElementById('eventModal').classList.remove('active'); }
     function openChallengeModal() { document.getElementById('eventModal').classList.remove('active'); document.getElementById('challengeModal').classList.add('active'); }
     function closeChallengeModal() { document.getElementById('challengeModal').classList.remove('active'); }
+
+    // --- LOGIKA COUNTDOWN ---
+    function startStegoCountdown() {
+        if (stegoInterval) clearInterval(stegoInterval);
+        
+        const updateTimer = () => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+            const timerElement = document.getElementById("stego-countdown");
+
+            if (!timerElement) return; // Mencegah error jika modal ditutup
+
+            if (distance < 0) {
+                clearInterval(stegoInterval);
+                timerElement.innerHTML = "WAKTU HABIS";
+                timerElement.style.color = "red";
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Format: 5d 12h 30m 45s
+            timerElement.innerHTML = `${days}h ${hours}j ${minutes}m ${seconds}d`;
+        };
+
+        updateTimer(); // Jalankan langsung biar gak nunggu 1 detik
+        stegoInterval = setInterval(updateTimer, 1000);
+    }
+
+    // --- LOGIKA MENYERAH ---
+    function openSurrenderModal() {
+        document.getElementById('stegoModal').classList.remove('active'); // Tutup modal password
+        document.getElementById('surrenderModal').classList.add('active'); // Buka modal nyerah
+    }
+
+    function closeSurrenderModal() {
+        document.getElementById('surrenderModal').classList.remove('active');
+        document.getElementById('stegoModal').classList.add('active'); // Balik lagi ke modal password
+    }
+
+    function confirmSurrender() {
+        // 1. Tambah Counter di LocalStorage
+        let count = parseInt(localStorage.getItem('stego_surrender_count') || 0);
+        count++;
+        localStorage.setItem('stego_surrender_count', count);
+
+        // 2. Tutup Semua Modal
+        document.getElementById('surrenderModal').classList.remove('active');
+        
+        // 3. Refresh Event Modal untuk update angka counter secara visual
+        // Kita tutup dulu sebentar lalu buka lagi (atau langsung refresh kontennya)
+        openEventModal(); 
+
+        alert("Yahhh cupu... 🏳️ Jumlah yang nyerah bertambah!");
+    }
 
     // Edit DOB
     let selectedDobValue = "";
