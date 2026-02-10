@@ -1099,6 +1099,14 @@
         {title: "RTC Radio FM", url: "https://stream.pamula.xyz/listen/rtc_ui/radio.mp3"},
         {title: "JGRP Radio Live", url: "https://s7.alhastream.com/radio/8350/live"}
     ];
+	
+	// ... (bgmPlaylist yang lama tetap biarkan di atas) ...
+
+    // --- TAMBAHAN UNTUK RADIO ---
+    // Pastikan URL ini support HTTPS jika web kamu di hosting di HTTPS (GitHub Pages/Vercel)
+    // Jika DBFM pakai HTTP biasa, mungkin tidak jalan di browser Chrome HP (Mixed Content)
+    const dbfmUrl = "http://stream.dbfmradio.id:8000/stream"; // Ganti dengan URL Streaming Asli DBFM
+    let firstRun = true; // Penanda apakah ini pertama kali buka web
 
     const jodohSongs = [
         "https://od.lk/s/NjhfMTYyNzYyNDI5Xw/Beautiful%20in%20white%20CUT_2_2.mp3",
@@ -1331,35 +1339,75 @@
         // Opsional: document.getElementById('now-playing-box').classList.add('expanded'); 
     }
 
-    function playRandomBGM() {
-        if (!userInteracted) return;
-
+function playRandomBGM() {
         bgmAudio.pause();
-        let newIdx;
-        do { newIdx = Math.floor(Math.random() * bgmPlaylist.length); } while (newIdx === currentBgmIndex && bgmPlaylist.length > 1);
-        
-        currentBgmIndex = newIdx;
-        bgmAudio.src = bgmPlaylist[currentBgmIndex].url;
-        bgmAudio.volume = 0; 
-        
-        const playPromise = bgmAudio.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.then(() => {
+        bgmAudio.onerror = null; // Reset error handler sebelumnya
+        bgmAudio.onended = null; // Reset ended handler sebelumnya
+
+        // --- SKENARIO 1: PEMUTARAN PERTAMA (RADIO) ---
+        if (firstRun) {
+            console.log("Mencoba menghubungkan ke DBFM...");
+            showNowPlaying("Menghubungkan DBFM...");
+            
+            bgmAudio.src = dbfmUrl;
+            bgmAudio.volume = 0; 
+            
+            // Set firstRun ke false, jadi kalau nanti radio putus/error, 
+            // dia gak akan looping nyoba radio terus, tapi pindah ke lagu.
+            firstRun = false; 
+
+            // SAFETY NET: Timer 5 Detik
+            // Jika dalam 5 detik server radio tidak merespon, paksa pindah ke playlist
+            const connectionTimeout = setTimeout(() => {
+                if (bgmAudio.readyState < 2) { // 2 = HAVE_CURRENT_DATA
+                    console.log("DBFM tidak merespon (Timeout). Pindah ke Playlist.");
+                    playRandomBGM(); // Panggil fungsi ini lagi (masuk ke Skenario 2)
+                }
+            }, 5000);
+
+            bgmAudio.play().then(() => {
+                clearTimeout(connectionTimeout); // Batalkan timer jika berhasil play
                 fadeInBGM();
-                updateNPUI(bgmPlaylist[currentBgmIndex].title);
-                renderPlaylist(); 
+                showNowPlaying("DBFM Pemda Radio");
                 
-                // Animasi expand sebentar
-                const box = document.getElementById('now-playing-box');
-                box.classList.add('expanded');
+                // Jika streaming radio putus sendiri, pindah ke playlist
+                bgmAudio.onended = playRandomBGM; 
                 
-            }).catch(error => {
-                console.log("Autoplay blocked. Waiting for interaction.");
+            }).catch(e => {
+                clearTimeout(connectionTimeout);
+                console.log("DBFM Error (Blokir Browser/Mati). Pindah ke Playlist.");
+                playRandomBGM(); // Pindah ke Skenario 2
             });
+
+            // Handler Error Khusus (misal link mati total 404)
+            bgmAudio.onerror = () => {
+                clearTimeout(connectionTimeout);
+                console.log("Stream Error. Pindah ke Playlist.");
+                playRandomBGM();
+            };
+
+        } 
+        // --- SKENARIO 2: PLAYLIST BIASA (LOGIKA LAMA) ---
+        else {
+            let newIdx;
+            do { 
+                newIdx = Math.floor(Math.random() * bgmPlaylist.length); 
+            } while (newIdx === currentBgmIndex && bgmPlaylist.length > 1);
+            
+            currentBgmIndex = newIdx;
+            bgmAudio.src = bgmPlaylist[currentBgmIndex].url;
+            bgmAudio.volume = 0; 
+            
+            bgmAudio.play().then(() => {
+                fadeInBGM();
+                showNowPlaying(bgmPlaylist[currentBgmIndex].title);
+            }).catch(e => console.log("Autoplay blocked by browser"));
+            
+            // Kalau lagu habis, putar lagu acak lainnya
+            bgmAudio.onended = playRandomBGM;
+            // Kalau lagu error, ganti lagu lain
+            bgmAudio.onerror = playRandomBGM; 
         }
-        
-        bgmAudio.onended = playRandomBGM;
     }
 
     function fadeInBGM() {
