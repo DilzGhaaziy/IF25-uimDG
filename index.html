@@ -86,34 +86,85 @@
         .pos-theme i { color: #f1c40f; }
         body.dark-mode .pos-theme i { color: #f39c12; }
 
-        /* --- NOW PLAYING BOX --- */
-        .now-playing-box {
-            position: fixed; bottom: 20px; right: -350px;
-            z-index: 9999;
-            background: var(--fixed-bg);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 50px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 15px;
-            transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 300px;
-        }
-        .now-playing-box.show { right: 20px; }
-        .np-icon {
-            width: 35px; height: 35px; background: #e91e63; color: white;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 14px; animation: spin 3s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        .np-info { display: flex; flex-direction: column; overflow: hidden; }
-        .np-label { font-size: 10px; color: var(--text-color); opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
-        .np-title { font-size: 13px; font-weight: 700; color: var(--fixed-text); white-space: nowrap; }
-        .np-mute {
-            background: transparent; border: none; color: var(--fixed-text);
-            cursor: pointer; font-size: 16px; transition: 0.3s;
-        }
+/* --- UPDATE NOW PLAYING BOX (FITUR MENGINTIP) --- */
+.now-playing-box {
+    position: fixed; bottom: 20px; 
+    right: -240px; /* Default: Mengintip (hanya ikon terlihat) */
+    z-index: 9999;
+    background: var(--fixed-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 10px 15px;
+    border-radius: 50px 0 0 50px; /* Melengkung di kiri saja */
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    display: flex; align-items: center; gap: 15px;
+    transition: right 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 300px; /* Lebar tetap agar perhitungan posisi pas */
+    cursor: pointer;
+}
+
+/* Saat class .show aktif atau di-hover, box muncul penuh */
+.now-playing-box.show, .now-playing-box:hover { right: 0; border-radius: 50px 0 0 50px; }
+
+.np-icon {
+    min-width: 40px; height: 40px; background: #e91e63; color: white;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; animation: spin 3s linear infinite;
+    box-shadow: 0 0 10px rgba(233, 30, 99, 0.5);
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.np-info { display: flex; flex-direction: column; overflow: hidden; flex: 1; }
+.np-label { font-size: 9px; opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+.np-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.np-controls { display: flex; gap: 8px; }
+.np-btn {
+    background: rgba(0,0,0,0.05); border: none; color: var(--fixed-text);
+    width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.3s; font-size: 12px;
+}
+.np-btn:hover { background: #e91e63; color: white; }
+
+/* --- CSS UNTUK PLAYLIST MODAL --- */
+.playlist-modal {
+    position: fixed; bottom: 80px; right: 20px;
+    width: 280px; max-height: 400px;
+    background: var(--card-bg);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    z-index: 9998;
+    transform: translateY(20px); opacity: 0; visibility: hidden;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex; flex-direction: column;
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(15px);
+}
+.playlist-modal.active { transform: translateY(0); opacity: 1; visibility: visible; }
+
+.playlist-header {
+    padding: 15px; border-bottom: 1px solid rgba(0,0,0,0.05);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.playlist-header h3 { font-size: 16px; margin: 0; color: var(--text-color); }
+.playlist-header button { background: none; border: none; cursor: pointer; font-size: 16px; color: var(--text-color); }
+
+.playlist-content { overflow-y: auto; padding: 10px; flex: 1; }
+.playlist-item {
+    padding: 10px; border-radius: 10px; margin-bottom: 5px;
+    cursor: pointer; display: flex; align-items: center; gap: 10px;
+    transition: 0.2s; color: var(--text-color); font-size: 13px;
+}
+.playlist-item:hover { background: rgba(0,0,0,0.05); }
+.playlist-item.active { background: linear-gradient(90deg, #e91e63, #ff6b6b); color: white; font-weight: bold; }
+.playlist-item i { font-size: 10px; opacity: 0.7; }
+
+/* Mobile Adjustment */
+@media (max-width: 600px) {
+    .now-playing-box { width: 260px; right: -210px; } /* Sesuaikan posisi mengintip di HP */
+    .playlist-modal { bottom: 90px; right: 10px; width: 260px; }
+}
         .np-mute:hover { color: #e91e63; }
 
         /* --- MOBILE LAYOUT --- */
@@ -502,13 +553,25 @@
 <div id="fireflies-container"></div>
 <div id="copy-tooltip" class="copy-tooltip">NIM Disalin!</div>
 
-<div id="now-playing-box" class="now-playing-box">
+<div id="now-playing-box" class="now-playing-box" onclick="toggleMusicBox()">
     <div class="np-icon"><i class="fas fa-music"></i></div>
     <div class="np-info">
         <div class="np-label">Now Playing</div>
-        <div class="np-title" id="np-title">Judul Lagu</div>
+        <div class="np-title" id="np-title">Menunggu Musik...</div>
     </div>
-    <button class="np-mute" onclick="toggleMute()"><i class="fas fa-volume-up" id="mute-icon"></i></button>
+    <div class="np-controls">
+        <button class="np-btn" onclick="event.stopPropagation(); togglePlaylist()"><i class="fas fa-list"></i></button>
+        <button class="np-btn" onclick="event.stopPropagation(); toggleMute()"><i class="fas fa-volume-up" id="mute-icon"></i></button>
+    </div>
+</div>
+
+<div class="playlist-modal" id="playlistModal">
+    <div class="playlist-header">
+        <h3>Daftar Putar</h3>
+        <button onclick="togglePlaylist()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="playlist-content" id="playlistContent">
+        </div>
 </div>
 
 <div class="modal-overlay" id="selectionModal">
@@ -707,7 +770,7 @@
     
     // --- TAMBAHAN UNTUK RADIO ---
     // Pastikan URL ini valid dan support HTTPS jika hosting kamu HTTPS
-    const dbfmUrl = "https://pu.klikhost.com/proxy/dbfm/stream"; // GANTI DENGAN URL STREAMING ASLI DBFM
+    const dbfmUrl = "http://stream.dbfmradio.id:8000/stream"; // GANTI DENGAN URL STREAMING ASLI DBFM
     let firstRun = true;
 
     const jodohSongs = [
@@ -759,7 +822,7 @@
 
         // --- SKENARIO 1: PEMUTARAN PERTAMA (RADIO) ---
         if (firstRun) {
-            console.log("Menghubungkan ke DBFM...");
+            console.log("Mencoba menghubungkan ke DBFM...");
             showNowPlaying("Menghubungkan DBFM...");
             
             bgmAudio.src = dbfmUrl;
@@ -771,7 +834,7 @@
             // Jika dalam 5 detik server radio tidak merespon, paksa pindah ke playlist
             const connectionTimeout = setTimeout(() => {
                 if (bgmAudio.readyState < 2) { 
-                    console.log("DBFM tidak merespon. Pindah ke Playlist.");
+                    console.log("DBFM tidak merespon (Timeout). Pindah ke Playlist.");
                     playRandomBGM(); 
                 }
             }, 5000);
@@ -786,7 +849,7 @@
                 
             }).catch(e => {
                 clearTimeout(connectionTimeout);
-                console.log("DBFM Error. Pindah ke Playlist.");
+                console.log("DBFM Error/Blocked. Pindah ke Playlist.");
                 playRandomBGM(); 
             });
 
@@ -1236,4 +1299,3 @@
 </script>
 </body>
 </html>
-
