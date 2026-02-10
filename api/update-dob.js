@@ -1,78 +1,2175 @@
-// File: api/update-dob.js
-
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method Not Allowed' });
-  }
-
-  const { nim, newDOB, repoOwner, repoName } = req.body;
-  
-  // Pastikan Anda sudah setting GITHUB_TOKEN di Environment Variables Vercel
-  const token = process.env.GITHUB_TOKEN; 
-  const path = 'index.html'; // Nama file utama Anda
-
-  if (!token) {
-    return res.status(500).json({ message: 'Server Error: GITHUB_TOKEN is missing.' });
-  }
-
-  try {
-    // 1. GET file content dari GitHub
-    const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IF25 Terkece Biodata</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Berkshire+Swash&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    const getResponse = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
+    <style>
+/* --- 1. SETTING DASAR & WARNA --- */
+        :root {
+            /* Background ditangani oleh div terpisah, jadi transparan disini */
+            --bg-gradient: transparent; 
+            --text-color: #333;
+            --card-bg: rgba(230, 230, 254, 0.85); /* Sedikit lebih transparan agar background terlihat */
+            --nim-bg: #ecf0f1;
+            --nim-text: #2c3e50;
+            --fixed-bg: rgba(255, 255, 255, 0.85);
+            --fixed-text: #2c3e50;
+            --firefly-color: #ffeb3b; 
+            --glow-color: rgba(52, 152, 219, 0.3); 
+        }
+
+        body.dark-mode {
+            --text-color: #e0e0e0;
+            --card-bg: rgba(43, 63, 118, 0.85); 
+            --nim-bg: #1a1a2e;
+            --nim-text: #bdc3c7;
+            --fixed-bg: rgba(15, 52, 96, 0.85);
+            --fixed-text: #e0e0e0;
+            --firefly-color: #76ff03;
+            --glow-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            position: relative;
+            background-color: #f0f0f0; /* Fallback color */
+            -webkit-overflow-scrolling: touch; 
+        }
+
+/* =========================================
+   BACKGROUND SYSTEMS (Global Fixed Layers)
+   ========================================= */
+
+        /* Container Umum untuk Background */
+        .global-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -9999; /* Paling belakang */
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* --- A. LIGHT MODE BACKGROUND (AURORA) --- */
+        #bg-light-mode {
+            background-color: #000510;
+            background-image: linear-gradient(135deg, #001233 0%, #003060 100%);
+            display: block;
+        }
+        
+        /* Sembunyikan Light Mode BG saat Dark Mode aktif */
+        body.dark-mode #bg-light-mode { display: none; }
+
+        .glow {
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.7; mix-blend-mode: screen;
+        }
+        .glow-1 {
+            width: 80vw; height: 80vh; background: linear-gradient(45deg, #00fff2, #00a2ff);
+            bottom: -20%; left: -20%; transform: rotate(20deg) skewX(-20deg);
+            animation: drift 10s infinite alternate ease-in-out;
+        }
+        .glow-2 {
+            width: 90vw; height: 70vh; background: linear-gradient(120deg, #0061ff, #001eff);
+            top: -10%; right: -10%; transform: rotate(-30deg); opacity: 0.6;
+            animation: drift 15s infinite alternate-reverse ease-in-out;
+        }
+        .glow-3 {
+            width: 100vw; height: 40vh;
+            background: radial-gradient(ellipse at center, rgba(0, 255, 234, 0.4), transparent 70%);
+            top: 30%; left: 10%; transform: rotate(-45deg) scaleY(0.5);
+            filter: blur(60px); opacity: 0.5;
+        }
+        .stars-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 130px 80px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 160px 120px, #a3d5ff, rgba(0,0,0,0)),
+                radial-gradient(3px 3px at 200px 200px, #ffffff, rgba(0,0,0,0));
+            background-size: 250px 250px; 
+            opacity: 0.6;
+            animation: moveUpSmall 20s linear infinite;
+        }
+        .stars-sm-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 100px 50px, #fff, transparent),
+                radial-gradient(1px 1px at 200px 150px, #fff, transparent),
+                radial-gradient(1.5px 1.5px at 300px 250px, #00fff2, transparent);
+            background-size: 350px 350px;
+            opacity: 0.4;
+            animation: moveUpLarge 30s linear infinite;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) rotate(20deg) skewX(-20deg); }
+            100% { transform: translate(20px, -20px) rotate(25deg) skewX(-15deg); }
+        }
+        @keyframes moveUpSmall { from { background-position: 0 0; } to { background-position: 0 -250px; } }
+        @keyframes moveUpLarge { from { background-position: 0 0; } to { background-position: 0 -350px; } }
+
+
+        /* --- B. DARK MODE BACKGROUND (SPACE & METEORS) --- */
+        #bg-dark-mode {
+            background: radial-gradient(ellipse at bottom, #0B1026 0%, #000000 100%);
+            display: none; /* Default hidden until dark mode active */
+            perspective: 1000px;
+        }
+
+        /* Tampilkan Dark Mode BG saat class dark-mode ada di body */
+        body.dark-mode #bg-dark-mode { display: block; }
+
+        .star-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent; will-change: transform;
+        }
+        .star-field {
+            width: 2px; height: 2px; background: transparent; border-radius: 50%;
+        }
+        @keyframes moveStars {
+            from { transform: translateY(0); }
+            to { transform: translateY(-2000px); }
+        }
+        .layer-1 { animation: moveStars 100s linear infinite; opacity: 0.6; }
+        .layer-2 { animation: moveStars 50s linear infinite; opacity: 0.8; }
+        .layer-3 { animation: moveStars 25s linear infinite; opacity: 1; }
+
+        .meteor {
+            position: absolute; opacity: 0; transform-origin: left center;
+            pointer-events: none; z-index: 10;
+            background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0) 100%);
+            border-radius: 500px; will-change: transform, opacity;
+        }
+        .meteor-head {
+            position: absolute; left: 0; top: 50%; transform: translate(-50%, -50%);
+            border-radius: 50%; background: #fff;
+            box-shadow: 0 0 10px 2px rgba(100, 200, 255, 0.8);
+        }
+        @keyframes shooting {
+            0% { transform: translate(0, 0) rotate(-45deg); opacity: 1; }
+            100% { transform: translate(-150vh, 150vh) rotate(-45deg); opacity: 0; }
+        }
+
+/* =========================================
+   END BACKGROUND SYSTEMS
+   ========================================= */
+
+        /* --- 2. LAYOUT UTAMA --- */
+        
+        /* Container Profil */
+        #profile-view {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2000; 
+            display: none; opacity: 0;
+            transition: opacity 0.3s ease; overflow-y: auto; 
+            background: transparent !important; 
+            will-change: opacity;
+        }
+
+        /* Konten Profil (Di depan animasi) */
+        .profile-content { 
+            position: relative; 
+            z-index: 5; 
+            width: 100%; min-height: 100%; 
+            display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; 
+            padding: 40px 20px; 
+        }
+
+        /* --- FIXED ELEMENTS (DESKTOP) --- */
+        .fixed-element {
+            position: fixed; top: 20px; z-index: 1000;
+            background: var(--fixed-bg); padding: 10px 20px;
+            border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            color: var(--fixed-text);
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; font-size: 14px; font-weight: 600;
+            transition: transform 0.2s; border: 1px solid rgba(255,255,255,0.1);
+        }
+        .pos-left { left: 20px; }
+        .pos-right { right: 20px; } /* Youtube Desktop */
+        .pos-theme { right: 180px; width: 45px; height: 45px; padding: 0; cursor: pointer; border: none; font-size: 18px; }
+        .pos-right i { color: #ff0000; font-size: 18px; margin-right: 8px; }
+        .pos-theme i { color: #f1c40f; }
+        body.dark-mode .pos-theme i { color: #f39c12; }
+
+        /* --- EVENT BOX --- */
+        .event-box {
+            position: fixed; top: 70px; left: 20px; z-index: 999;
+            background: linear-gradient(135deg, #ffd700 0%, #2ecc71 100%);
+            padding: 8px 20px; border-radius: 30px;
+            color: #fff; font-size: 13px; font-weight: 700;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+            cursor: pointer; overflow: hidden; transition: transform 0.2s;
+            border: 2px solid rgba(255,255,255,0.3);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .event-box:hover { transform: scale(1.05); }
+        .event-box::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.6), transparent);
+            transform: skewX(-25deg); animation: shine 3s infinite;
+        }
+        @keyframes shine { 100% { left: 200%; } }
+
+        /* --- NOW PLAYING BOX (REVAMPED - PEEK MODE) --- */
+        .now-playing-box {
+            position: fixed; 
+            bottom: 20px; 
+            right: 0; /* Selalu menempel di kanan */
+            z-index: 9999;
+            background: var(--fixed-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 8px; /* Padding lebih kecil agar icon pas */
+            padding-right: 20px;
+            border-top-left-radius: 50px;
+            border-bottom-left-radius: 50px;
+            box-shadow: -5px 5px 20px rgba(0,0,0,0.2);
+            display: flex; 
+            align-items: center; 
+            gap: 15px;
+            /* LOGIKA PEEK (MENGINTIP) */
+            width: 300px; /* Lebar penuh */
+            transform: translateX(calc(100% - 50px)); /* Geser ke kanan, sisakan 50px (icon) */
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55); /* Efek membal */
+        }
+
+        /* Kelas untuk membuka box sepenuhnya */
+        .now-playing-box.expanded {
+            transform: translateX(0);
+        }
+
+        .np-icon {
+            width: 35px; height: 35px; flex-shrink: 0; /* Agar tidak gepeng */
+            background: #e91e63; color: white;
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 14px; 
+            animation: spin 3s linear infinite;
+            cursor: pointer; /* Indikator bisa diklik */
+            box-shadow: 0 0 10px rgba(233, 30, 99, 0.6);
+            position: relative;
+            z-index: 2;
+        }
+        
+        /* Efek pulse saat mode "mengintip" agar user sadar */
+        .now-playing-box:not(.expanded) .np-icon {
+            animation: spin 3s linear infinite, pulseIcon 2s infinite;
+        }
+        
+        @keyframes pulseIcon { 0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(233, 30, 99, 0); } 100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); } }
+
+        .np-content {
+            display: flex; align-items: center; justify-content: space-between;
+            width: 100%; overflow: hidden; opacity: 0; transition: opacity 0.2s;
+        }
+        
+        /* Konten hanya muncul saat expanded agar rapi */
+        .now-playing-box.expanded .np-content { opacity: 1; transition-delay: 0.2s; }
+
+        .np-info { display: flex; flex-direction: column; overflow: hidden; max-width: 140px; }
+        .np-label { font-size: 9px; color: var(--text-color); opacity: 0.7; text-transform: uppercase; letter-spacing: 1px; }
+        .np-title { font-size: 12px; font-weight: 700; color: var(--fixed-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .np-controls { display: flex; gap: 8px; }
+        .np-btn {
+            background: rgba(0,0,0,0.05); border: none; color: var(--fixed-text);
+            width: 28px; height: 28px; border-radius: 50%;
+            cursor: pointer; font-size: 12px; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .np-btn:hover { background: #e91e63; color: white; }
+        .np-btn.active-list { background: #3498db; color: white; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        /* --- PLAYLIST BOX (NEON RGB) --- */
+        .playlist-box {
+            position: fixed;
+            bottom: 80px; right: 20px;
+            width: 280px; max-height: 400px;
+            background: var(--card-bg); /* Sesuai Tema */
+            border-radius: 15px;
+            z-index: 9998;
+            padding: 3px; /* Space untuk border RGB */
+            opacity: 0; visibility: hidden; transform: translateY(20px);
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden; /* Penting untuk masking border */
+        }
+
+        .playlist-box.show { opacity: 1; visibility: visible; transform: translateY(0); }
+
+        /* RGB BORDER ANIMATION */
+        .playlist-box::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: conic-gradient(transparent, transparent, transparent, #ff0000, #ff7300, #fffb00, #48ff00, #00ffd5, #002bff, #7a00ff, #ff00c8, #ff0000);
+            animation: rotateRGB 4s linear infinite;
+            z-index: 0;
+        }
+        
+        @keyframes rotateRGB { 100% { transform: rotate(360deg); } }
+
+        .playlist-inner {
+            position: relative; z-index: 1;
+            background: var(--card-bg); /* Timpa background RGB di tengah */
+            width: 100%; height: 100%;
+            border-radius: 12px;
+            display: flex; flex-direction: column;
+        }
+
+        .playlist-header { padding: 12px 15px; font-weight: bold; border-bottom: 1px solid rgba(128,128,128,0.2); color: var(--text-color); display: flex; justify-content: space-between; align-items: center; }
+        .playlist-scroll { padding: 10px; overflow-y: auto; max-height: 300px; }
+        
+        .track-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 10px; border-radius: 8px;
+            cursor: pointer; transition: 0.2s;
+            margin-bottom: 5px;
+        }
+        .track-item:hover { background: rgba(0,0,0,0.05); }
+        .track-item.playing { background: rgba(52, 152, 219, 0.15); border-left: 3px solid #3498db; }
+        
+        .track-icon { font-size: 12px; color: #7f8c8d; width: 20px; text-align: center; }
+        .track-item.playing .track-icon { color: #3498db; animation: pulse 1s infinite; }
+        
+        .track-info { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+        .track-name { font-size: 12px; font-weight: 600; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .track-status { font-size: 10px; color: #aaa; }
+        
+        /* Scrollbar Tipis */
+        .playlist-scroll::-webkit-scrollbar { width: 4px; }
+        .playlist-scroll::-webkit-scrollbar-track { background: transparent; }
+        .playlist-scroll::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+
+        /* --- MOBILE LAYOUT --- */
+        .mobile-layout-controls {
+            display: none; position: fixed; top: 75px; left: 50%; transform: translateX(-50%);
+            z-index: 990; background: var(--fixed-bg); padding: 4px; border-radius: 50px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1); backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .mobile-btn {
+            background: transparent; border: none; color: var(--fixed-text);
+            padding: 6px 15px; border-radius: 20px; cursor: pointer;
+            font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 5px; transition: 0.3s;
+        }
+        .mobile-btn.active { background: #3498db; color: white; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3); }
+
+        /* --- UTAMA --- */
+        #main-view { position: relative; z-index: 10; transition: opacity 0.5s; min-height: 100vh; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px 40px 20px; padding-top: 120px; }
+        header { text-align: center; margin-bottom: 30px; }
+        
+        h1 { 
+            font-family: 'Berkshire Swash', cursive;
+            font-weight: 400; color: #ff0000; margin-bottom: 5px; 
+            font-size: 3rem; letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        p.subtitle { color: #ddd; margin-bottom: 25px; }
+        
+        .search-box { width: 100%; max-width: 500px; margin: 0 auto 30px auto; }
+        .search-box input {
+            width: 100%; padding: 15px 25px; border-radius: 50px; border: none;
+            font-family: 'Poppins', sans-serif; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: var(--card-bg); color: var(--text-color);
+        }
+        
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        
+        /* --- CARD STYLING --- */
+        .card {
+            background: var(--card-bg); 
+            border-radius: 15px; padding: 25px; text-align: center; 
+            border-top: 5px solid transparent; cursor: pointer;
+            position: relative; overflow: hidden;
+            backdrop-filter: none !important; 
+            -webkit-backdrop-filter: none !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); 
+            will-change: transform;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card::after {
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(600px circle at var(--x) var(--y), var(--glow-color), transparent 40%);
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none; z-index: 2; 
+        }
+
+        .card:hover::after { opacity: 1; }
+        .card:hover { transform: translateY(-5px); border-top: 5px solid #3498db; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 20; }
+        .card.hidden-card { display: none; } 
+
+        @keyframes ownerGlowLoop { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
+        .card.owner-card {
+            background: linear-gradient(45deg, #059669, #10b981, #de7ed4cc, #e598ffcc, #10b981, #059669);
+            background-size: 400% 400%; animation: ownerGlowLoop 8s ease infinite; 
+            color: white !important; border: 2px solid #ffd700; text-shadow: 0 1px 4px rgba(0,0,0,0.6); 
+        }
+        .card.owner-card .avatar, .card.owner-card h3, .card.owner-card .nim-badge { position: relative; z-index: 5; }
+        .card.owner-card .owner-badge, .card.owner-card .gender-tag { z-index: 10; }
+
+        /* --- STYLING CARD KHUSUS --- */
+        .card.ketua-card { background: linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%); color: white !important; border: 2px solid #fff; }
+        .card.wakil1-card, .big-profile-card.wakil1-profile { background: linear-gradient(135deg, #6F2DA8 0%, #C54B8C 100%); color: white !important; border: 2px solid #ff758c; }
+        .wakil1-badge { background: #fff; color: #8e44ad; }
+        .card.wakil2-card, .big-profile-card.wakil2-profile { background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%); color: white !important; border: 2px solid #f39c12; }
+        .wakil2-badge { background: #fff; color: #e67e22; }
+        .card.keamanan-card, .big-profile-card.keamanan-profile { background: linear-gradient(135deg, #FF2400 0%, #7C0A02 150%); color: white !important; border: 2px solid #ff0000; }
+        .keamanan-badge { background: #000; color: #ff0000; border: 1px solid #ff0000; }
+        .card.pj-leni-card, .big-profile-card.pj-leni-profile { background: linear-gradient(135deg, #FC6C85 0%, #FF46A2 100%); color: #444 !important; border: 2px solid #E89EB8; }
+        .card.pj-leni-card h3, .card.pj-leni-card .nim-badge, .big-profile-card.pj-leni-profile .info-label, .big-profile-card.pj-leni-profile .info-val { color: #444 !important; }
+        .card.pj-leni-card .nim-badge { background: rgba(255,255,255,0.25); }
+        .pj-leni-badge { background: #ff6f91; color: white; }
+        .card.pj-nirwanda-card, .big-profile-card.pj-nirwanda-profile { background: linear-gradient(135deg, #D30000 0%, #FF2400 80%); color: white !important; border: 2px solid #ff758c; }
+        .pj-nirwanda-badge { background: #fff; color: #800020; }
+        .card.wakil-if2-card, .big-profile-card.wakil-if2-profile { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white !important; border: 2px solid #fff; }
+        .wakil-if2-badge { background: #fff; color: #00c6fb; }
+
+        .card.owner-card h3, .card.ketua-card h3, .card.wakil-if2-card h3 { color: white !important; }
+        .card.ketua-card h3 { text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .card.owner-card .nim-badge, .card.ketua-card .nim-badge, .card.wakil-if2-card .nim-badge { color: white; background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.2); }
+
+        /* --- BADGES --- */
+        .owner-badge, .ketua-badge, .wakil-badge, .wakil1-badge, .wakil2-badge, .keamanan-badge, .pj-badge, .wakil-if2-badge {
+            position: absolute; top: 10px; left: 10px; font-size: 10px; padding: 2px 8px; border-radius: 8px; font-weight: 800;
+            box-shadow: 0 2px 3px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 4px; z-index: 10;
+        }
+        .owner-badge { background: #ffd700; color: #b45309; text-shadow: none; }
+        .ketua-badge { background: #fff; color: #2980b9; }
+
+        .gender-tag { position: absolute; top: 10px; right: 10px; font-size: 12px; padding: 2px 8px; border-radius: 10px; color: white; font-weight: bold; z-index: 10; }
+        .gender-L { background: #3498db; }
+        .gender-P { background: #e91e63; }
+        
+        .avatar {
+            width: 65px; height: 65px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; margin: 0 auto 10px auto;
+            position: relative; z-index: 5; -webkit-mask-image: -webkit-radial-gradient(white, black);
+        }
+        .card h3 { font-size: 17px; font-weight: 600; color: var(--text-color); min-height: 50px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; }
+        .nim-badge { background: var(--nim-bg); color: var(--nim-text); padding: 4px 12px; border-radius: 15px; font-size: 13px; font-weight: 500; position: relative; z-index: 5; }
+
+/* --- PROFIL VIEW (THEMED) --- */
+        .big-profile-card {
+            /* Background box mengikuti tema card */
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 40px; border-radius: 30px; text-align: center; 
+            
+            /* Warna teks mengikuti tema */
+            color: var(--text-color); 
+            
+            width: 100%; max-width: 500px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.1); /* Shadow lebih halus */
+            position: relative; overflow: hidden; animation: zoomIn 0.3s ease;
+        }
+
+        /* Penyesuaian warna label di dalam profil */
+        .info-label { color: var(--text-color); opacity: 0.7; text-align: left; }
+        .info-val { font-weight: 600; text-align: right; display: flex; align-items: center; gap: 8px; justify-content: flex-end; color: var(--fixed-text); }
+        .quote-box { color: var(--text-color); border-left: 4px solid #f1c40f; background: rgba(0,0,0,0.05); }
+        .big-profile-card #p-nim { color: var(--text-color); opacity: 0.8; }
+
+        /* Pertahankan warna khusus untuk Owner/Ketua meskipun di light mode */
+        .big-profile-card.owner-profile { background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%); color: white !important; }
+        .big-profile-card.owner-profile .info-label, .big-profile-card.owner-profile .info-val, .big-profile-card.owner-profile #p-nim { color: #e0f2fe !important; }
+        
+        .big-profile-card.ketua-profile { background: linear-gradient(135deg, rgba(41, 128, 185, 0.9) 0%, rgba(109, 213, 250, 0.9) 100%); color: white !important; }
+        .big-profile-card.ketua-profile .info-label, .big-profile-card.ketua-profile .info-val, .big-profile-card.ketua-profile #p-nim { color: #e0f2fe !important; }
+
+        .owner-role {
+            font-size: 12px; background: #ffd700; color: #b45309; padding: 2px 10px; border-radius: 10px;
+            display: inline-block; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .owner-role.ketua-role-tag { background: #fff; color: #2980b9; }
+
+        .big-avatar {
+            width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px auto; background: linear-gradient(45deg, #ff00cc, #333399);
+            display: flex; align-items: center; justify-content: center; font-size: 40px; font-weight: bold; border: 4px solid rgba(255,255,255,0.5);
+            box-shadow: 0 0 30px rgba(255, 0, 204, 0.4);
+        }
+        .copy-btn { background: transparent; border: none; color: #bbb; cursor: pointer; margin-left: 8px; font-size: 14px; transition: 0.3s; }
+        .copy-btn:hover { color: #fff; transform: scale(1.1); }
+        .copy-tooltip { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 10px 20px; border-radius: 20px; z-index: 5000; opacity: 0; pointer-events: none; transition: 0.3s; }
+        .copy-tooltip.show { opacity: 1; margin-top: -50px; }
+        
+        .info-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 14px; }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: #aaa; text-align: left; }
+        .big-profile-card.owner-profile .info-label, .big-profile-card.ketua-profile .info-label, .big-profile-card.wakil-if2-profile .info-label { color: #e0f2fe; } 
+        .info-val { font-weight: 600; text-align: right; display: flex; align-items: center; gap: 8px; justify-content: flex-end;}
+        
+        .edit-icon { cursor: pointer; color: #3498db; margin-left: 8px; font-size: 14px; transition: 0.3s; }
+        .edit-icon.faded { color: #7f8c8d; opacity: 0.5; cursor: default; }
+
+        .jodoh-btn { margin-top: 30px; width: 100%; padding: 15px; background: linear-gradient(90deg, #ff512f, #dd2476); border: none; border-radius: 50px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 20px rgba(221, 36, 118, 0.4); transition: transform 0.2s; position: relative; overflow: hidden; }
+        .quote-box { margin-top: 20px; padding: 15px; background: rgba(0,0,0,0.3); border-radius: 15px; font-size: 13px; font-style: italic; color: #ddd; border-left: 4px solid #f1c40f; text-align: center; }
+        .ipk-btn { margin-top: 15px; width: 100%; padding: 12px; background: linear-gradient(135deg, #00b09b, #96c93d); border: none; border-radius: 50px; color: white; font-size: 15px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(0, 176, 155, 0.4); transition: transform 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .ipk-btn:hover { transform: scale(1.02); }
+
+        /* --- MODALS GENERAL --- */
+        .modal-overlay, .date-picker-overlay, .date-confirm-overlay, .ipk-modal, .verify-modal, .event-modal, .ipk-input-modal, .event-challenge-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
+            /* Z-Index 5000 agar diatas Profil (2000) */
+            z-index: 5000; 
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            opacity: 0; visibility: hidden; transition: 0.3s; backdrop-filter: blur(5px);
+        }
+        .modal-overlay { z-index: 10000; } /* Class Select Modal harus paling atas */
+        .active { opacity: 1; visibility: visible; }
+        
+        .modal-box { background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; max-width: 90%; width: 400px; transform: scale(0.9); transition: transform 0.3s; }
+        .active .modal-box { transform: scale(1); }
+
+        /* IPK Modal Specific */
+        .ipk-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 20px; padding: 30px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); transform: translateY(20px); transition: 0.3s; }
+        .ipk-modal.active .ipk-content { transform: translateY(0); }
+        .ipk-header { text-align: center; margin-bottom: 20px; color: var(--text-color); }
+        .semester-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
+        .semester-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.05); border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--text-color); border-left: 4px solid #ccc; }
+        .semester-row.has-score { border-left: 4px solid #00b09b; background: rgba(0, 176, 155, 0.1); }
+        .ipk-edit-btn { background: none; border: none; color: #f39c12; cursor: pointer; margin-left: 10px; font-size: 14px; }
+        .close-ipk { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .close-ipk:hover { background: #555; }
+
+        /* Modern IPK Input Modal */
+        .modern-input-field { width: 100%; padding: 15px; font-size: 24px; text-align: center; border: 2px solid #3498db; border-radius: 15px; background: white; color: #333; font-weight: bold; margin: 20px 0; outline: none; }
+        .modern-input-field:focus { box-shadow: 0 0 15px rgba(52, 152, 219, 0.4); }
+
+        /* Date Picker & Confirmation */
+        .date-input-container { margin: 20px 0; display: flex; justify-content: center; }
+        .custom-date-input { padding: 15px; border-radius: 10px; border: 2px solid #3498db; font-family: 'Poppins', sans-serif; font-size: 16px; width: 100%; color: #333; background: white; }
+        .warning-text { color: #e74c3c; font-size: 13px; margin-bottom: 20px; font-weight: 600; }
+        .confirm-btn-container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        .btn-check { width: 60px; height: 60px; border-radius: 50%; background: #2ecc71; color: white; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(46, 204, 113, 0.4); transition: transform 0.2s; }
+        .btn-check:hover { transform: scale(1.1); }
+        .btn-cross { width: 60px; height: 60px; border-radius: 50%; background: #e74c3c; color: white; border: none; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4); transition: transform 0.2s; }
+        .btn-cross:hover { transform: scale(1.1); }
+        .btn-conf-primary { background: #3498db; color: white; padding: 12px 25px; border-radius: 25px; border: none; font-weight: 600; cursor: pointer; font-size: 15px; }
+        .btn-conf-close { background: #95a5a6; color: white; padding: 12px 25px; border-radius: 25px; border: none; font-weight: 600; cursor: pointer; font-size: 15px; }
+
+        /* Verify Modal */
+        .verify-input { width: 100%; padding: 15px; text-align: center; font-size: 24px; letter-spacing: 5px; border: 2px solid #3498db; border-radius: 10px; margin-top: 20px; outline: none; background: white; color: #333; }
+        .bold-ex { font-weight: 800; color: #e74c3c; }
+
+        /* Event Modal */
+        .event-list { text-align: left; margin-top: 20px; }
+        .event-item { background: linear-gradient(135deg, #fceabb 0%, #f8b500 100%); padding: 15px; border-radius: 10px; color: #8e44ad; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid #fff; animation: pulse 2s infinite; cursor: pointer; transition: transform 0.2s; }
+        .event-item:active { transform: scale(0.95); }
+        @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 181, 0, 0.7); } 70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(248, 181, 0, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(248, 181, 0, 0); } }
+        .event-title { font-weight: 800; font-size: 16px; margin-bottom: 5px; }
+        .event-prize { font-size: 14px; font-weight: 600; color: #d35400; }
+
+/* --- FIRE EVENT STYLE (FIXED - NO INNER GLOW) --- */
+        .event-item.fire-theme {
+            position: relative;
+            background: #000; /* Warna dasar hitam pekat */
+            color: #fff;
+            border: none;
+            overflow: hidden;
+            z-index: 1;
+            /* Shadow hanya di luar, tidak di dalam */
+            box-shadow: 0 0 15px rgba(255, 69, 0, 0.5); 
+            animation: none;
+        }
+
+        .event-item.fire-theme .event-title, 
+        .event-item.fire-theme .event-prize {
+            position: relative;
+            z-index: 5; /* Pastikan teks paling atas */
+            text-shadow: 2px 2px 4px #000;
+        }
+        
+        .event-item.fire-theme .event-prize { color: #ffd700; }
+
+        /* LAYER 1: Animasi Border Mengalir (Berada paling belakang) */
+        .event-item.fire-theme::before {
+            content: ''; 
+            position: absolute;
+            top: -50%; left: -50%; 
+            width: 200%; height: 200%;
+            /* Gradient warna api */
+            background: conic-gradient(transparent, #ff0000, #ff4500, #ffff00, #ff0000);
+            animation: rotateFireBorder 3s linear infinite;
+            z-index: -2; 
+        }
+
+        /* LAYER 2: Penutup Tengah (Background GIF) */
+        .event-item.fire-theme::after {
+            content: ''; 
+            position: absolute;
+            /* Jarak 3px dari tepi untuk menciptakan efek border */
+            top: 3px; left: 3px; right: 3px; bottom: 3px;
+            
+            /* PENTING: Background hitam solid + GIF */
+            background-color: #000; 
+            background-image: url('https://media1.tenor.com/m/PEDzvMlrdi0AAAAC/fire.gif');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: 100% 100%;
+            
+            border-radius: 8px;
+            z-index: -1; 
+            /* Opacity dihapus agar tidak tembus pandang ke animasi border di belakangnya */
+        }
+
+        @keyframes rotateFireBorder {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- STEGANOGRAPHY INPUT STYLE --- */
+        .stego-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 15px;
+            border: none;
+            outline: none;
+            color: #fff; /* Warna Teks Putih */
+            
+            /* Gradasi Emas ke Emerald */
+            background: linear-gradient(45deg, #ffd700, #50c878, #ffd700, #009b77);
+            background-size: 300% 300%;
+            
+            /* Efek Animasi Berkilau */
+            animation: shimmerEffect 3s ease infinite;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .stego-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        @keyframes shimmerEffect {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Event Challenge Modal */
+        .wa-btn { background: #25D366; color: white; padding: 15px 30px; border-radius: 30px; border: none; font-weight: bold; font-size: 16px; margin-top: 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; text-decoration: none; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3); }
+
+        /* --- JODOH MODAL (FIXED POSITION & Z-INDEX) --- */
+        .jodoh-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); 
+            z-index: 10000 !important; /* Paling atas */
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+            opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s;
+        }
+        .jodoh-modal.active { opacity: 1; visibility: visible; }
+
+        .choice-btn { padding: 15px 30px; border: none; border-radius: 12px; font-size: 18px; font-weight: 600; cursor: pointer; color: white; margin: 0 10px; }
+        .btn-if1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-if2 { background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%); }
+        .match-result-box { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 350px; text-align: center; overflow: hidden; }
+        .match-name { font-size: 24px; font-weight: bold; color: #2c3e50; margin: 15px 0; min-height: 60px; display: flex; align-items: center; justify-content: center;}
+        .couple-display { display: none; margin-top: 10px; animation: slideUp 0.5s ease; }
+        .couple-container { display: flex; flex-direction: column; gap: 10px; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .c-name-user { font-size: 18px; font-weight: 700; color: #2c3e50; }
+        .c-heart { font-size: 30px; color: #e91e63; animation: heartbeat 1s infinite; }
+        .c-name-partner { font-size: 18px; font-weight: 700; color: #e91e63; }
+        .couple-sub { font-size: 13px; color: #7f8c8d; font-style: italic; margin-top: 5px; line-height: 1.4; padding: 0 5px; }
+        .couple-gif { width: 140px; height: auto; border-radius: 10px; margin-top: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .special-title { font-size: 26px; font-weight: 800; color: #c0392b; margin-bottom: 10px; }
+        .close-match { margin-top: 20px; background: #333; color: white; border: none; padding: 10px 20px; border-radius: 20px; cursor: pointer;}
+        .heart-beat { font-size: 60px; color: #e91e63; animation: heartbeat 1s infinite; margin-bottom: 20px; }
+
+        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Media Query Mobile (FIXED POSITIONING) */
+        @media (max-width: 600px) {
+            .mobile-layout-controls { display: flex; }
+            .grid-container { grid-template-columns: 1fr; padding: 0 10px; }
+            .search-box { padding: 0 10px; }
+            
+            /* Button Fixes */
+            .pos-left { font-size: 10px; padding: 6px 10px; left: 10px; top: 15px; width: auto; max-width: 150px; }
+            .pos-right { font-size: 0; padding: 8px 12px; right: 15px; top: 15px; }
+            .pos-right i { margin: 0; font-size: 18px; }
+            .pos-theme { right: 55px; width: 35px; height: 35px; font-size: 16px; top: 15px; padding: 0; }
+            
+            .event-box { top: 60px; left: 10px; padding: 6px 12px; font-size: 11px; }
+            h1 { font-size: 1.8rem; }
+            .grid-container.mobile-grid-active { grid-template-columns: repeat(2, 1fr) !important; gap: 10px; }
+            .grid-container.mobile-grid-active .card { padding: 15px 10px; }
+            .grid-container.mobile-grid-active .avatar { width: 45px; height: 45px; font-size: 16px; margin-bottom: 8px; }
+            .grid-container.mobile-grid-active h3 { font-size: 13px; min-height: 40px; line-height: 1.2; margin-bottom: 5px; }
+            .grid-container.mobile-grid-active .nim-badge { font-size: 10px; padding: 3px 8px; }
+            .now-playing-box { bottom: 70px; max-width: 250px; }
+        }
+        
+        /* --- SAFETY FIX: Mencegah Gambar Meledak di Modal --- */
+        .modal-box img {
+            max-width: 100%; /* Gambar tidak boleh lebih lebar dari kotak */
+            height: auto;
+        }
+        
+        /* Pastikan wrapper hint tidak melar */
+        .stego-hint-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Rapi kanan-kiri */
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(100, 100, 100, 0.2); /* Sedikit lebih gelap agar terlihat */
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px dashed #ffd700;
+            width: 100%;
+            box-sizing: border-box; /* Penting agar padding tidak melebarkan box */
+        }
+    </style>
+</head>
+<body>
+
+<div class="global-bg" id="bg-light-mode">
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="glow glow-3"></div>
+    <div class="stars-bg"></div>
+    <div class="stars-sm-bg"></div>
+</div>
+
+<div class="global-bg" id="bg-dark-mode">
+    <div class="star-layer layer-1" id="stars1"></div>
+    <div class="star-layer layer-2" id="stars2"></div>
+    <div class="star-layer layer-3" id="stars3"></div>
+</div>
+<div id="fireflies-container"></div>
+<div id="copy-tooltip" class="copy-tooltip">NIM Disalin!</div>
+
+<div id="playlist-box" class="playlist-box">
+    <div class="playlist-inner">
+        <div class="playlist-header">
+            <span><i class="fas fa-list-ul"></i> Daftar Lagu</span>
+            <span style="font-size:10px; opacity:0.6;">Auto-Play</span>
+        </div>
+        <div class="playlist-scroll" id="playlist-container">
+            </div>
+    </div>
+</div>
+
+<div id="now-playing-box" class="now-playing-box">
+    <div class="np-icon" onclick="toggleNPBox()">
+        <i class="fas fa-music"></i>
+    </div>
+    
+    <div class="np-content">
+        <div class="np-info">
+            <div class="np-label">Sedang Memutar</div>
+            <div class="np-title" id="np-title">Menunggu Lagu...</div>
+        </div>
+        <div class="np-controls">
+            <button class="np-btn" id="btn-playlist-toggle" onclick="togglePlaylist()" title="Daftar Lagu">
+                <i class="fas fa-list"></i>
+            </button>
+            <button class="np-btn" onclick="toggleMute()" title="Mute/Unmute">
+                <i class="fas fa-volume-up" id="mute-icon"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="selectionModal">
+    <div class="modal-box">
+        <h2 style="margin-bottom:20px; color:var(--text-color);">Mau Liat Kelas IF Berapa?</h2>
+        <div style="display:flex; justify-content:center;">
+            <button class="choice-btn btn-if1" onclick="loadClassData('IF1')">IF 1</button>
+            <button class="choice-btn btn-if2" onclick="loadClassData('IF2')">IF 2</button>
+        </div>
+    </div>
+</div>
+
+<div class="mobile-layout-controls">
+    <button class="mobile-btn active" onclick="setMobileList()" id="btnList"><i class="fas fa-list"></i> List</button>
+    <button class="mobile-btn" onclick="setMobileGrid()" id="btnGrid"><i class="fas fa-th-large"></i> Petak</button>
+</div>
+
+<div id="main-view">
+    <div class="fixed-element pos-left">Karya: Gilang Aidil Pratama</div>
+    <div class="event-box" onclick="openEventModal()">
+        <i class="fas fa-trophy"></i> Event
+    </div>
+
+    <button class="fixed-element pos-theme" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
+    <a href="http://www.youtube.com/@DilzGhaaziy" target="_blank" class="fixed-element pos-right"><i class="fab fa-youtube"></i><span>Dilz Ghaaziy</span></a>
+
+    <div class="container">
+        <header>
+            <h1>Daftar Mahasiswa</h1>
+            <p class="subtitle"><span id="class-name">Kelas</span> &bull; Cihuyyy</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" onkeyup="filterNames()" placeholder="Cari nama atau NIM...">
+            </div>
+        </header>
+        <div class="grid-container" id="cardGrid"></div>
+    </div>
+</div>
+
+<div id="profile-view">
+    
+    <button class="back-btn-float" onclick="closeProfile()" style="position: absolute; top: 20px; left: 20px; padding: 10px 20px; background: var(--fixed-bg); border: none; border-radius: 20px; color: var(--fixed-text); font-weight: bold; cursor: pointer; z-index: 2005;"><i class="fas fa-arrow-left"></i> Kembali</button>
+
+    <div class="profile-content">
+        <div class="big-profile-card">
+            <div class="big-avatar" id="p-avatar">GA</div>
+            <h2 id="p-name" style="margin-bottom:5px;">Nama</h2>
+            <div id="p-role" class="owner-role" style="display:none;">Pembuat Web</div>
+            <div style="display:flex; align-items:center; justify-content:center; margin-bottom:20px;">
+                <p id="p-nim" style="color:var(--text-color); margin:0;">NIM</p>
+                <button class="copy-btn" onclick="copyNIM()"><i class="fas fa-copy"></i></button>
+            </div>
+            
+            <div class="info-row"><span class="info-label">Angkatan</span><span class="info-val">2025</span></div>
+            <div class="info-row"><span class="info-label">Kelas</span><span class="info-val" id="p-class">IF X</span></div>
+            <div class="info-row"><span class="info-label">Jenis Kelamin</span><span class="info-val" id="p-gender">-</span></div>
+            
+            <div class="info-row">
+                <span class="info-label">Tanggal Lahir</span>
+                <span class="info-val">
+                    <span id="p-dob">-</span> 
+                    <i id="dob-edit-icon" class="fas fa-edit edit-icon" title="Edit Tanggal Lahir" onclick="initEditDOB()"></i>
+                </span>
+            </div>
+            
+            <div class="info-row"><span class="info-label">Dosen Pembimbing</span><span class="info-val" id="p-dospem">-</span></div>
+            <div class="info-row" id="p-status-row" style="display: none;"><span class="info-label">Status Kuliah</span><span class="info-val" id="p-status-val">-</span></div>
+
+            <button class="ipk-btn" onclick="openIPKModal()">
+                <i class="fas fa-chart-line"></i> Lihat Detail IPK
+            </button> 
+
+            <button class="jodoh-btn" onclick="cekJodoh()">
+                <i class="fas fa-heart"></i> Siapa Jodohmu?
+            </button>
+            <div class="quote-box" id="daily-quote">"Memuat kata-kata..."</div>
+        </div>
+    </div>
+</div>
+
+<div class="event-modal" id="eventModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color);"><i class="fas fa-calendar-alt"></i> Event Aktif</h2>
+        <div class="event-list" id="eventListContainer"></div>
+        <button class="btn-conf-close" style="margin-top:20px;" onclick="closeEventModal()">Tutup</button>
+    </div>
+</div>
+
+<div class="event-challenge-modal" id="challengeModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); margin-bottom: 5px;">Duel Dengan Owner. GRATIS KOK</h2>
+        <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 20px;">Chat Pembuat Event Untuk Diskusi / Terima Tantangan</p>
+        <a href="https://wa.me/628311801213" target="_blank" class="wa-btn">
+            <i class="fab fa-whatsapp"></i> Terima Tantangan
+        </a>
+        <br><br>
+        <button class="btn-conf-close" onclick="closeChallengeModal()">Batal</button>
+    </div>
+</div>
+
+<div class="ipk-modal" id="ipkModal">
+    <div class="ipk-content">
+        <div class="ipk-header">
+            <h2>Riwayat IPK</h2>
+            <p id="ipk-nama-mhs">Nama Mahasiswa</p>
+        </div>
+        <div class="semester-list" id="semesterList"></div>
+        <button class="close-ipk" onclick="closeIPKModal()">Tutup</button>
+    </div>
+</div>
+
+<div class="ipk-input-modal" id="ipkInputModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color);">Input Nilai IPK</h2>
+        <p style="font-size: 12px; color: #666;">Masukkan nilai antara 1.00 sampai 4.00</p>
+        
+        <input type="number" id="modern-ipk-input" class="modern-input-field" placeholder="0.00" step="0.01" min="1" max="4">
+        
+        <div style="display:flex; justify-content:center; gap:10px;">
+            <button class="btn-conf-close" onclick="closeIpkInputModal()">Batal</button>
+            <button class="btn-conf-primary" onclick="confirmIPKInput()">Simpan</button>
+        </div>
+    </div>
+</div>
+
+<div class="date-picker-overlay" id="datePickerModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); margin-bottom: 15px;">Ubah Tanggal Lahir</h2>
+        <p class="warning-text">Tanggal Lahir hanya bisa diubah sekali!</p>
+        
+        <div class="date-input-container">
+            <input type="date" id="newDobInput" class="custom-date-input">
+        </div>
+
+        <div style="display: flex; justify-content: center; gap: 10px;">
+            <button class="btn-conf-close" onclick="closeDatePicker()">Batal</button>
+            <button class="btn-conf-primary" onclick="confirmDateSelection()">Konfirmasi</button>
+        </div>
+    </div>
+</div>
+
+<div class="verify-modal" id="verifyModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); font-size: 20px;">Memastikan Kalau Ini Adalah Kamu</h2>
+        <p style="color: var(--text-color); margin-top: 10px; font-size: 14px;">
+            masukkan 2 angka terakhir dari NIM mu, contohnya 55202250<span class="bold-ex">23</span>
+        </p>
+        <input type="tel" id="nim-verify-input" class="verify-input" maxlength="2" placeholder="XX" autocomplete="off">
+        <div style="margin-top: 20px; display:flex; justify-content: center; gap: 10px;">
+            <button class="btn-conf-close" onclick="closeVerifyModal()">Batal</button>
+            <button class="btn-conf-primary" onclick="submitVerification()">Verifikasi</button>
+        </div>
+    </div>
+</div>
+
+<div class="date-confirm-overlay" id="dateConfirmModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); margin-bottom: 10px;">Konfirmasi</h2>
+        <p style="color: var(--text-color); margin-bottom: 20px;">Tanggal Lahirnya Sudah Benar?</p>
+        <div style="font-size: 20px; font-weight: bold; color: #3498db; margin-bottom: 30px;" id="conf-dob-display">-</div>
+        <div class="confirm-btn-container">
+            <button class="btn-cross" onclick="closeDateConfirm()"><i class="fas fa-times"></i></button>
+            <button class="btn-check" onclick="initVerification()"><i class="fas fa-check"></i></button>
+        </div>
+    </div>
+</div>
+
+<div class="jodoh-modal" id="jodohModal">
+    <div class="heart-beat"><i class="fas fa-heart"></i></div>
+    <h2 style="color:white; margin-bottom:20px;">Mencari Koneksi Hati...</h2>
+    <div class="match-result-box">
+        <div id="searching-ui">
+            <div style="font-size:12px; color:#aaa; margin-bottom:10px;">JODOH KAMU ADALAH</div>
+            <div class="match-name" id="match-name-display">X</div>
+        </div>
+        <div class="couple-display" id="final-couple-ui"></div>
+        <br>
+        <button class="close-match" onclick="closeJodoh()">Tutup</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="stegoModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); margin-bottom: 5px;">Yakin Kamu Bisa?</h2>
+        <p style="font-size: 12px; color: #7f8c8d; margin-bottom: 20px;">
+            Hanya Calon Hacker & Detekif Yang Bisa
+        </p>
+        
+        <div class="stego-hint-wrapper">
+            <div class="stego-hint-text">CARI SESUATU DI GAMBAR INI</div>
+            <i class="fas fa-arrow-right arrow-anim"></i>
+            
+            <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" 
+                 onclick="openStegoImage()" 
+                 title="Klik untuk memperbesar" 
+                 style="width: 60px !important; height: 60px !important; min-width: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #fff; cursor: pointer; background: #000;">
+        </div>
+
+        <input type="text" id="stegoAnswerInput" class="stego-input" placeholder="Masukkan 3 Kata Rahasia..." autocomplete="off">
+        
+        <div style="margin-top: 20px; display:flex; justify-content: center; gap: 10px;">
+            <button class="btn-conf-close" onclick="closeStegoModal()">Batal</button>
+            <button class="btn-conf-primary" onclick="checkStegoAnswer()">Konfirmasi</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="stegoImageModal" style="z-index: 11000;" onclick="closeStegoImage()">
+    <div class="modal-box" style="background: transparent; box-shadow: none; max-width: 95%;">
+        <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" class="stego-thumb" onclick="openStegoImage()" title="Klik untuk memperbesar">
+        <p style="color: white; margin-top: 15px; font-weight: bold; text-shadow: 0 2px 4px #000;">Klik dimana saja untuk menutup</p>
+    </div>
+</div>
+
+<div class="modal-overlay" id="stegoSuccessModal">
+    <div class="modal-box" style="border: 2px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);">
+        <h2 style="color: var(--text-color); margin-bottom: 5px;">Hebat, Calon Hacker Ya?</h2>
+        
+        <div style="margin: 20px 0;">
+            <i class="fas fa-money-bill-wave" style="font-size: 80px; background: -webkit-linear-gradient(#11998e, #38ef7d); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+        </div>
+        
+        <p style="font-size: 14px; font-weight: bold; color: var(--text-color); margin-bottom: 20px;">
+            Selamat, Kamu Dapat 200 Ribu !<br>Screenshot & Kirim Ke Owner Web<br><br>Jelaskan Step-Stepmu Saat Menyelesaikannya.
+        </p>
+        
+        <a href="https://wa.me/628311801213?text=Halo%20Min,%20saya%20berhasil%20memecahkan%20tantangan%20Steganography!" target="_blank" class="wa-btn">
+            <i class="fab fa-whatsapp"></i> Ambil Hadiah
+        </a>
+        
+        <br><br>
+        <button class="btn-conf-close" onclick="closeStegoSuccess()">Tutup</button>
+    </div>
+</div>
+
+<script>
+// --- KONFIGURASI REPO GITHUB ---
+    const REPO_CONFIG = { owner: "DilzGhaaziy", name: "IF25-uimDG" };
+
+    // --- DATA EVENTS ---
+    const eventsData = [
+        { title: "Duel Game Naruto Storm 4", prize: "Rp 60.000", theme: "normal" },
+        { title: "Steganography", prize: "Rp 200.000", theme: "fire" } 
+    ];
+
+    // --- DATABASE (DINAMIS DARI JSON) ---
+    let dataIF1 = [];
+    let dataIF2 = [];
+    let allStudents = [];
+
+    // Fungsi untuk mengambil data terbaru dari students.json
+    async function fetchStudentData() {
+        try {
+            const response = await fetch('students.json?t=' + new Date().getTime());
+            if (!response.ok) throw new Error("Gagal mengambil data");
+            
+            const data = await response.json();
+            
+            dataIF1 = data.IF1;
+            dataIF2 = data.IF2;
+            
+            allStudents = [
+                ...dataIF1.map(s => ({...s, class:'IF 1'})), 
+                ...dataIF2.map(s => ({...s, class:'IF 2'}))
+            ];
+            
+            console.log("✅ Data mahasiswa berhasil dimuat!");
+        } catch (error) {
+            console.error("❌ Error loading student data:", error);
+            alert("Gagal memuat data mahasiswa terbaru. Mohon refresh halaman.");
+        }
+    }
+
+    const quotes = ["Jadilah versi terbaik.", "Turu jalan ninjaku.", "10% ngetik 90% error.", "Aku belum cebok.", "Jodoh gak kemana.", "Tetap santuy.", "Kita akan mati kapan aja.", "Error 404 katanya.", "Ngoding dulu rawr.", "Cintailah otakmu, jangan ngoding tiap hari.", "Hidup seperti array.(Meme Spongebob)", "PHP tuh bukan pemberi harapan palsu.", "Kuliah Pulang Tidur.", "Uang habis.", "Oh Tuhan, ku sayang dia.", "Bersakit dahulu wisuda kemudian.", "Fokus masa depan.", "Joki hanya di Dilz Ghaaziy JOKI.", "Gak bosen tah ke Be Hots Mulu.", "Kamu udah mandi belum?", "Bahagia itu ketika bisa jajan terus.", "Nilai A buat Kalkulus itu MITOS.", "Masih hidup lu?", "Udah kuliah kok masih labil itu mindset.", "Kucing bawa motor pake helm", "Sayang, kok kamu gak ngabarin aku?", "Bismillah Umroh.", "Lu mah mending, lah gua...", "Jangan panggil aku anak kecil paman!", "Jual tanah demi gaji UMR, What? Total gaji seumur hidup gak sampe harga tanahnya", "Minta doa yang terbaik ke Ibu.", "Fokus, hiyak hiyak hiyak!", "Sebel ga sih nilai C?.", "Tugas kelar.", "Wifi kencang is anugerah.", "Kalo ada cobaan, ya cobain.", "Kalo kata aku, dia gak waras.", "Aku lagi nahan eeq.", "Calon Mahasiswa Cumlaude.", "Ijo Lumut - Ikatan Jomblo Lucu Imut.", "Informatika? Chat GPT!.", "Pergi ke warung beli kopi,(cakep) Ya abis itu pulang.", "Algoritma cinta.", "Ada ide? Chat pribadi ke Owner web ini ya.", "Kayaknya kalo makan mie sukses terus, bisa jadi orang sukses.", "Apa yang kamu harapin dari dia?.", "Aku tak pernah, untuk mencintai...", "Ego vs Ego = Hubungan gak sehat.", "Katamu, pacarmu cuma satu.", "Array of hope.", "Informatika?! Cihuyyyy!.", "Ganteng pendiem = Cool.|Jelek pendiem = Introvert", "Duel Game Naruto sama Owner, Menang dapet 100 ribu.", "Bug adalah fitur.", "Ctrl+C Ctrl+V.", "Cihuyyyyy.", "Dibuat makalah minimal 15 lembar ya :).", "Kurang apa nih webnya?.", "Ga suka libur, gak ada jokian.", "Adalah pokoknya.", "Om jangan om", "Tolong jokiin hidupku.", "Searching makna.", "Nyari masalah?", "Recursion.", "Memory leak.", "Garbage collection.", "Compile error.", "Runtime exception.", "Debug hidup.", "Deploy bahagia.", "Version control.", "Git commit.", "Git push.", "Git pull.", "Merge conflict.", "Branch baru.", "Master skills.", "Main function happy.", "Include doa.", "Import sukses.", "Print Hello.", "Return 0.", "Void sedih.", "Public static.", "System out.", "Console log.", "Echo bisa.", "Select rejeki.", "Insert usaha.", "Update skill.", "Delete pikiran.", "Drop malas.", "Create view.", "Grant success.", "Revoke gagal.", "Commit.", "Rollback dosa.", "Savepoint.", "Connect God.", "Disconnect toxic."];
+
+    const coupleVariations = [
+        { t: "Ciee, dunia serasa milik berdua nih.", type: "cute" }, { t: "Semoga langgeng sampai wisuda ya!", type: "cute" }, { t: "Aduh gemes banget liatnya.", type: "cute" }, { t: "Cocok banget, kayak kopi sama gula.", type: "cute" }, { t: "Udah jadian aja belum sih?", type: "cute" }, { t: "Kiw kiw cukurukuk ebew rawr well ungrr.", type: "cute" }, { t: "Jangan lupa undang-undang kalau nikah.", type: "cute" }, { t: "Liat kalian berdua bikin iri jomblo.", type: "cute" }, { t: "Chemistry-nya dapet banget!", type: "cute" }, { t: "Kawal sampai halal pokoknya!", type: "cute" }, { t: "Senyumnya mirip, jodoh beneran nih.", type: "cute" }, { t: "Semesta merestui hubungan ini.", type: "cute" }, { t: "Gak usah malu-malu, tembak aja langsung.", type: "cute" }, { t: "Pasangan ter-uwu di angkatan 2025.", type: "cute" }, { t: "Bahagia terus ya kalian berdua.", type: "cute" }, { t: "Kayak ada manis-manisnya gitu.", type: "cute" }, { t: "Fix, tahun depan nyebar undangan.", type: "cute" }, { t: "Cintaku bersemi di ruang C3.", type: "cute" }, { t: "Jangan berantem terus ya, sayang kuotanya.", type: "cute" }, { t: "Semoga jodoh dunia akhirat.", type: "cute" }, { t: "Lucu banget cii kalian.", type: "cute" }, { t: "Tatapan matanya itu lho, dalem banget.", type: "cute" }, { t: "Yang satu ganteng, yang satu cantik. Pas!", type: "cute" }, { t: "Jodoh emang gak kemana, ternyata seprodi.", type: "cute" }, { t: "Semoga kalian selalu bahagia bersama.", type: "cute" },
+        { t: "Hadeh, kasian banget jodohnya sama dia.", type: "mock" }, { t: "Yakin mau sama dia? Pikir lagi deh 7x24 jam.", type: "mock" }, { t: "Siap-siap makan ati ya tiap hari.", type: "mock" }, { t: "Jodoh sih, tapi kok kayak terpaksa gitu mukanya?", type: "mock" }, { t: "Awas, dia galak loh kalau lagi laper.", type: "mock" }, { t: "Kuat-kuatin iman ya ngadepin dia.", type: "mock" }, { t: "Yah, nasibmu kurang beruntung dapet dia.", type: "mock" }, { t: "Kok bisa sih jodohnya sama modelan begini?", type: "mock" }, { t: "Sabar ya, ini ujian hidup.", type: "mock" }, { t: "Dompet aman? Dia doyan jajan.", type: "mock" }, { t: "Mending pura-pura gak kenal aja deh.", type: "mock" }, { t: "Selamat menikmati penderitaan.", type: "mock" }, { t: "Dia tidurnya ngorok, yakin mau?", type: "mock" }, { t: "Jodoh sih, tapi boong (canda deng).", type: "mock" }, { t: "Aduh, turun standar banget dapet dia.", type: "mock" }, { t: "Dia suka nahan eeq.", type: "mock" }, { t: "Dia kalau mandi lama banget weee, awas telat ngampus.", type: "mock" }, { t: "Dia kalo bales chat bisa 3 hari, sabar ya.", type: "mock" }, { t: "Hati-hati, dia buaya/kucing garong berkedok mahasiswa.", type: "mock" }, { t: "Yakin mentalmu kuat? Dia drama queen/king.", type: "mock" }, { t: "Duh, sainganmu berat (sama hobi tidurnya).", type: "mock" }, { t: "Pasti kamu banyak dosa makanya dapet dia.", type: "mock" }, { t: "Jangan kaget kalau dia tiba-tiba minjem duit.", type: "mock" }, { t: "Selamat menempuh hidup penuh huru-hara.", type: "mock" }, { t: "Cinta itu buta.", type: "mock" }
+    ];
+    const cuteGifs = ["https://media.tenor.com/36d8ovZxZsgAAAAi/bubu-bubu-dudu.gif", "https://media.tenor.com/qQmsOJoeMoMAAAAi/dudu-bubu.gif", "https://media.tenor.com/Eazcnx5O-bgAAAAM/dudu-dudu-cute.gif", "https://media.tenor.com/pN7xf12qQcwAAAAM/cuddle-cute.gif", "https://media.tenor.com/RDwCMZeZ7b8AAAAi/hugs.gif", "https://media.tenor.com/wA5xWw0tNBwAAAAi/h%C3%AAh.gif", "https://media.tenor.com/9Pnoc6MKDrEAAAAi/love-you-too.gif", "https://media.tenor.com/JcPATwwdUOQAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/pdv5YIMB-hkAAAAi/cute.gif", "https://media1.tenor.com/m/z2TX5B4RD34AAAAC/your-so-cute-mini-seb.gif", "https://media1.tenor.com/m/pjBtpAFSnmgAAAAC/peach-goma-peach-and-goma.gif", "https://media1.tenor.com/m/FYrmLKoB1UIAAAAC/peach-and-goma-peach-loves-goma.gif", "https://media.tenor.com/Zrr4L_Wd4JkAAAAi/bubu-rub-bubu-love-dudu.gif", "https://media.tenor.com/vzkveVGDzmAAAAAi/dudu-hug-bubu-dudu-kiss.gif", "https://media1.tenor.com/m/hOmnC-qwGagAAAAC/peach-and-goma.gif", "https://media.tenor.com/KqqtGmNZ_vkAAAAi/bubu-dudu.gif", "https://media.tenor.com/rjnOQXkO-TEAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/wKP-p_HtfOoAAAAi/bubu-dudu.gif", "https://media.tenor.com/cqGxLDiHeKoAAAAi/bubu-dudu-bubu-dudu-love.gif", "https://media.tenor.com/MkU0kjfQnngAAAAi/kiss-bubu.gif", "https://media.tenor.com/vEvRDC60wpoAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/u7fyNJeFi44AAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/fQ0oZELv1y4AAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/UeanLw-I3B4AAAAi/tkthao219-bubududu.gif", "https://media.tenor.com/vJRHkcdlEQQAAAAi/casal-dudu.gif", "https://media.tenor.com/tnTcMaEkXzAAAAAi/tonibear-bubu.gif", "https://media.tenor.com/Zc42xR3zFWYAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/NgAmTbY1aokAAAAi/dare-aggie-dare-aggie-bunny.gif", "https://media.tenor.com/S_lMGnbCMzYAAAAi/bubu-bubu-dudu.gif", "https://media.tenor.com/3BTNvUaCiGgAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/wG7yYjwS7F8AAAAi/milk-and-mocha-sleeping.gif", "https://media1.tenor.com/m/2BrMVhEIsgIAAAAC/mocha-bear-kiss-bear-kiss.gif", "https://media1.tenor.com/m/1gf_Jz8WYH0AAAAC/sami-en-dina-sami-dina.gif", "https://media1.tenor.com/m/WAqsZeIoxnEAAAAC/milk-and-mocha-milk-and-mocha-kiss.gif"];
+    const mockGifs = ["https://media.tenor.com/vu0bClH3OiUAAAAM/bubu-dudu-sseeyall.gif", "https://media.tenor.com/8Hs24bl0z94AAAAM/12.gif", "https://media.tenor.com/IFAObJVF4tEAAAAi/bubu-dudu.gif", "https://media.tenor.com/2L3bWLooqT8AAAAi/bubu-silly.gif", "https://media1.tenor.com/m/ddBFqmr_qp0AAAAC/laughing-bubu.gif", "https://media.tenor.com/eSMmyYMJXOcAAAAi/miss-you.gif", "https://media.tenor.com/KmIZbENMqx4AAAAi/bubu-dudu-sseeyall.gif", "https://media1.tenor.com/m/KUGbLzdDd9YAAAAC/bubu-dudu.gif", "https://media.tenor.com/7awxGekCrFoAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/SzjZCjI1kZQAAAAi/bubu-bubu-dudu.gif", "https://media.tenor.com/RhdwDUpRXeMAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/LC74nzQObQ0AAAAi/bubu-dudu.gif", "https://media.tenor.com/tJk6yhct0wMAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/kTIu00Dc0WwAAAAi/hi.gif", "https://media.tenor.com/WZyHt5hOIKsAAAAi/bubu-bubu-dudu.gif", "https://media.tenor.com/wSjhsZknWUsAAAAi/bubu-dudu-sseeyall.gif", "https://media.tenor.com/9gBByPt6k4oAAAAi/bubu-dudu-twitter.gif", "https://media1.tenor.com/m/1Hq1EY8_MXAAAAAd/m%C3%A8o-troll.gif"];
+
+    let availableVariationIndices = Array.from({length: coupleVariations.length}, (_, i) => i);
+    let currentClassData = [], currentClassLabel = "", currentProfile = null;
+    let bgmAudio = new Audio();
+    let jodohAudio = new Audio(); 
+    let currentBgmIndex = -1;
+    let currentJodohSongIndex = -1;
+    let isMuted = false;
+    let userInteracted = false; 
+    let radioTimeout = null; // VARIABLE BARU UNTUK TIMER RADIO DEFAULT
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    // =================================================================
+    // PLAYLIST CONFIGURATION (DBFM RADIO AS DEFAULT)
+    // =================================================================
+    const bgmPlaylist = [
+        // Index 0: Default Utama (DBFM Pemda Radio)
+        {title: "DBFM Radio Pemda", url: "http://stream.dbfmradio.id:8000/stream"}, 
+        
+        // Playlist Cadangan
+        {title: "iSWARA Jakarta FM", url: "https://n13.radiojar.com/4ywdgup3bnzuv?rj-ttl=5&rj-tok=AAABnECWuWQAm41UJbq3s9BypA"},
+        {title: "iSWARA Banjarmasin FM", url: "https://stream.radiojar.com/qfqd2aw80k8uv"},
+        {title: "SmartFM", url: "https://cast2.my-control-panel.com/proxy/radioso3/stream"}, 
+        {title: "Mettaswara Dangdut FM", url: "http://mettaswara.com:8700/d4d"},
+        {title: "Mettaswara Koplo FM", url: "http://mettaswara.com:8700/koplo"},
+        {title: "Tebet Radio FM", url: "https://stream-ssl.arenastreaming.com:8066/stream"},
+        {title: "RTC Radio FM", url: "https://stream.pamula.xyz/listen/rtc_ui/radio.mp3"},
+        {title: "JGRP Radio Live", url: "https://s7.alhastream.com/radio/8350/live"}
+    ];
+
+    const jodohSongs = [
+        "https://od.lk/s/NjhfMTYyNzYyNDI5Xw/Beautiful%20in%20white%20CUT_2_2.mp3",
+        "https://od.lk/s/NjhfMTYyNzYyNDMxXw/Rewrite%20the%20start%20CUT.mp3",
+        "https://od.lk/s/NjhfMTYyNzYyNDU0Xw/dandelions%20CUT.mp3",
+        "https://od.lk/s/NjhfMTYyNzYyNDYwXw/Melukis%20Senja%20CUT.mp3",
+        "https://od.lk/s/NjhfMTYyNzYyNDYxXw/Love%20Story%20CUT.mp3"
+    ];
+
+    const S_MATI = "https://od.lk/s/NjhfMTYyNzYyNDE7Xw/Ingat%20Mati%20CUT.mp3";
+    const S_ISLAMI = "https://od.lk/s/NjhfMTYyNzYyNDE5Xw/Haaaaa%20Islami%20CUT.mp3";
+    const S_FUNNY = "https://od.lk/s/NjhfMTYyNzYyNDIwXw/Alur%20Cerita%20FB%20CUT.mp3";
+    const S_SAD = "https://od.lk/s/NjhfMTYyNzYyNDE4Xw/Sampai%20kini%20masih%20ku%20coba%20CUT.mp3";
+    const S_YALILI = "https://od.lk/s/NjhfMTYyNzYyNDE1Xw/Yalil%20Yalili%20CUT.mp3";
+    const CEO_NAMES = ["CEO MBG", "CEO Cendol", "CEO Ayam Potong", "CEO Gorengan", "CEO Ayam Geprek", "CEO Seblak", "CEO EpEp", "CEO Pecel Lele", "CEO Tahu Bulat"];
+
+    window.onload = function() {
+        // LOAD DATA
+        fetchStudentData(); 
+
+        document.getElementById('selectionModal').classList.add('active');
+        
+        // Initialize Background Systems
+        createBackgroundStars();
+        meteorLoop(); 
+
+        if(localStorage.getItem('theme')==='dark') { document.body.classList.add('dark-mode'); document.querySelector('#themeToggle i').classList.replace('fa-moon','fa-sun'); }
+        if(localStorage.getItem('mobileLayout')==='grid') setMobileGrid();
+        
+        if (window.requestIdleCallback) {
+            requestIdleCallback(preloadAudio);
+        } else {
+            setTimeout(preloadAudio, 3000);
+        }
+    };
+
+    /* =========================================
+       NEW BACKGROUND LOGIC
+       ========================================= */
+       
+    // --- 1. STARS FOR DARK MODE ---
+    function createBackgroundStars() {
+        createStarLayer('stars1', 400, 1);
+        createStarLayer('stars2', 100, 2);
+        createStarLayer('stars3', 20, 3);
+    }
+
+    function createStarLayer(containerId, count, size) {
+        const container = document.getElementById(containerId);
+        if(!container) return;
+        
+        const star = document.createElement('div');
+        star.classList.add('star-field');
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+
+        let boxShadows = [];
+        for (let i = 0; i < count; i++) {
+            const x = Math.floor(Math.random() * window.innerWidth);
+            const y = Math.floor(Math.random() * 2000); 
+            boxShadows.push(`${x}px ${y}px #FFF`);
+        }
+        star.style.boxShadow = boxShadows.join(', ');
+        
+        const clone = star.cloneNode(true);
+        clone.style.position = 'absolute';
+        clone.style.top = '2000px'; 
+        
+        container.appendChild(star);
+        container.appendChild(clone);
+    }
+
+    // --- 2. METEOR SYSTEM (SMART OPTIMIZATION) ---
+    let isTabActive = true;
+    let meteorTimeout;
+    const scene = document.getElementById('bg-dark-mode'); 
+
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            isTabActive = false;
+        } else {
+            isTabActive = true;
+            meteorLoop(); 
+        }
     });
 
-    if (!getResponse.ok) {
-      throw new Error(`Gagal mengambil file dari GitHub: ${getResponse.statusText}`);
+    function spawnMeteor() {
+        if (!isTabActive || !document.body.classList.contains('dark-mode')) return;
+
+        const meteor = document.createElement('div');
+        meteor.classList.add('meteor');
+
+        const headSize = Math.random() * 3 + 2; 
+        const tailLength = headSize * (Math.random() * 50 + 50);
+        const startX = Math.random() * 120 + 20; 
+        const duration = Math.random() * 1.5 + 0.8;
+
+        meteor.style.width = tailLength + 'px';
+        meteor.style.height = (headSize * 0.7) + 'px';
+        meteor.style.left = startX + 'vw';
+        meteor.style.top = '-100px';
+        meteor.style.animation = `shooting ${duration}s linear forwards`;
+
+        const head = document.createElement('div');
+        head.classList.add('meteor-head');
+        head.style.width = headSize + 'px';
+        head.style.height = headSize + 'px';
+        head.style.boxShadow = `0 0 ${headSize * 4}px ${headSize}px rgba(100, 200, 255, 0.9)`;
+        
+        meteor.appendChild(head);
+
+        meteor.addEventListener('animationend', () => {
+            meteor.remove();
+        });
+
+        if(scene) scene.appendChild(meteor);
     }
 
-    const data = await getResponse.json();
-    
-    // Decode konten dari Base64 ke UTF-8
-    const content = Buffer.from(data.content, 'base64').toString('utf-8');
-
-    // 2. Regex untuk mencari dan mengganti Tanggal Lahir berdasarkan NIM
-    // Pola ini mencari: nim: "X", ... dob: "Y" (mengabaikan spasi/baris baru diantaranya)
-    // Penjelasan Regex:
-    // (nim:\s*["']${nim}["'][\s\S]*?dob:\s*["']) -> Group 1: Cari NIM sampai ketemu awal 'dob:'
-    // ([^"']*) -> Group 2: Isi Tanggal Lahir lama (yang akan diganti)
-    // (["'])   -> Group 3: Tanda kutip penutup
-    
-    const regex = new RegExp(`(nim:\\s*["']${nim}["'][\\s\\S]*?dob:\\s*["'])([^"']*)(["'])`);
-    
-    if (!regex.test(content)) {
-      return res.status(404).json({ message: 'NIM tidak ditemukan dalam data script.' });
+    function meteorLoop() {
+        clearTimeout(meteorTimeout);
+        if (isTabActive && document.body.classList.contains('dark-mode')) {
+            spawnMeteor();
+        }
+        const randomDelay = Math.random() * 2000 + 500;
+        meteorTimeout = setTimeout(meteorLoop, randomDelay);
     }
 
-    const newContent = content.replace(regex, `$1${newDOB}$3`);
+    /* =========================================
+       AUDIO PLAYER LOGIC
+       ========================================= */
 
-    // 3. PUT (Update) file kembali ke GitHub
-    const putResponse = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: `Update DOB for NIM ${nim} via Web`, // Pesan commit otomatis
-        content: Buffer.from(newContent).toString('base64'), // Encode kembali ke Base64
-        sha: data.sha, // SHA wajib disertakan untuk update file
-      }),
+    function preloadAudio() {
+        jodohSongs.forEach(url => { const t = new Audio(); t.src = url; t.preload = 'none'; });
+        bgmPlaylist.forEach(t => { const a = new Audio(); a.src = t.url; a.preload = 'none'; });
+    }
+
+    function toggleNPBox() {
+        const box = document.getElementById('now-playing-box');
+        const playlist = document.getElementById('playlist-box');
+        
+        box.classList.toggle('expanded');
+        
+        if (!box.classList.contains('expanded')) {
+            playlist.classList.remove('show');
+            document.getElementById('btn-playlist-toggle').classList.remove('active-list');
+        }
+    }
+
+    function togglePlaylist() {
+        const playlistBox = document.getElementById('playlist-box');
+        const btn = document.getElementById('btn-playlist-toggle');
+        
+        if (!playlistBox.classList.contains('show')) {
+            renderPlaylist();
+        }
+        
+        playlistBox.classList.toggle('show');
+        btn.classList.toggle('active-list');
+    }
+
+    function renderPlaylist() {
+        const container = document.getElementById('playlist-container');
+        container.innerHTML = "";
+        
+        bgmPlaylist.forEach((track, index) => {
+            const isPlaying = (index === currentBgmIndex && !bgmAudio.paused);
+            
+            const item = document.createElement('div');
+            item.className = `track-item ${isPlaying ? 'playing' : ''}`;
+            item.onclick = () => playSpecificBGM(index);
+            
+            item.innerHTML = `
+                <div class="track-icon">
+                    <i class="fas ${isPlaying ? 'fa-volume-up' : 'fa-play'}"></i>
+                </div>
+                <div class="track-info">
+                    <div class="track-name">${track.title}</div>
+                    <div class="track-status">${isPlaying ? 'Sedang Diputar' : 'Klik untuk memutar'}</div>
+                </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    // --- LOGIKA UTAMA PLAYER & FALLBACK ---
+
+    // Fungsi ini dipanggil saat user pertama kali interaksi (klik pilih kelas)
+    function tryPlayDefaultRadio() {
+        if (!userInteracted) return;
+
+        console.log("Mencoba memutar Radio Default (DBFM)...");
+        
+        // Set ke Index 0 (DBFM)
+        currentBgmIndex = 0; 
+        playSpecificBGM(0, true); // True artinya ini adalah percobaan start awal
+
+        // --- FITUR FALLBACK: CEK RESPON SERVER ---
+        // Jika dalam 5 detik radio tidak berbunyi (masih buffering/error), ganti ke random
+        if (radioTimeout) clearTimeout(radioTimeout);
+        
+        radioTimeout = setTimeout(() => {
+            // Cek jika masih loading (readyState < 3) atau error
+            if (bgmAudio.paused || bgmAudio.readyState < 3) {
+                console.warn("Server Radio Default tidak merespon/lambat. Pindah ke Playlist Random.");
+                playRandomBGM(); // Pindah ke playlist lain
+            } else {
+                console.log("Radio Default Berhasil Terhubung!");
+            }
+        }, 5000); // Batas waktu tunggu 5 Detik
+    }
+
+    function playSpecificBGM(index, isStartup = false) {
+        if (currentBgmIndex === index && !bgmAudio.paused && !isStartup) {
+             bgmAudio.pause();
+             renderPlaylist(); 
+             return;
+        }
+
+        jodohAudio.pause();
+        jodohAudio.currentTime = 0;
+
+        currentBgmIndex = index;
+        bgmAudio.src = bgmPlaylist[currentBgmIndex].url;
+        bgmAudio.volume = isMuted ? 0 : 1.0;
+        
+        // Error Handler
+        bgmAudio.onerror = function() {
+            console.error("Error pada stream: " + bgmPlaylist[currentBgmIndex].title);
+            if (isStartup) {
+                playRandomBGM(); // Jika ini radio utama, cari yang lain
+            } else {
+                updateNPUI("Stream Offline/Error");
+            }
+        };
+
+        const playPromise = bgmAudio.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                updateNPUI(bgmPlaylist[currentBgmIndex].title);
+                renderPlaylist(); 
+                
+                // Jika berhasil play, dan ini startup, matikan timer fallback
+                if(isStartup && radioTimeout) clearTimeout(radioTimeout);
+
+            }).catch(e => {
+                console.log("Autoplay blocked atau Stream Error:", e);
+                if(isStartup) playRandomBGM(); // Fallback
+            });
+        }
+
+        bgmAudio.onended = playRandomBGM; 
+    }
+
+    function updateNPUI(title) {
+        document.getElementById('np-title').innerText = title;
+    }
+
+    function playRandomBGM() {
+        if (!userInteracted) return;
+        
+        // Bersihkan timer radio jika fungsi ini dipanggil
+        if (radioTimeout) clearTimeout(radioTimeout);
+
+        bgmAudio.pause();
+        let newIdx;
+        do { 
+            newIdx = Math.floor(Math.random() * bgmPlaylist.length); 
+        } while (
+            (newIdx === currentBgmIndex || newIdx === 0) && bgmPlaylist.length > 1
+        );
+        
+        currentBgmIndex = newIdx;
+        bgmAudio.src = bgmPlaylist[currentBgmIndex].url;
+        bgmAudio.volume = 0; 
+        
+        bgmAudio.onerror = () => { playRandomBGM(); };
+
+        const playPromise = bgmAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                fadeInBGM();
+                updateNPUI(bgmPlaylist[currentBgmIndex].title);
+                renderPlaylist(); 
+                
+                const box = document.getElementById('now-playing-box');
+                box.classList.add('expanded');
+                
+            }).catch(error => {
+                console.log("Autoplay blocked.");
+            });
+        }
+        
+        bgmAudio.onended = playRandomBGM;
+    }
+
+    function fadeInBGM() {
+        let vol = 0;
+        const fade = setInterval(() => { 
+            if(vol < 1.0) { 
+                vol += 0.1; 
+                if(!isMuted) bgmAudio.volume = Math.min(vol, 1.0); 
+            } else { 
+                clearInterval(fade); 
+            }
+        }, 100);
+    }
+
+    function toggleMute() {
+        isMuted = !isMuted;
+        bgmAudio.muted = isMuted;
+        jodohAudio.muted = isMuted;
+        const icon = document.getElementById('mute-icon');
+        icon.className = isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+    }
+
+    // --- JODOH PLAYER LOGIC ---
+    function playRandomJodohSong() {
+        let newIdx;
+        do { newIdx = Math.floor(Math.random() * jodohSongs.length); } while (newIdx === currentJodohSongIndex && jodohSongs.length > 1);
+        currentJodohSongIndex = newIdx;
+        jodohAudio.src = jodohSongs[currentJodohSongIndex];
+        jodohAudio.play();
+        jodohAudio.onended = playRandomJodohSong; 
+    }
+
+    function getStudentCoupleContent() {
+        if (availableVariationIndices.length === 0) {
+            availableVariationIndices = Array.from({length: coupleVariations.length}, (_, i) => i);
+        }
+        const randomIndex = Math.floor(Math.random() * availableVariationIndices.length);
+        const selectedIndex = availableVariationIndices[randomIndex];
+        availableVariationIndices.splice(randomIndex, 1);
+        
+        const variation = coupleVariations[selectedIndex];
+        let gifUrl = variation.type === 'cute' ? cuteGifs[Math.floor(Math.random() * cuteGifs.length)] : mockGifs[Math.floor(Math.random() * mockGifs.length)];
+        return { text: variation.t, gif: gifUrl };
+    }
+    
+    // --- UI FUNCTIONS ---
+    function playTick() {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.type = 'square'; osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.05);
+        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.connect(gain); gain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+    }
+
+    function loadClassData(type) {
+        // Unlock Audio Context on first interaction
+        if (!userInteracted) {
+            userInteracted = true;
+            // TRY PLAY DEFAULT RADIO (DBFM)
+            if(bgmAudio.paused) {
+                tryPlayDefaultRadio(); 
+            }
+        }
+
+        const grid = document.getElementById('cardGrid');
+        grid.innerHTML = "";
+        currentClassData = (type === 'IF1') ? dataIF1 : dataIF2;
+        currentClassLabel = (type === 'IF1') ? "IF 1" : "IF 2";
+        document.getElementById('class-name').innerText = currentClassLabel;
+        
+        const fragment = document.createDocumentFragment();
+
+        currentClassData.forEach((s, index) => {
+            const card = document.createElement('div'); 
+            
+            let cardClass = 'card';
+            let roleBadge = '';
+            
+            if (s.isOwner) {
+                cardClass += ' owner-card';
+                roleBadge = `<div class="owner-badge"><i class="fas fa-crown"></i> Owner</div>`;
+            } 
+            else if (s.role === "Ketua IF 1" || s.role === "Ketua IF 2") {
+                cardClass += ' ketua-card';
+                roleBadge = `<div class="ketua-badge"><i class="fas fa-user-tie"></i> ${s.role}</div>`;
+            }
+            else if (s.role === "Wakil IF2") {
+                cardClass += ' wakil-if2-card';
+                roleBadge = `<div class="wakil-if2-badge"><i class="fas fa-star"></i> Wakil</div>`;
+            }
+            else if (s.role === "Wakil 1 IF1") {
+                cardClass += ' wakil1-card';
+                roleBadge = `<div class="wakil1-badge"><i class="fas fa-star"></i> ${s.role}</div>`;
+            }
+            else if (s.role === "Wakil 2 IF1") {
+                cardClass += ' wakil2-card';
+                roleBadge = `<div class="wakil2-badge"><i class="fas fa-star-half-alt"></i> ${s.role}</div>`;
+            }
+            else if (s.role === "Keamanan IF1") {
+                cardClass += ' keamanan-card';
+                roleBadge = `<div class="keamanan-badge"><i class="fas fa-shield-alt"></i> ${s.role}</div>`;
+            }
+            else if (s.role === "PJ Matkul") {
+                if (s.name.includes("Leni")) {
+                    cardClass += ' pj-leni-card';
+                    roleBadge = `<div class="pj-badge pj-leni-badge"><i class="fas fa-book"></i> ${s.role}</div>`;
+                } else if (s.name.includes("Nirwanda")) {
+                    cardClass += ' pj-nirwanda-card';
+                    roleBadge = `<div class="pj-badge pj-nirwanda-badge"><i class="fas fa-book"></i> ${s.role}</div>`;
+                }
+            }
+            
+            card.className = cardClass;
+            card.dataset.index = index;
+            
+            card.innerHTML = `${roleBadge}<div class="gender-tag ${s.gender==='L'?'gender-L':'gender-P'}">${s.gender}</div><div class="avatar">${getInitials(s.name)}</div><h3>${s.name}</h3><span class="nim-badge">${s.nim}</span>`;
+            fragment.appendChild(card);
+        });
+        
+        grid.appendChild(fragment); 
+        document.getElementById('selectionModal').classList.remove('active');
+    }
+
+    document.getElementById('cardGrid').addEventListener('mousemove', function(e) {
+        const card = e.target.closest('.card');
+        if (card) {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            card.style.setProperty('--x', `${x}px`);
+            card.style.setProperty('--y', `${y}px`);
+        }
     });
 
-    if (!putResponse.ok) {
-      const errData = await putResponse.json();
-      throw new Error(`Gagal menyimpan ke GitHub: ${errData.message}`);
+    document.getElementById('cardGrid').addEventListener('click', function(e) {
+        const card = e.target.closest('.card');
+        if (card) {
+            const index = card.dataset.index;
+            if (currentClassData[index]) {
+                openProfile(currentClassData[index]);
+            }
+        }
+    });
+
+    function openProfile(s) {
+        currentProfile = s;
+        if(!isMuted) bgmAudio.volume = 0.2;
+
+        document.getElementById('p-avatar').innerText = getInitials(s.name);
+        document.getElementById('p-name').innerText = s.name;
+        document.getElementById('p-nim').innerText = s.nim;
+        document.getElementById('p-class').innerText = currentClassLabel;
+        document.getElementById('p-gender').innerText = s.gender==='L'?'Laki-Laki':'Perempuan';
+        document.getElementById('p-dob').innerText = s.dob;
+        document.getElementById('p-dospem').innerText = s.dospem;
+        
+        const hasEdited = localStorage.getItem(`dob_edited_${s.nim}`);
+        const dobIcon = document.getElementById('dob-edit-icon');
+        if (hasEdited === "true") {
+            dobIcon.classList.add('faded');
+            dobIcon.onclick = function() { alert("Tanggal Lahir di Profil ini sudah pernah diubah"); };
+        } else {
+            dobIcon.classList.remove('faded');
+            dobIcon.onclick = initEditDOB;
+        }
+
+        const statusRow = document.getElementById('p-status-row');
+        if(s.status) {
+            document.getElementById('p-status-val').innerText = s.status;
+            statusRow.style.display = 'flex';
+        } else {
+            statusRow.style.display = 'none';
+        }
+        
+        const ipkRow = document.getElementById('p-ipk-row');
+        if(ipkRow) ipkRow.style.display = 'none';
+
+        const profileCard = document.querySelector('.big-profile-card');
+        const roleDiv = document.getElementById('p-role');
+        
+        profileCard.className = 'big-profile-card'; 
+        roleDiv.className = 'owner-role';
+        
+        roleDiv.style.background = ""; roleDiv.style.color = ""; roleDiv.style.border = "";
+
+        if (s.isOwner) {
+            profileCard.classList.add('owner-profile');
+            roleDiv.innerText = "Pembuat Web";
+            roleDiv.style.display = 'inline-block';
+        } else if (s.role) {
+            roleDiv.innerText = s.role;
+            roleDiv.style.display = 'inline-block';
+            
+            if (s.role.includes('Ketua')) {
+                profileCard.classList.add('ketua-profile');
+                roleDiv.classList.add('ketua-role-tag');
+            } else if (s.role === "Wakil IF2") {
+                profileCard.classList.add('wakil-if2-profile');
+                roleDiv.style.background = "#fff"; roleDiv.style.color = "#00c6fb";
+            } else if (s.role === "Wakil 1 IF1") {
+                profileCard.classList.add('wakil1-profile');
+                roleDiv.style.background = "#fff"; roleDiv.style.color = "#8e44ad";
+            } else if (s.role === "Wakil 2 IF1") {
+                profileCard.classList.add('wakil2-profile');
+                roleDiv.style.background = "#fff"; roleDiv.style.color = "#e67e22";
+            } else if (s.role === "Keamanan IF1") {
+                profileCard.classList.add('keamanan-profile');
+                roleDiv.style.background = "#000"; roleDiv.style.color = "#ff0000"; roleDiv.style.border = "1px solid red";
+            } else if (s.role === "PJ Matkul") {
+                if(s.name.includes("Leni")) {
+                    profileCard.classList.add('pj-leni-profile');
+                    roleDiv.style.background = "#ff6f91"; roleDiv.style.color = "#fff";
+                } else {
+                    profileCard.classList.add('pj-nirwanda-profile');
+                    roleDiv.style.background = "#fff"; roleDiv.style.color = "#800020";
+                }
+            }
+        } else {
+            roleDiv.style.display = 'none';
+        }
+
+        document.getElementById('daily-quote').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
+        document.getElementById('main-view').style.opacity = '0';
+        setTimeout(() => { document.getElementById('main-view').style.display = 'none'; document.getElementById('profile-view').style.display = 'block'; setTimeout(() => document.getElementById('profile-view').style.opacity = '1', 50); }, 300);
     }
 
-    return res.status(200).json({ message: 'Berhasil diupdate!', newDOB });
+    function closeProfile() {
+        if(!isMuted) bgmAudio.volume = 1.0;
+        document.getElementById('profile-view').style.opacity = '0';
+        setTimeout(() => { document.getElementById('profile-view').style.display = 'none'; document.getElementById('main-view').style.display = 'block'; setTimeout(() => document.getElementById('main-view').style.opacity = '1', 50); }, 300);
+    }
+    
+    // --- FITUR IPK LOGIC (IMPROVED) ---
+    const ipkSchedule = {
+        2: new Date('2026-07-05'),
+        3: new Date('2027-01-24'),
+        4: new Date('2027-07-04'),
+        5: new Date('2028-01-23'),
+        6: new Date('2028-07-09')
+    };
 
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: error.message });
-  }
-}
+    let editingSem = 0;
+
+    function openIPKModal() {
+        if (!currentProfile) return;
+        
+        const modal = document.getElementById('ipkModal');
+        const listContainer = document.getElementById('semesterList');
+        document.getElementById('ipk-nama-mhs').innerText = currentProfile.name;
+        
+        listContainer.innerHTML = "";
+        
+        const today = new Date();
+
+        for (let i = 1; i <= 6; i++) {
+            let storedIPK = localStorage.getItem(`ipk_val_sem${i}_${currentProfile.nim}`);
+            let nilai = storedIPK ? storedIPK : (i === 1 && currentProfile.ipk1 ? currentProfile.ipk1 : "0.00");
+            let hasScore = parseFloat(nilai) > 0;
+            
+            let editButtonHtml = "";
+            let canEdit = false;
+
+            if (i === 1) {
+                const isEdited = localStorage.getItem(`ipk_edited_sem1_${currentProfile.nim}`);
+                if (!isEdited) canEdit = true;
+            } else {
+                if (today >= ipkSchedule[i]) {
+                     const isEdited = localStorage.getItem(`ipk_edited_sem${i}_${currentProfile.nim}`);
+                     if (!isEdited) canEdit = true;
+                }
+            }
+
+            if (canEdit) {
+                editButtonHtml = `<button class="ipk-edit-btn" onclick="openIpkInputModal(${i})"><i class="fas fa-pencil-alt"></i></button>`;
+            }
+
+            const row = document.createElement('div');
+            row.className = `semester-row ${hasScore ? 'has-score' : ''}`;
+            row.innerHTML = `<span>Semester ${i}</span><span>${nilai}${editButtonHtml}</span>`;
+            listContainer.appendChild(row);
+        }
+        
+        modal.classList.add('active');
+    }
+
+    // --- MODERN IPK INPUT ---
+    function openIpkInputModal(sem) {
+        editingSem = sem;
+        document.getElementById('modern-ipk-input').value = "";
+        document.getElementById('ipkModal').classList.remove('active');
+        document.getElementById('ipkInputModal').classList.add('active');
+    }
+
+    function closeIpkInputModal() {
+        document.getElementById('ipkInputModal').classList.remove('active');
+        document.getElementById('ipkModal').classList.add('active');
+    }
+
+    function confirmIPKInput() {
+        const input = document.getElementById('modern-ipk-input');
+        const val = parseFloat(input.value);
+
+        if (isNaN(val) || val < 1.00 || val > 4.00) {
+            alert("Nilai tidak valid! Masukkan angka antara 1.00 sampai 4.00");
+            return;
+        }
+
+        const fixedVal = val.toFixed(2);
+        localStorage.setItem(`ipk_val_sem${editingSem}_${currentProfile.nim}`, fixedVal);
+        localStorage.setItem(`ipk_edited_sem${editingSem}_${currentProfile.nim}`, "true");
+        
+        alert(`IPK Semester ${editingSem} berhasil disimpan!`);
+        closeIpkInputModal();
+        openIPKModal(); // Refresh list
+    }
+
+    function closeIPKModal() {
+        document.getElementById('ipkModal').classList.remove('active');
+    }
+
+    // --- EVENT BOX LOGIC (UPDATED WITH STEGO) ---
+    function openEventModal() {
+        const modal = document.getElementById('eventModal');
+        const list = document.getElementById('eventListContainer');
+        list.innerHTML = "";
+        
+        eventsData.forEach(ev => {
+            const item = document.createElement('div');
+            
+            // Set Style Tema
+            if (ev.theme === 'fire') {
+                item.className = 'event-item fire-theme';
+            } else {
+                item.className = 'event-item';
+            }
+            
+            // LOGIKA KLIK BERBEDA
+            if (ev.title === "Steganography") {
+                item.onclick = openStegoModal;
+            } else {
+                item.onclick = openChallengeModal;
+            }
+
+            item.innerHTML = `<div class="event-title">${ev.title}</div><div class="event-prize">Hadiah: ${ev.prize}</div>`;
+            list.appendChild(item);
+        });
+        
+        modal.classList.add('active');
+    }
+    
+    function closeEventModal() {
+        document.getElementById('eventModal').classList.remove('active');
+    }
+
+    function openChallengeModal() {
+        document.getElementById('eventModal').classList.remove('active');
+        document.getElementById('challengeModal').classList.add('active');
+    }
+
+    function closeChallengeModal() {
+        document.getElementById('challengeModal').classList.remove('active');
+    }
+
+
+    // --- FITUR EDIT DOB REALTIME ---
+    let selectedDobValue = "";
+
+    function initEditDOB() {
+        if (localStorage.getItem(`dob_edited_${currentProfile.nim}`) === "true") {
+             alert("Tanggal Lahir di Profil ini sudah pernah diubah");
+             return;
+        }
+        document.getElementById('newDobInput').value = "";
+        document.getElementById('datePickerModal').classList.add('active');
+    }
+
+    function closeDatePicker() {
+        document.getElementById('datePickerModal').classList.remove('active');
+    }
+
+    function formatIndoDate(dateString) {
+        const date = new Date(dateString);
+        const options = { day: 'numeric', month: 'long', year: 'numeric' };
+        return date.toLocaleDateString('id-ID', options);
+    }
+
+    function confirmDateSelection() {
+        const inputVal = document.getElementById('newDobInput').value;
+        if (!inputVal) {
+            alert("Pilih tanggal terlebih dahulu!");
+            return;
+        }
+        
+        selectedDobValue = formatIndoDate(inputVal);
+        document.getElementById('conf-dob-display').innerText = selectedDobValue;
+        
+        document.getElementById('datePickerModal').classList.remove('active');
+        document.getElementById('dateConfirmModal').classList.add('active');
+    }
+
+    function closeDateConfirm() {
+        document.getElementById('dateConfirmModal').classList.remove('active');
+        document.getElementById('datePickerModal').classList.add('active');
+    }
+
+    // --- VERIFICATION LOGIC ---
+    function initVerification() {
+        document.getElementById('dateConfirmModal').classList.remove('active');
+        document.getElementById('verifyModal').classList.add('active');
+        document.getElementById('nim-verify-input').value = "";
+        document.getElementById('nim-verify-input').focus();
+    }
+    
+    function closeVerifyModal() {
+        document.getElementById('verifyModal').classList.remove('active');
+        document.getElementById('dateConfirmModal').classList.add('active');
+    }
+
+    function submitVerification() {
+        const input = document.getElementById('nim-verify-input').value;
+        const correctSuffix = currentProfile.nim.slice(-2);
+        
+        if (input === correctSuffix) {
+            finalUpdateDOB();
+        } else {
+            alert("Verifikasi Gagal! 2 Digit terakhir NIM salah.");
+        }
+    }
+
+    async function finalUpdateDOB() {
+        const dobElement = document.getElementById('p-dob');
+        const originalText = dobElement.innerText;
+        
+        document.getElementById('verifyModal').classList.remove('active');
+        
+        dobElement.innerHTML = "<em>Menyimpan...</em>";
+
+        try {
+            const response = await fetch('/api/update-dob', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nim: currentProfile.nim,
+                    newDOB: selectedDobValue,
+                    repoOwner: REPO_CONFIG.owner,
+                    repoName: REPO_CONFIG.name
+                })
+            });
+
+            const result = await response.json();
+
+            if (response.ok) {
+                alert("Berhasil disimpan! Data di GitHub akan terupdate.");
+                
+                localStorage.setItem(`dob_edited_${currentProfile.nim}`, "true");
+                const dobIcon = document.getElementById('dob-edit-icon');
+                dobIcon.classList.add('faded');
+                dobIcon.onclick = function() { alert("Tanggal Lahir di Profil ini sudah pernah diubah"); };
+
+                dobElement.innerText = selectedDobValue;
+                currentProfile.dob = selectedDobValue;
+                
+                const targetData = (currentClassLabel === "IF 1") ? dataIF1 : dataIF2;
+                const index = targetData.findIndex(s => s.nim === currentProfile.nim);
+                if (index !== -1) targetData[index].dob = selectedDobValue;
+            } else {
+                throw new Error(result.message || "Gagal menyimpan.");
+            }
+        } catch (error) {
+            alert("Error: " + error.message);
+            dobElement.innerText = originalText;
+        }
+    }
+
+    let matchInterval;
+    
+    function cekJodoh() {
+        if (!currentProfile) return;
+
+        // --- 0. SIAPKAN TOMBOL TUTUP ---
+        const closeBtn = document.querySelector('.close-match');
+        closeBtn.disabled = true;
+        closeBtn.style.opacity = '0.5';
+        closeBtn.style.cursor = 'not-allowed';
+        
+        let countdownVal = 3;
+        closeBtn.innerText = `Tunggu ${countdownVal}...`;
+        
+        const btnInterval = setInterval(() => {
+            countdownVal--;
+            if (countdownVal > 0) {
+                closeBtn.innerText = `Tunggu ${countdownVal}...`;
+            } else {
+                clearInterval(btnInterval);
+            }
+        }, 1000);
+
+
+        // --- 1. SIAPKAN POOL UMUM ---
+        const myGender = currentProfile.gender;
+        const targetGender = myGender === 'L' ? 'P' : 'L';
+        
+        let normalPool = allStudents.filter(s => s.gender === targetGender).map(s => ({ type: 'student', ...s }));
+        
+        normalPool.push({ type: 'special', subtype: 'kematian', name: "Kematian" });
+        normalPool.push({ type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" });
+        normalPool.push({ type: 'special', subtype: 'ceo', name: "CEO" });
+
+        let animationCandidates = [...normalPool]; 
+        let finalResult = null; 
+
+        // --- 2. LOGIKA CHANCE (TAKDIR) ---
+
+        if (currentProfile.name === "Fikri Julianda Laksono") {
+            finalResult = { type: 'student', name: "Aisyah Nur Syifa", gender: "P" };
+        }
+        else if (currentProfile.name === "Aisyah Nur Syifa") {
+            finalResult = { type: 'student', name: "Fikri Julianda Laksono", gender: "L" };
+        }
+        else if (currentProfile.name.includes("Leni")) {
+            const rng = Math.random();
+            if (rng < 0.7) { 
+                finalResult = { type: 'student', name: "Se-hun", gender: "L" };
+            } else { 
+                const uniqueOptions = [
+                    { type: 'special', subtype: 'kematian', name: "Kematian" },
+                    { type: 'special', subtype: 'allah', name: "Hanya Allah Yang Tahu" },
+                    { type: 'special', subtype: 'ceo', name: "CEO" },
+                    { type: 'special', subtype: 'halu', name: "Dih Ngarepin Siapa Sih, Halu!" },
+                    { type: 'special', subtype: 'korea', name: "Cowo Korea" }
+                ];
+                finalResult = uniqueOptions[Math.floor(Math.random() * uniqueOptions.length)];
+            }
+        }
+        else if (currentProfile.name === "Amri Rahman") {
+            const rng = Math.random();
+            if (rng < 0.7) { 
+                const boyPool = allStudents
+                    .filter(s => s.gender === 'L' && s.name !== "Gilang Aidil Pratama" && s.name !== "Amri Rahman")
+                    .map(s => ({ type: 'student', ...s }));
+                animationCandidates = boyPool; 
+                finalResult = boyPool[Math.floor(Math.random() * boyPool.length)];
+            } else {
+                const girlPool = allStudents.filter(s => s.gender === 'P').map(s => ({ type: 'student', ...s }));
+                animationCandidates = girlPool;
+                finalResult = girlPool[Math.floor(Math.random() * girlPool.length)];
+            }
+        }
+
+        // KASUS DEFAULT (ORANG BIASA)
+        if (!finalResult) {
+            let fullPool = [...animationCandidates];
+            fullPool.push({ type: 'special', subtype: 'halu', name: "Dih Ngarepin Siapa Sih, Halu!" });
+            
+            if (myGender === 'L') {
+                fullPool.push({ type: 'special', subtype: 'ukthi', name: "Ukthi Yalil Yalili" });
+            } else {
+                fullPool.push({ type: 'special', subtype: 'korea', name: "Cowo Korea" });
+                fullPool.push({ type: 'special', subtype: 'cina', name: "Cowo Cina" });
+            }
+
+            animationCandidates = fullPool;
+            finalResult = fullPool[Math.floor(Math.random() * fullPool.length)];
+        }
+
+
+        // --- 3. EKSEKUSI ANIMASI ---
+        const modal = document.getElementById('jodohModal');
+        const searchUI = document.getElementById('searching-ui');
+        const finalUI = document.getElementById('final-couple-ui');
+        const nameDisplay = document.getElementById('match-name-display');
+
+        searchUI.style.display = 'block';
+        finalUI.style.display = 'none';
+        modal.classList.add('active');
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        // STEP A: Animasi "Mengacak"
+        matchInterval = setInterval(() => {
+            const r = animationCandidates[Math.floor(Math.random() * animationCandidates.length)];
+            nameDisplay.innerText = r.subtype === 'ceo' ? CEO_NAMES[Math.floor(Math.random()*CEO_NAMES.length)] : r.name;
+            nameDisplay.style.color = "#ccc"; 
+            playTick();
+        }, 100);
+
+        // STEP B: Menampilkan Hasil
+        setTimeout(() => {
+            clearInterval(matchInterval);
+            clearInterval(btnInterval); 
+            
+            closeBtn.innerText = "Tutup";
+            closeBtn.disabled = false;
+            closeBtn.style.opacity = '1';
+            closeBtn.style.cursor = 'pointer';
+
+            let result = finalResult;
+            
+            searchUI.style.display = 'none';
+            finalUI.style.display = 'block';
+            finalUI.innerHTML = "";
+            
+            bgmAudio.pause(); 
+            
+            let htmlContent = "";
+
+            if (result.type === 'student') {
+                let content = getStudentCoupleContent();
+
+                // LOGIKA MOCK
+                if (currentProfile.gender === 'L' && currentProfile.name !== "Fikri Julianda Laksono" && result.name === "Aisyah Nur Syifa") {
+                    content.text = "Mau Dihantam Fikri Lu?";
+                    content.gif = "https://media1.tenor.com/m/vgtGULlqLkcAAAAC/slp-baba.gif"; 
+                }
+                else if (currentProfile.gender === 'P' && currentProfile.name !== "Aisyah Nur Syifa" && result.name === "Fikri Julianda Laksono") {
+                    content.text = "Mau Ditampar Syifa Lu?";
+                    content.gif = "https://media1.tenor.com/m/6WBG_NSP0B0AAAAC/gabe-greenspan-brian-rosenthal.gif"; 
+                }
+
+                htmlContent = `
+                    <div class="couple-container">
+                        <div class="c-name-user">${currentProfile.name}</div>
+                        <div class="c-heart"><i class="fas fa-heart"></i></div>
+                        <div class="c-name-partner">${result.name}</div>
+                    </div>
+                    <div class="couple-sub">${content.text}</div>
+                    <img src="${content.gif}" class="couple-gif" alt="Funny Gif" loading="lazy">
+                `;
+                playRandomJodohSong(); 
+            } else {
+                // LOGIKA SPECIAL
+                let title = result.name;
+                let sub = "";
+                let soundToPlay = "";
+
+                switch(result.subtype) {
+                    case 'kematian': title = "KEMATIAN"; sub = "Perbaiki Ibadahmu, Kematian Gak Ada Yang Tahu Kapan"; soundToPlay = S_MATI; break;
+                    case 'allah': sub = "Sempurnakan, Perbaiki, Dan Pantaskan Agar Allah Berikan Yang Terbaik"; soundToPlay = S_ISLAMI; break;
+                    case 'ceo': 
+                        title = CEO_NAMES[Math.floor(Math.random() * CEO_NAMES.length)]; sub = "Korban Drachin"; soundToPlay = S_FUNNY; 
+                        htmlContent = `<div class="couple-container"><div class="c-name-user">${currentProfile.name}</div><div class="c-heart"><i class="fas fa-heart"></i></div><div class="c-name-partner">${title}</div></div><div class="couple-sub">${sub}</div>`;
+                        break;
+                    case 'halu': sub = "Dia Udah Jadi Milik Yang Lain :)"; soundToPlay = S_SAD; break;
+                    case 'ukthi': sub = "Perbaiki Dirimu Agar Pantas Dengannya Atau Akan Allah Jauhkan"; soundToPlay = S_YALILI; break;
+                    case 'korea': case 'cina': sub = "Ah Masa Sih, Emang Dia Mau Ya?"; soundToPlay = S_FUNNY; break;
+                }
+
+                if (result.subtype !== 'ceo') {
+                    htmlContent = `<div class="special-title">${title}</div><div class="couple-sub">${sub}</div>`;
+                }
+                
+                jodohAudio.src = soundToPlay;
+                jodohAudio.play();
+                jodohAudio.onended = null; 
+            }
+            
+            finalUI.innerHTML = htmlContent;
+
+        }, 3000);
+    }
+
+    function closeJodoh() {
+        document.getElementById('jodohModal').classList.remove('active');
+        clearInterval(matchInterval);
+        jodohAudio.pause(); jodohAudio.currentTime = 0;
+        bgmAudio.play();
+        if(!isMuted) bgmAudio.volume = 0.2; 
+    }
+
+    function copyNIM() { navigator.clipboard.writeText(document.getElementById('p-nim').innerText).then(() => { document.getElementById('copy-tooltip').classList.add('show'); setTimeout(() => document.getElementById('copy-tooltip').classList.remove('show'), 1500); }); }
+    function setMobileList() { document.getElementById('cardGrid').classList.remove('mobile-grid-active'); document.getElementById('btnList').classList.add('active'); document.getElementById('btnGrid').classList.remove('active'); localStorage.setItem('mobileLayout', 'list'); }
+    function setMobileGrid() { document.getElementById('cardGrid').classList.add('mobile-grid-active'); document.getElementById('btnGrid').classList.add('active'); document.getElementById('btnList').classList.remove('active'); localStorage.setItem('mobileLayout', 'grid'); }
+    function toggleTheme() { 
+        document.body.classList.toggle('dark-mode'); 
+        localStorage.setItem('theme', document.body.classList.contains('dark-mode')?'dark':'light'); 
+        document.querySelector('#themeToggle i').className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon'; 
+        
+        if(document.body.classList.contains('dark-mode')) {
+            meteorLoop();
+        }
+    }
+    function getInitials(n) { let p=n.split(" "); return p.length>1?(p[0][0]+p[1][0]).toUpperCase():p[0].substring(0,2).toUpperCase(); }
+    
+    // --- FUNGSI SEARCH ---
+    let searchTimeout;
+    function filterNames() { 
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const v=document.getElementById("searchInput").value.toUpperCase(); 
+            const c=document.getElementById("cardGrid").getElementsByClassName("card"); 
+            for(let i=0;i<c.length;i++){ 
+                const t=c[i].textContent||c[i].innerText; 
+                if(t.toUpperCase().indexOf(v) > -1) {
+                    c[i].classList.remove('hidden-card');
+                } else {
+                    c[i].classList.add('hidden-card');
+                }
+            } 
+        }, 150); 
+    }
+
+// --- STEGANOGRAPHY LOGIC ---
+    
+    // Ganti kode angka di bawah ini dengan kode yang muncul saat Mode Setup
+    const SECRET_HASH_CODE = "-430950083"; 
+    
+    // Ubah jadi 'true' untuk melihat kode jawabanmu. 
+    // Ubah jadi 'false' jika web sudah siap disebar.
+    const SETUP_MODE = false; 
+
+
+    // --- MESIN PENGACAK (HASHING) ---
+    function generateSafeHash(str) {
+        let hash = 0;
+        if (str.length === 0) return hash.toString();
+        for (let i = 0; i < str.length; i++) {
+            const char = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash; // Convert to 32bit integer
+        }
+        return hash.toString();
+    }
+
+    // --- FUNGSI LOGIKA ---
+    function openStegoModal() {
+        document.getElementById('eventModal').classList.remove('active');
+        document.getElementById('stegoModal').classList.add('active');
+        document.getElementById('stegoAnswerInput').value = "";
+        
+        if(SETUP_MODE) {
+            document.getElementById('stegoAnswerInput').placeholder = "[MODE SETUP AKTIF] Ketik Jawaban Benar...";
+        }
+    }
+
+    function closeStegoModal() {
+        document.getElementById('stegoModal').classList.remove('active');
+        document.getElementById('eventModal').classList.add('active');
+    }
+
+    function checkStegoAnswer() {
+        const input = document.getElementById('stegoAnswerInput').value;
+        
+        // 1. Bersihkan input & jadikan huruf besar semua
+        const cleanInput = input.trim().toUpperCase(); 
+        
+        // 2. Ubah teks menjadi Kode Hash
+        const userHash = generateSafeHash(cleanInput);
+
+        // --- FITUR MODE SETUP ---
+        if (SETUP_MODE) {
+            console.log("JAWABAN:", cleanInput);
+            console.log("KODE HASH:", userHash);
+            alert(`KODE HASH UNTUK "${cleanInput}" ADALAH:\n\n${userHash}\n\nSalin angka tersebut dan masukkan ke const SECRET_HASH_CODE di codingan, lalu ubah SETUP_MODE jadi false.`);
+            return; 
+        }
+
+        // 3. Cek Jawaban (Bandingkan Angka)
+        if (userHash === SECRET_HASH_CODE) {
+            document.getElementById('stegoModal').classList.remove('active');
+            document.getElementById('stegoSuccessModal').classList.add('active');
+        } else {
+            alert("Jawaban Salah! Coba cari petunjuk lagi.");
+            document.getElementById('stegoAnswerInput').style.border = "2px solid red";
+            setTimeout(() => {
+                 document.getElementById('stegoAnswerInput').style.border = "none";
+            }, 1000);
+        }
+    }
+
+    function openStegoImage() { document.getElementById('stegoImageModal').classList.add('active'); }
+    function closeStegoImage() { document.getElementById('stegoImageModal').classList.remove('active'); }
+    function closeStegoSuccess() { document.getElementById('stegoSuccessModal').classList.remove('active'); }
+</script>
+</body>
+</html>
