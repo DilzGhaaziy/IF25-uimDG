@@ -1082,7 +1082,8 @@
     let currentJodohSongIndex = -1;
     let isMuted = false;
     let userInteracted = false; 
-    let radioTimeout = null; // VARIABLE BARU UNTUK TIMER RADIO DEFAULT
+    let radioTimeout = null; 
+    let npBoxTimeout = null; // <--- TAMBAHKAN INI (Untuk timer 5 detik)
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     // =================================================================
@@ -1355,8 +1356,28 @@
         bgmAudio.onended = playRandomBGM; 
     }
 
-    function updateNPUI(title) {
+function updateNPUI(title) {
+        // 1. Update Teks Judul
         document.getElementById('np-title').innerText = title;
+        
+        // 2. Ambil Elemen
+        const box = document.getElementById('now-playing-box');
+        const playlist = document.getElementById('playlist-box');
+
+        // 3. Munculkan Box (Expand)
+        box.classList.add('expanded');
+
+        // 4. Reset Timer sebelumnya (jika ada) agar tidak bentrok
+        if (npBoxTimeout) clearTimeout(npBoxTimeout);
+
+        // 5. Set Timer Baru untuk Sembunyi dalam 5 Detik
+        npBoxTimeout = setTimeout(() => {
+            // HANYA sembunyi jika Playlist SEDANG TERTUTUP
+            // (Supaya kalau lagi milih lagu di playlist, box-nya gak tiba-tiba ilang)
+            if (!playlist.classList.contains('show')) {
+                box.classList.remove('expanded');
+            }
+        }, 5000); 
     }
 
     function playRandomBGM() {
