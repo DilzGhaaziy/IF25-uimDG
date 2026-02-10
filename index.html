@@ -704,12 +704,11 @@
         {title: "Rewrite The Stars", url: "https://od.lk/s/NjhfMTYyNzYyNDM9Xw/Rewrite%20The%20Stars%20-%20The%20Greatest%20Showman%20_%20Shania%20Yan%20Cover.mp3"},
         {title: "Angel Baby", url: "https://od.lk/s/NjhfMTYyNzYyNDM9Xw/Troye%20Sivan-Angel%20Baby%20%28cover%29-Studio%20Version%20%20Gigi%20De%20Lana%20%20Jon%20%20Jake%20%20Romeo-Oyus.mp3"}
     ];
-
-    // --- LOGIKA RADIO BARU ---
-    // URL Streaming DBFM (Shoutcast/Icecast standard)
-    // NOTE: Jika web ini dijalankan di HTTPS (Gembok Hijau), browser mungkin memblokir link HTTP biasa.
-    const radioUrl = "http://stream.dbfmradio.id:8000/stream"; 
-    let isRadioAttempted = false; // Flag penanda apakah radio sudah pernah dicoba diputar
+    
+    // --- TAMBAHAN UNTUK RADIO ---
+    // Pastikan URL ini valid dan support HTTPS jika hosting kamu HTTPS
+    const dbfmUrl = "http://stream.dbfmradio.id:8000/stream"; // GANTI DENGAN URL STREAMING ASLI DBFM
+    let firstRun = true;
 
     const jodohSongs = [
         "https://od.lk/s/NjhfMTYyNzYyNDI5Xw/Beautiful%20in%20white%20CUT_2_2.mp3",
@@ -752,59 +751,58 @@
         });
     }
 
-    // --- BGM PLAYER LOGIC (REVISI: RADIO FAILOVER) ---
+    // --- BGM PLAYER LOGIC (HYBRID RADIO & PLAYLIST) ---
     function playRandomBGM() {
         bgmAudio.pause();
-        
-        // Bersihkan handler sebelumnya agar tidak menumpuk
-        bgmAudio.onerror = null;
-        bgmAudio.onended = null;
+        bgmAudio.onerror = null; 
+        bgmAudio.onended = null; 
 
-        // SKENARIO 1: PEMUTARAN PERTAMA -> COBA RADIO
-        if (!isRadioAttempted) {
-            isRadioAttempted = true; // Tandai sudah dicoba, agar berikutnya langsung ke playlist
+        // --- SKENARIO 1: PEMUTARAN PERTAMA (RADIO) ---
+        if (firstRun) {
+            console.log("Mencoba menghubungkan ke DBFM...");
+            showNowPlaying("Menghubungkan DBFM...");
             
-            console.log("Mencoba memutar Radio DBFM...");
-            showNowPlaying("Menghubungkan DBFM Radio...");
+            bgmAudio.src = dbfmUrl;
+            bgmAudio.volume = 0; 
             
-            bgmAudio.src = radioUrl;
-            bgmAudio.volume = 0;
+            firstRun = false; 
 
             // SAFETY NET: Timer 5 Detik
-            // Jika dalam 5 detik radio masih loading/diam, paksa pindah ke Playlist
-            const radioTimeout = setTimeout(() => {
-                if (bgmAudio.paused || bgmAudio.readyState < 2) { 
-                    console.log("Radio Timeout (5s). Beralih ke Playlist.");
-                    playRandomBGM(); // Panggil fungsi ini lagi (masuk ke Skenario 2)
+            // Jika dalam 5 detik server radio tidak merespon, paksa pindah ke playlist
+            const connectionTimeout = setTimeout(() => {
+                if (bgmAudio.readyState < 2) { 
+                    console.log("DBFM tidak merespon (Timeout). Pindah ke Playlist.");
+                    playRandomBGM(); 
                 }
             }, 5000);
 
             bgmAudio.play().then(() => {
-                clearTimeout(radioTimeout); // Batalkan timer jika berhasil play
+                clearTimeout(connectionTimeout); 
                 fadeInBGM();
-                showNowPlaying("DBFM Radio Pemda");
+                showNowPlaying("DBFM Pemda Radio");
                 
-                // Jika streaming radio putus (koneksi drop), pindah ke playlist
+                // Jika streaming radio putus sendiri, pindah ke playlist
                 bgmAudio.onended = playRandomBGM; 
                 
             }).catch(e => {
-                clearTimeout(radioTimeout);
-                console.log("Radio Error/Blocked. Beralih ke Playlist.");
-                playRandomBGM(); // Pindah ke Skenario 2
+                clearTimeout(connectionTimeout);
+                console.log("DBFM Error/Blocked. Pindah ke Playlist.");
+                playRandomBGM(); 
             });
 
-            // Handler jika link radio mati total (404/Network Error)
             bgmAudio.onerror = () => {
-                clearTimeout(radioTimeout);
-                console.log("Radio Source Error. Beralih ke Playlist.");
+                clearTimeout(connectionTimeout);
+                console.log("Stream Error. Pindah ke Playlist.");
                 playRandomBGM();
             };
 
         } 
-        // SKENARIO 2: PLAYLIST NORMAL (JIKA RADIO GAGAL/SELESAI)
+        // --- SKENARIO 2: PLAYLIST BIASA (LOGIKA LAMA) ---
         else {
             let newIdx;
-            do { newIdx = Math.floor(Math.random() * bgmPlaylist.length); } while (newIdx === currentBgmIndex && bgmPlaylist.length > 1);
+            do { 
+                newIdx = Math.floor(Math.random() * bgmPlaylist.length); 
+            } while (newIdx === currentBgmIndex && bgmPlaylist.length > 1);
             
             currentBgmIndex = newIdx;
             bgmAudio.src = bgmPlaylist[currentBgmIndex].url;
@@ -813,10 +811,10 @@
             bgmAudio.play().then(() => {
                 fadeInBGM();
                 showNowPlaying(bgmPlaylist[currentBgmIndex].title);
-            }).catch(e => console.log("Autoplay blocked"));
+            }).catch(e => console.log("Autoplay blocked by browser"));
             
             bgmAudio.onended = playRandomBGM;
-            bgmAudio.onerror = playRandomBGM; // Skip lagu error
+            bgmAudio.onerror = playRandomBGM; 
         }
     }
 
