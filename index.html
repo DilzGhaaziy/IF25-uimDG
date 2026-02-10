@@ -1090,7 +1090,7 @@
     // =================================================================
     const bgmPlaylist = [
         // Index 0: Default Utama (DBFM Pemda Radio)
-        {title: "DBFM Radio Pemda", url: "http://stream.dbfmradio.id:8000/stream"}, 
+        {title: "DBFM Radio Pemda", url: "https://pu.klikhost.com/proxy/dbfm/stream"}, 
         
         // Playlist Cadangan
         {title: "iSWARA Jakarta FM", url: "https://n13.radiojar.com/4ywdgup3bnzuv?rj-ttl=5&rj-tok=AAABnECWuWQAm41UJbq3s9BypA"},
@@ -1292,7 +1292,7 @@
     function tryPlayDefaultRadio() {
         if (!userInteracted) return;
 
-        console.log("Mencoba memutar Radio Default (DBFM)...");
+        console.log("Menghubungkan DBFM...");
         
         // Set ke Index 0 (DBFM)
         currentBgmIndex = 0; 
@@ -1305,10 +1305,10 @@
         radioTimeout = setTimeout(() => {
             // Cek jika masih loading (readyState < 3) atau error
             if (bgmAudio.paused || bgmAudio.readyState < 3) {
-                console.warn("Server Radio Default tidak merespon/lambat. Pindah ke Playlist Random.");
+                console.warn("Server DFM tidak merespon. Pindah ke Playlist Random.");
                 playRandomBGM(); // Pindah ke playlist lain
             } else {
-                console.log("Radio Default Berhasil Terhubung!");
+                console.log("Radio DBFM Berhasil Terhubung!");
             }
         }, 5000); // Batas waktu tunggu 5 Detik
     }
@@ -1333,7 +1333,7 @@
             if (isStartup) {
                 playRandomBGM(); // Jika ini radio utama, cari yang lain
             } else {
-                updateNPUI("Stream Offline/Error");
+                updateNPUI("DBFM Lagi Offline");
             }
         };
 
