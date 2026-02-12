@@ -2,6 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -66,43 +69,78 @@
         
         body.dark-mode #bg-light-mode { display: none; }
 
+        /* --- 1. CAHAYA AURORA (GLOW) --- */
         .glow {
-            position: absolute; border-radius: 50%;
-            filter: blur(80px); opacity: 0.7; mix-blend-mode: screen;
+            position: absolute; 
+            border-radius: 50%;
+            filter: blur(60px); 
+            mix-blend-mode: screen; 
             will-change: transform; 
+            opacity: 0.6;
+            transform: translateZ(0); 
         }
+
         .glow-1 {
-            width: 80vw; height: 80vh; background: linear-gradient(45deg, #00fff2, #00a2ff);
-            bottom: -20%; left: -20%; transform: rotate(20deg) skewX(-20deg);
-            animation: drift 10s infinite alternate ease-in-out;
+            width: 80vw; height: 80vh; 
+            background: linear-gradient(45deg, #00fff2, #00a2ff);
+            bottom: -20%; left: -20%; 
+            animation: drift 12s infinite alternate ease-in-out;
         }
+
         .glow-2 {
-            width: 90vw; height: 70vh; background: linear-gradient(120deg, #0061ff, #001eff);
-            top: -10%; right: -10%; transform: rotate(-30deg); opacity: 0.6;
+            width: 90vw; height: 70vh; 
+            background: linear-gradient(120deg, #0061ff, #001eff);
+            top: -10%; right: -10%; 
+            opacity: 0.5;
             animation: drift 15s infinite alternate-reverse ease-in-out;
         }
+
         .glow-3 {
             width: 100vw; height: 40vh;
             background: radial-gradient(ellipse at center, rgba(0, 255, 234, 0.4), transparent 70%);
-            top: 30%; left: 10%; transform: rotate(-45deg) scaleY(0.5);
-            filter: blur(60px); opacity: 0.5;
+            top: 30%; left: 10%; 
+            transform: rotate(-45deg) scaleY(0.5);
+            filter: blur(50px); 
+            opacity: 0.4;
         }
+
+        /* --- 2. BINTANG BERGERAK (STARS) --- */
         .stars-bg, .stars-sm-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            opacity: 0.6;
             will-change: transform;
+            z-index: -1; 
         }
+
         .stars-bg {
-            background-image: radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)), radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0));
-            background-size: 250px 250px; 
-            animation: moveUpSmall 40s linear infinite; 
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)), 
+                radial-gradient(2px 2px at 40px 70px, #ffffff, rgba(0,0,0,0)), 
+                radial-gradient(2px 2px at 50px 160px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(2px 2px at 90px 40px, #ffffff, rgba(0,0,0,0)),
+                radial-gradient(1.5px 1.5px at 130px 80px, #ffffff, rgba(0,0,0,0));
+            background-size: 200px 200px; 
+            opacity: 0.8;
+            animation: moveUpSmall 50s linear infinite; 
+        }
+
+        .stars-sm-bg {
+            background-image: 
+                radial-gradient(1px 1px at 10px 10px, #fff, rgba(0,0,0,0)),
+                radial-gradient(1px 1px at 150px 150px, #fff, rgba(0,0,0,0));
+            background-size: 100px 100px;
+            opacity: 0.5;
+            animation: moveUpSmall 80s linear infinite; 
         }
 
         @keyframes drift {
             0% { transform: translate3d(0, 0, 0) rotate(20deg) skewX(-20deg); }
             100% { transform: translate3d(20px, -20px, 0) rotate(25deg) skewX(-15deg); }
         }
-        @keyframes moveUpSmall { from { transform: translateY(0); } to { transform: translateY(-250px); } }
+
+        @keyframes moveUpSmall { 
+            from { transform: translateY(0); } 
+            to { transform: translateY(-1000px); } 
+        }
 
         /* --- DARK MODE BACKGROUND --- */
         #bg-dark-mode {
@@ -168,6 +206,8 @@
             border-radius: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
+            transform: translateZ(0); 
+            will-change: transform;
             color: var(--fixed-text);
             display: flex; align-items: center; justify-content: center;
             text-decoration: none; font-size: 14px; font-weight: 600;
@@ -198,16 +238,19 @@
             position: fixed; bottom: 20px; right: 0; z-index: 9999;
             background: var(--fixed-bg);
             backdrop-filter: blur(10px);
+            transform: translate3d(calc(100% - 50px), 0, 0); 
+            will-change: transform;
             border: 1px solid rgba(255,255,255,0.2);
             padding: 8px; padding-right: 20px;
             border-top-left-radius: 50px; border-bottom-left-radius: 50px;
             box-shadow: -5px 5px 20px rgba(0,0,0,0.2);
             display: flex; align-items: center; gap: 15px;
             width: 300px; 
-            transform: translateX(calc(100% - 50px)); 
             transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
         }
-        .now-playing-box.expanded { transform: translateX(0); }
+        .now-playing-box.expanded { 
+            transform: translate3d(0, 0, 0); 
+        }
         .np-icon {
             width: 35px; height: 35px; flex-shrink: 0;
             background: #e91e63; color: white; border-radius: 50%; 
@@ -291,12 +334,12 @@
             background: var(--card-bg); color: var(--text-color);
         }
         
-        /* Grid Container - PERBAIKAN BUG CARD TERPOTONG */
+        /* Grid Container */
         .grid-container { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
             gap: 20px; 
-            padding: 10px; /* Tambahan padding agar shadow/hover tidak terpotong */
+            padding: 10px; 
         }
         
         /* CARD STYLING */
@@ -310,7 +353,6 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        /* GLOW HANYA MUNCUL DI PERANGKAT NON-TOUCH (PC) UNTUK PERFORMA */
         @media (hover: hover) {
             .card::after {
                 content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -373,7 +415,7 @@
         .card h3 { font-size: 17px; font-weight: 600; color: var(--text-color); min-height: 50px; display: flex; align-items: center; justify-content: center; position: relative; z-index: 5; }
         .nim-badge { background: var(--nim-bg); color: var(--nim-text); padding: 4px 12px; border-radius: 15px; font-size: 13px; font-weight: 500; position: relative; z-index: 5; }
 
-        /* Profil Big Card */
+        /* --- CSS PROFIL BIG CARD --- */
         .big-profile-card {
             background: var(--card-bg); border: 1px solid rgba(255, 255, 255, 0.15);
             padding: 40px; border-radius: 30px; text-align: center; 
@@ -381,15 +423,35 @@
             box-shadow: 0 25px 50px rgba(0,0,0,0.1); 
             position: relative; overflow: hidden; animation: zoomIn 0.3s ease;
         }
+
+        /* VARIAN WARNA PROFIL */
+        .big-profile-card.owner-profile { background: linear-gradient(45deg, #059669, #10b981); color: white !important; border: 2px solid #ffd700; }
+        .big-profile-card.ketua-profile { background: linear-gradient(135deg, #2980b9 0%, #6dd5fa 100%); color: white !important; }
+        .big-profile-card.wakil1-profile { background: linear-gradient(135deg, #6F2DA8 0%, #C54B8C 100%); color: white !important; }
+        .big-profile-card.wakil2-profile { background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%); color: white !important; }
+        .big-profile-card.wakil-if2-profile { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white !important; }
+        .big-profile-card.keamanan-profile { background: linear-gradient(135deg, #FF2400 0%, #7C0A02 150%); color: white !important; }
+        
+        .big-profile-card.pj-leni-profile { background: linear-gradient(135deg, #FC6C85 0%, #FF46A2 100%); color: #444 !important; }
+        .big-profile-card.pj-leni-profile .info-label, .big-profile-card.pj-leni-profile .info-val, .big-profile-card.pj-leni-profile #p-nim { color: #444 !important; }
+
+        .big-profile-card.pj-nirwanda-profile { background: linear-gradient(135deg, #D30000 0%, #FF2400 80%); color: white !important; }
+
+        /* Override Text Color for Dark Background Profiles */
+        .big-profile-card.owner-profile .info-label, .big-profile-card.owner-profile .info-val, .big-profile-card.owner-profile #p-nim,
+        .big-profile-card.ketua-profile .info-label, .big-profile-card.ketua-profile .info-val, .big-profile-card.ketua-profile #p-nim,
+        .big-profile-card.wakil1-profile .info-label, .big-profile-card.wakil1-profile .info-val, .big-profile-card.wakil1-profile #p-nim,
+        .big-profile-card.wakil2-profile .info-label, .big-profile-card.wakil2-profile .info-val, .big-profile-card.wakil2-profile #p-nim,
+        .big-profile-card.wakil-if2-profile .info-label, .big-profile-card.wakil-if2-profile .info-val, .big-profile-card.wakil-if2-profile #p-nim,
+        .big-profile-card.keamanan-profile .info-label, .big-profile-card.keamanan-profile .info-val, .big-profile-card.keamanan-profile #p-nim,
+        .big-profile-card.pj-nirwanda-profile .info-label, .big-profile-card.pj-nirwanda-profile .info-val, .big-profile-card.pj-nirwanda-profile #p-nim {
+            color: #e0f2fe !important; text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
         .info-label { color: var(--text-color); opacity: 0.7; text-align: left; }
         .info-val { font-weight: 600; text-align: right; display: flex; align-items: center; gap: 8px; justify-content: flex-end; color: var(--fixed-text); }
         .quote-box { color: var(--text-color); border-left: 4px solid #f1c40f; background: rgba(0,0,0,0.05); }
         .big-profile-card #p-nim { color: var(--text-color); opacity: 0.8; }
-
-        .big-profile-card.owner-profile { background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%); color: white !important; }
-        .big-profile-card.owner-profile .info-label, .big-profile-card.owner-profile .info-val, .big-profile-card.owner-profile #p-nim { color: #e0f2fe !important; }
-        .big-profile-card.ketua-profile { background: linear-gradient(135deg, rgba(41, 128, 185, 0.9) 0%, rgba(109, 213, 250, 0.9) 100%); color: white !important; }
-        .big-profile-card.ketua-profile .info-label, .big-profile-card.ketua-profile .info-val, .big-profile-card.ketua-profile #p-nim { color: #e0f2fe !important; }
 
         .owner-role {
             font-size: 12px; background: #ffd700; color: #b45309; padding: 2px 10px; border-radius: 10px;
@@ -429,16 +491,26 @@
         .modal-box { background: var(--card-bg); padding: 40px; border-radius: 20px; text-align: center; max-width: 90%; width: 400px; transform: scale(0.9); transition: transform 0.3s; }
         .active .modal-box { transform: scale(1); }
 
-        /* IPK Modal Specific */
-        .ipk-content { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 20px; padding: 30px; position: relative; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); transform: translateY(20px); transition: 0.3s; }
+        /* CSS MODAL IPK */
+        .ipk-modal { overflow-y: auto; padding-top: 20px; padding-bottom: 20px; }
+        .ipk-content {
+            background: var(--card-bg); width: 90%; max-width: 400px; 
+            border-radius: 20px; padding: 30px; position: relative; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); 
+            transform: translateY(20px); transition: 0.3s; margin: auto; 
+        }
+        .close-ipk {
+            width: 100%; padding: 12px; background: #333; color: white; 
+            border: none; border-radius: 15px; cursor: pointer; font-weight: bold; 
+            transition: 0.2s; position: relative; z-index: 100; 
+        }
+        .close-ipk:hover { background: #555; }
         .ipk-modal.active .ipk-content { transform: translateY(0); }
         .ipk-header { text-align: center; margin-bottom: 20px; color: var(--text-color); }
         .semester-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
         .semester-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: rgba(0,0,0,0.05); border-radius: 10px; font-size: 14px; font-weight: 500; color: var(--text-color); border-left: 4px solid #ccc; }
         .semester-row.has-score { border-left: 4px solid #00b09b; background: rgba(0, 176, 155, 0.1); }
         .ipk-edit-btn { background: none; border: none; color: #f39c12; cursor: pointer; margin-left: 10px; font-size: 14px; }
-        .close-ipk { width: 100%; padding: 12px; background: #333; color: white; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .close-ipk:hover { background: #555; }
         
         .modern-input-field { width: 100%; padding: 15px; font-size: 24px; text-align: center; border: 2px solid #3498db; border-radius: 15px; background: white; color: #333; font-weight: bold; margin: 20px 0; outline: none; }
         .modern-input-field:focus { box-shadow: 0 0 15px rgba(52, 152, 219, 0.4); }
@@ -477,7 +549,7 @@
         .event-item.fire-theme::after {
             content: ''; position: absolute; top: 3px; left: 3px; right: 3px; bottom: 3px;
             background-color: #000; 
-            background-image: url('https://media1.tenor.com/m/PEDzvMlrdi0AAAAC/fire.gif');
+            background-image: url('https://media1.tenor.com/m/3Dv1dt0VcxUAAAAC/fire.gif');
             background-repeat: no-repeat; background-position: center center; background-size: 100% 100%;
             border-radius: 8px; z-index: -1; 
         }
@@ -522,7 +594,6 @@
         @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         @media (max-width: 600px) {
-            .mobile-layout-controls { display: flex; }
             .grid-container { grid-template-columns: 1fr; padding: 0 10px; }
             .search-box { padding: 0 10px; }
             .pos-left { font-size: 10px; padding: 6px 10px; left: 10px; top: 15px; width: auto; max-width: 150px; }
@@ -543,67 +614,148 @@
         .stego-hint-wrapper { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 20px; background: rgba(100, 100, 100, 0.2); padding: 8px 12px; border-radius: 10px; border: 1px dashed #ffd700; width: 100%; box-sizing: border-box; }
 
         /* --- UPDATE CSS EVENT & COUNTDOWN --- */
-        .event-item-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%;
-        }
-
+        .event-item-content { display: flex; justify-content: space-between; align-items: center; width: 100%; }
         .event-left { text-align: left; }
-
-        .event-right {
-            text-align: right;
-            background: rgba(0,0,0,0.4);
-            padding: 5px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
+        .event-right { text-align: right; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.3); }
         .timer-label { font-size: 10px; color: #ffd700; text-transform: uppercase; margin-bottom: 2px; }
         .timer-digit { font-size: 14px; font-weight: 800; font-family: monospace; color: white; }
-
-        .surrender-count-badge {
-            margin-top: 5px;
-            font-size: 11px;
-            background: #fff;
-            color: #c0392b;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: bold;
-            display: inline-block;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
+        .surrender-count-badge { margin-top: 5px; font-size: 11px; background: #fff; color: #c0392b; padding: 2px 8px; border-radius: 10px; font-weight: bold; display: inline-block; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
 
         /* --- CSS MODAL NYERAH --- */
-        .flag-emoji {
-            font-size: 80px; 
-            animation: waveFlag 2s infinite ease-in-out;
-            margin: 20px 0;
-        }
-
-        @keyframes waveFlag {
-            0% { transform: rotate(0deg); }
-            25% { transform: rotate(-10deg); }
-            50% { transform: rotate(10deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        .btn-giveup {
-            background: #e74c3c;
-            color: white;
-            padding: 12px 25px;
-            border-radius: 25px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 15px;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4);
-        }
+        .flag-emoji { font-size: 80px; animation: waveFlag 2s infinite ease-in-out; margin: 20px 0; }
+        @keyframes waveFlag { 0% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } 100% { transform: rotate(0deg); } }
+        .btn-giveup { background: #e74c3c; color: white; padding: 12px 25px; border-radius: 25px; border: none; font-weight: 600; cursor: pointer; font-size: 15px; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.4); }
         .btn-giveup:hover { transform: scale(1.05); }
+        
+        /* --- CUSTOM DATE PICKER STYLES --- */
+        .custom-picker-container { background: rgba(0,0,0,0.05); border-radius: 15px; padding: 15px; min-height: 300px; display: flex; align-items: center; justify-content: center; border: 1px solid rgba(128,128,128,0.2); }
+        .picker-step { width: 100%; animation: fadeIn 0.3s ease; }
+        .picker-grid { display: grid; gap: 10px; }
+        .date-grid { grid-template-columns: repeat(7, 1fr); }
+        .month-grid { grid-template-columns: repeat(3, 1fr); }
+        .year-grid { grid-template-columns: repeat(4, 1fr); }
+        .picker-btn { background: var(--card-bg); border: 1px solid rgba(0,0,0,0.1); color: var(--text-color); padding: 10px 5px; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.2s; font-size: 14px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .picker-btn:hover { background: #3498db; color: white; transform: translateY(-2px); box-shadow: 0 5px 10px rgba(52, 152, 219, 0.3); }
+        .picker-btn.active-select { background: #2ecc71; color: white; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 400px) { .date-grid { gap: 5px; } .picker-btn { padding: 8px 2px; font-size: 12px; } }
+
+        /* --- CLASS SELECTOR TOGGLE (BARU) --- */
+        .class-selector-box {
+            position: fixed; top: 70px; right: 20px; z-index: 999;
+            background: var(--fixed-bg); padding: 5px; border-radius: 30px;
+            display: flex; gap: 5px; backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px); transform: translateZ(0); 
+            border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .class-selector-box:hover { transform: scale(1.02); }
+        .cls-btn {
+            border: none; background: transparent; color: var(--fixed-text);
+            padding: 6px 15px; border-radius: 20px; font-weight: 700;
+            font-family: 'Poppins', sans-serif; cursor: pointer; transition: 0.3s;
+            font-size: 12px; opacity: 0.6;
+        }
+        .cls-btn:hover { opacity: 1; background: rgba(0,0,0,0.05); }
+        .cls-btn.active { background: #3498db; color: white; opacity: 1; box-shadow: 0 2px 10px rgba(52, 152, 219, 0.4); }
+        @media (max-width: 600px) { .class-selector-box { top: 60px; right: 10px; padding: 4px; } .cls-btn { padding: 5px 12px; font-size: 11px; } }
+
+        /* --- KONAMI CODE EASTER EGG STYLES (UPDATED: BASS BEAT MODE) --- */
+        body.konami-active {
+            animation: rainbow-bg 1s infinite linear; 
+        }
+        @keyframes rainbow-bg {
+            0% { filter: hue-rotate(0deg) saturate(2); } 
+            100% { filter: hue-rotate(360deg) saturate(2); }
+        }
+        .card.konami-spin {
+            animation: partyBeat 0.5s infinite cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+            border: 3px solid #fff;
+            box-shadow: 0 0 20px rgba(255,255,255,0.8); 
+        }
+        @keyframes partyBeat {
+            0% { transform: scale(1) rotate(0deg); }
+            15% { transform: scale(1.15) rotate(3deg); border-color: #ff0055; box-shadow: 0 0 30px #ff0055; }
+            30% { transform: scale(0.95) rotate(-2deg); border-color: #00ffea; }
+            50%, 100% { transform: scale(1) rotate(0deg); border-color: #fff; }
+        }
+        .konami-avatar-img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+        }
+        
+        /* --- STYLE UNTUK FITUR CLUE --- */
+        .clue-btn-trigger {
+            background: #8e44ad; color: white; padding: 10px 20px; border-radius: 20px; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 10px rgba(142, 68, 173, 0.4); display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: auto;
+        }
+        .clue-btn-trigger:hover { transform: scale(1.05); background: #9b59b6; }
+        .clue-scroll-box { max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .clue-item { background: rgba(0,0,0,0.05); border-left: 4px solid #f1c40f; padding: 12px; margin-bottom: 10px; border-radius: 5px; font-size: 13px; color: var(--text-color); line-height: 1.5; }
+        .clue-number { font-weight: 800; color: #d35400; display: block; margin-bottom: 3px; font-size: 11px; text-transform: uppercase; }
+        @media (max-width: 400px) { .btn-conf-primary, .btn-conf-close { padding: 10px 15px; font-size: 13px; } }
+
+        /* --- MODERN TOAST NOTIFICATIONS --- */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10005; /* Harus paling atas melebihi modal */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none; /* Agar area kosong tidak memblokir klik */
+            align-items: center;
+        }
+
+        .toast-box {
+            background: var(--fixed-bg);
+            color: var(--fixed-text);
+            padding: 12px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 5px solid #3498db; /* Default Biru */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: slideInDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            max-width: 90vw;
+            pointer-events: auto; /* Boksnya tetap bisa diklik/disentuh */
+            border-right: 1px solid rgba(255,255,255,0.2);
+            border-top: 1px solid rgba(255,255,255,0.2);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .toast-box.success { border-left-color: #2ecc71; }
+        .toast-box.error { border-left-color: #e74c3c; }
+        .toast-box.warning { border-left-color: #f1c40f; }
+        .toast-box.party { border-left-color: #9b59b6; animation: slideInDown 0.4s forwards, partyToast 1s infinite; }
+
+        .toast-icon { font-size: 18px; }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-30px) scale(0.9); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes fadeOutUp {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(-20px) scale(0.9); }
+        }
+
+        @keyframes partyToast {
+            0% { border-color: #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
+            50% { border-color: #00ffea; box-shadow: 0 0 15px rgba(0, 255, 234, 0.5); }
+            100% { border-color: #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
+        }
     </style>
 </head>
 <body>
+
+<div id="toast-container" class="toast-container"></div>
 
 <div class="global-bg" id="bg-light-mode">
     <div class="glow glow-1"></div>
@@ -676,6 +828,11 @@
     <button class="fixed-element pos-theme" id="themeToggle" onclick="toggleTheme()"><i class="fas fa-moon"></i></button>
     <a href="http://www.youtube.com/@DilzGhaaziy" target="_blank" class="fixed-element pos-right"><i class="fab fa-youtube"></i><span>Dilz Ghaaziy</span></a>
 
+    <div class="class-selector-box">
+        <button class="cls-btn active" id="btn-cls-if1" onclick="loadClassData('IF1')">IF 1</button>
+        <button class="cls-btn" id="btn-cls-if2" onclick="loadClassData('IF2')">IF 2</button>
+    </div>
+
     <div class="container">
         <header>
             <h1>Daftar Mahasiswa</h1>
@@ -732,8 +889,16 @@
 <div class="event-modal" id="eventModal">
     <div class="modal-box">
         <h2 style="color: var(--text-color);"><i class="fas fa-calendar-alt"></i> Event Aktif</h2>
+        
         <div class="event-list" id="eventListContainer"></div>
-        <button class="btn-conf-close" style="margin-top:20px;" onclick="closeEventModal()">Tutup</button>
+        
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
+            <button class="btn-conf-primary" style="background: #8e44ad;" onclick="openClueSelection()">
+                <i class="fas fa-search"></i> Clue
+            </button>
+            
+            <button class="btn-conf-close" onclick="closeEventModal()">Tutup</button>
+        </div>
     </div>
 </div>
 
@@ -775,17 +940,27 @@
 </div>
 
 <div class="date-picker-overlay" id="datePickerModal">
-    <div class="modal-box">
-        <h2 style="color: var(--text-color); margin-bottom: 15px;">Ubah Tanggal Lahir</h2>
-        <p class="warning-text">Tanggal Lahir hanya bisa diubah sekali!</p>
+    <div class="modal-box" style="width: 450px; max-width: 95%;">
+        <h2 style="color: var(--text-color); margin-bottom: 5px;">Ubah Tanggal Lahir</h2>
+        <p class="warning-text" id="picker-title-step">Pilih Tanggal</p>
         
-        <div class="date-input-container">
-            <input type="date" id="newDobInput" class="custom-date-input">
+        <div class="custom-picker-container">
+            <div id="step-date" class="picker-step active">
+                <div class="picker-grid date-grid" id="grid-dates"></div>
+            </div>
+
+            <div id="step-month" class="picker-step" style="display:none;">
+                <div class="picker-grid month-grid" id="grid-months"></div>
+            </div>
+
+            <div id="step-year" class="picker-step" style="display:none;">
+                <div class="picker-grid year-grid" id="grid-years"></div>
+            </div>
         </div>
 
-        <div style="display: flex; justify-content: center; gap: 10px;">
+        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
             <button class="btn-conf-close" onclick="closeDatePicker()">Batal</button>
-            <button class="btn-conf-primary" onclick="confirmDateSelection()">Konfirmasi</button>
+            <button class="btn-conf-close" id="btn-back-step" onclick="backStepPicker()" style="display:none; background: #f39c12;">Kembali</button>
         </div>
     </div>
 </div>
@@ -838,7 +1013,7 @@
         </p>
         
         <div class="stego-hint-wrapper">
-            <div class="stego-hint-text">CARI SESUATU DI GAMBAR INI</div>
+            <div class="stego-hint-text">(Step 1)CARI SESUATU DI GAMBAR INI</div>
             <i class="fas fa-arrow-right arrow-anim"></i>
             
             <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" 
@@ -847,7 +1022,7 @@
                  style="width: 60px !important; height: 60px !important; min-width: 60px; object-fit: cover; border-radius: 8px; border: 2px solid #fff; cursor: pointer; background: #000;">
         </div>
 
-        <input type="text" id="stegoAnswerInput" class="stego-input" placeholder="Masukkan 3 Kata Rahasia..." autocomplete="off">
+        <input type="text" id="stegoAnswerInput" class="stego-input" placeholder="Nemu Jawabannya?" autocomplete="off">
         
         <div style="margin-top: 20px; display:flex; justify-content: center; gap: 10px;">
             <button class="btn-conf-close" onclick="openSurrenderModal()" style="background:#e74c3c; color:white;">Nyerah 🏳️</button>
@@ -856,10 +1031,26 @@
     </div>
 </div>
 
-<div class="modal-overlay" id="stegoImageModal" style="z-index: 11000;" onclick="closeStegoImage()">
-    <div class="modal-box" style="background: transparent; box-shadow: none; max-width: 95%;">
-        <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" class="stego-thumb" onclick="openStegoImage()" title="Klik untuk memperbesar">
-        <p style="color: white; margin-top: 15px; font-weight: bold; text-shadow: 0 2px 4px #000;">Klik dimana saja untuk menutup</p>
+<div class="modal-overlay" id="stegoImageModal" style="z-index: 11000;" onclick="closeStegoImage(event)">
+    <div class="modal-box" style="background: transparent; box-shadow: none; max-width: 95%; text-align: center;">
+        
+        <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" 
+             style="max-height: 60vh; border-radius: 10px; cursor: pointer; border: 2px solid #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);" 
+             onclick="openImageTab(event, this.src)" 
+             title="Klik untuk membuka gambar">
+        
+        <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+            <button class="btn-conf-primary" style="background: #3498db;" onclick="openImageTab(event, 'https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png')">
+                <i class="fas fa-external-link-alt"></i> Buka Gambar
+            </button>
+            <button class="btn-conf-primary" style="background: #2ecc71;" onclick="downloadImage(event, 'https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png')">
+                <i class="fas fa-download"></i> Download Gambar
+            </button>
+        </div>
+
+        <p style="color: white; margin-top: 20px; font-weight: bold; text-shadow: 0 2px 4px #000;">
+            Klik area kosong untuk menutup
+        </p>
     </div>
 </div>
 
@@ -899,11 +1090,100 @@
     </div>
 </div>
 
+<div class="modal-overlay" id="clueSelectionModal">
+    <div class="modal-box">
+        <h2 style="color: var(--text-color); margin-bottom: 20px;">Pilih Event</h2>
+        <p style="font-size: 13px; color: #7f8c8d; margin-bottom: 20px;">Mau intip clue untuk event yang mana?</p>
+        
+        <button class="event-item fire-theme" onclick="openStegoClueList()" style="width:100%; margin-bottom:10px;">
+            <div class="event-title" style="text-align:center;">🕵️ Steganography</div>
+        </button>
+
+        <button class="btn-conf-close" onclick="closeClueSelection()">Kembali</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="clueListModal">
+    <div class="modal-box" style="text-align: left;">
+        <h2 style="color: var(--text-color); text-align: center; margin-bottom: 10px;">
+            <i class="fas fa-lightbulb" style="color:#f1c40f;"></i> Petunjuk
+        </h2>
+        <p style="font-size: 12px; color: #7f8c8d; text-align: center; margin-bottom: 20px;">
+            Gunakan petunjuk ini dengan bijak!
+        </p>
+        
+        <div id="clue-container-list" class="clue-scroll-box"></div>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="btn-conf-close" onclick="backToClueSelection()">Kembali</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    const REPO_CONFIG = { owner: "DilzGhaaziy", name: "IF25-uimDG" };
+     // --- KONFIGURASI VERSI WEB ---
+    const APP_VERSION = "1.0"; 
+
+    // --- FITUR AUTO-UPDATE SCRIPT ---
+    (async function checkAppVersion() {
+        console.log("Mengecek pembaruan script...");
+        try {
+            const response = await fetch(window.location.href + '?t=' + new Date().getTime(), {
+                cache: "no-store"
+            });
+            if (!response.ok) return;
+            const text = await response.text();
+            const match = text.match(/const\s+APP_VERSION\s*=\s*"([^"]+)"/);
+            if (match && match[1]) {
+                const serverVersion = match[1];
+                if (serverVersion !== APP_VERSION) {
+                    console.log(`Versi Baru Ditemukan! Server: ${serverVersion}, Lokal: ${APP_VERSION}. Merefresh...`);
+                    if ('caches' in window) {
+                        const keys = await caches.keys();
+                        await Promise.all(keys.map(key => caches.delete(key)));
+                    }
+                    window.location.reload(true);
+                } else {
+                    console.log("Script sudah versi terbaru.");
+                }
+            }
+        } catch (error) {
+            console.log("Gagal mengecek versi:", error);
+        }
+    })();
+    
+    // --- FUNGSI NOTIFIKASI MODERN ---
+    function showNotification(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast-box ${type}`;
+        
+        // Tentukan Icon berdasarkan tipe (Warna menyesuaikan CSS border)
+        let icon = '<i class="fas fa-info-circle toast-icon" style="color: #3498db;"></i>';
+        if (type === 'success') icon = '<i class="fas fa-check-circle toast-icon" style="color: #2ecc71;"></i>';
+        if (type === 'error') icon = '<i class="fas fa-exclamation-circle toast-icon" style="color: #e74c3c;"></i>';
+        if (type === 'warning') icon = '<i class="fas fa-exclamation-triangle toast-icon" style="color: #f1c40f;"></i>';
+        if (type === 'party') icon = '🎉';
+
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        container.appendChild(toast);
+
+        // Hapus otomatis setelah 3.5 detik
+        setTimeout(() => {
+            toast.style.animation = 'fadeOutUp 0.3s ease forwards';
+            toast.addEventListener('animationend', () => {
+                toast.remove();
+            });
+        }, 3500);
+    }
+
+    const REPO_CONFIG = { owner: "DilzGhaaziy", name: "TestingDilz" };
     const eventsData = [ { title: "Duel Game Naruto Storm 4", prize: "Rp 60.000", theme: "normal" }, { title: "Steganography", prize: "Rp 200.000", theme: "fire" } ];
 
     let dataIF1 = [], dataIF2 = [], allStudents = [];
+    let globalStats = { stego_surrender_count: 0 };
 
     // Gunakan DOMContentLoaded agar Modal muncul INSTAN
     document.addEventListener('DOMContentLoaded', () => {
@@ -925,16 +1205,25 @@
         meteorLoop();
     });
 
-    async function fetchStudentData() {
+        async function fetchStudentData() {
         try {
+            // 1. Ambil Data Mahasiswa
             const response = await fetch('students.json?t=' + new Date().getTime());
-            if (!response.ok) throw new Error("Gagal mengambil data");
+            if (!response.ok) throw new Error("Gagal mengambil data mahasiswa");
             const data = await response.json();
             dataIF1 = data.IF1;
             dataIF2 = data.IF2;
             allStudents = [ ...dataIF1.map(s => ({...s, class:'IF 1'})), ...dataIF2.map(s => ({...s, class:'IF 2'})) ];
+
+            // 2. Ambil Data Statistik (Surrender Count) - TAMBAHAN BARU
+            const statsResponse = await fetch('stats.json?t=' + new Date().getTime());
+            if (statsResponse.ok) {
+                const stats = await statsResponse.json();
+                globalStats.stego_surrender_count = stats.stego_surrender_count || 0;
+            }
+
         } catch (error) {
-            console.error("❌ Error loading student data:", error);
+            console.error("❌ Error loading data:", error);
         }
     }
 
@@ -997,10 +1286,8 @@
         const container = document.getElementById(containerId);
         if(!container) return;
         
-        // Gunakan Fragment agar tidak reflow berkali-kali
         const fragment = document.createDocumentFragment();
         
-        // Box Shadow star lebih efisien daripada banyak div
         let boxShadows = [];
         for (let i = 0; i < count; i++) {
             const x = Math.floor(Math.random() * window.innerWidth);
@@ -1218,12 +1505,31 @@
             userInteracted = true;
             if(bgmAudio.paused) { tryPlayDefaultRadio(); }
         }
+        
         const grid = document.getElementById('cardGrid');
         grid.innerHTML = "";
+        
+        // Setup Variabel Kelas
         currentClassData = (type === 'IF1') ? dataIF1 : dataIF2;
         currentClassLabel = (type === 'IF1') ? "IF 1" : "IF 2";
         document.getElementById('class-name').innerText = currentClassLabel;
         
+        // --- TAMBAHAN BARU: Update Tampilan Tombol Selector ---
+        const btn1 = document.getElementById('btn-cls-if1');
+        const btn2 = document.getElementById('btn-cls-if2');
+        
+        // Cek jika elemen tombol sudah ada di HTML (Mencegah error saat load awal modal)
+        if (btn1 && btn2) {
+            if (type === 'IF1') {
+                btn1.classList.add('active');
+                btn2.classList.remove('active');
+            } else {
+                btn1.classList.remove('active');
+                btn2.classList.add('active');
+            }
+        }
+        // -----------------------------------------------------
+
         const fragment = document.createDocumentFragment();
         currentClassData.forEach((s, index) => {
             const card = document.createElement('div'); 
@@ -1247,24 +1553,43 @@
         });
         
         grid.appendChild(fragment); 
-        document.getElementById('selectionModal').classList.remove('active');
+        
+        // Tutup modal awal jika masih terbuka
+        const selectionModal = document.getElementById('selectionModal');
+        if (selectionModal) selectionModal.classList.remove('active');
     }
 
-    // --- OPTIMASI MOUSEMOVE (THROTTLING & CEK MOUSE) ---
-    // Hanya aktifkan listener glow jika perangkat mendukung hover (bukan touch)
+    // --- OPTIMASI MOUSEMOVE (TanPA Layout Thrashing) ---
     if (window.matchMedia("(hover: hover)").matches) {
-        document.getElementById('cardGrid').addEventListener('mousemove', function(e) {
-            // Menggunakan requestAnimationFrame untuk performa visual
-            requestAnimationFrame(() => {
-                const card = e.target.closest('.card');
-                if (card) {
-                    const rect = card.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-                    card.style.setProperty('--x', `${x}px`);
-                    card.style.setProperty('--y', `${y}px`);
-                }
-            });
+        const grid = document.getElementById('cardGrid');
+        let activeCard = null;
+        let cardRect = null;
+
+        // Hitung ukuran HANYA saat mouse mulai masuk ke kartu
+        grid.addEventListener('mouseover', function(e) {
+            const card = e.target.closest('.card');
+            if (card) {
+                activeCard = card;
+                cardRect = card.getBoundingClientRect(); 
+            }
+        });
+
+        // Hapus data memori saat mouse keluar dari kartu
+        grid.addEventListener('mouseout', function(e) {
+            activeCard = null;
+            cardRect = null;
+        });
+
+        // Saat mouse bergerak, gunakan data yang sudah disimpan
+        grid.addEventListener('mousemove', function(e) {
+            if (activeCard && cardRect) {
+                requestAnimationFrame(() => {
+                    const x = e.clientX - cardRect.left;
+                    const y = e.clientY - cardRect.top;
+                    activeCard.style.setProperty('--x', `${x}px`);
+                    activeCard.style.setProperty('--y', `${y}px`);
+                });
+            }
         });
     }
 
@@ -1276,9 +1601,11 @@
         }
     });
 
-    function openProfile(s) {
+ function openProfile(s) {
         currentProfile = s;
         if(!isMuted) bgmAudio.volume = 0.2;
+        
+        // Set Data Text
         document.getElementById('p-avatar').innerText = getInitials(s.name);
         document.getElementById('p-name').innerText = s.name;
         document.getElementById('p-nim').innerText = s.nim;
@@ -1287,41 +1614,87 @@
         document.getElementById('p-dob').innerText = s.dob;
         document.getElementById('p-dospem').innerText = s.dospem;
         
+        // Logika Tombol Edit DOB
         const hasEdited = localStorage.getItem(`dob_edited_${s.nim}`);
         const dobIcon = document.getElementById('dob-edit-icon');
         if (hasEdited === "true") {
             dobIcon.classList.add('faded');
-            dobIcon.onclick = function() { alert("Tanggal Lahir di Profil ini sudah pernah diubah"); };
+            dobIcon.onclick = function() { showNotification("Tanggal Lahir di Profil ini sudah pernah diubah", "warning"); };
         } else {
             dobIcon.classList.remove('faded');
             dobIcon.onclick = initEditDOB;
         }
 
+        // Status Kuliah
         const statusRow = document.getElementById('p-status-row');
         if(s.status) { document.getElementById('p-status-val').innerText = s.status; statusRow.style.display = 'flex'; } else { statusRow.style.display = 'none'; }
         
+        // --- LOGIKA TEMA WARNA PROFIL (PERBAIKAN) ---
         const profileCard = document.querySelector('.big-profile-card');
         const roleDiv = document.getElementById('p-role');
-        profileCard.className = 'big-profile-card'; roleDiv.className = 'owner-role';
+        
+        // Reset class ke default dulu
+        profileCard.className = 'big-profile-card'; 
+        
+        // Reset style badge role kecil
+        roleDiv.className = 'owner-role';
         roleDiv.style.background = ""; roleDiv.style.color = ""; roleDiv.style.border = "";
 
-        if (s.isOwner) { profileCard.classList.add('owner-profile'); roleDiv.innerText = "Pembuat Web"; roleDiv.style.display = 'inline-block'; } 
+        if (s.isOwner) { 
+            profileCard.classList.add('owner-profile'); 
+            roleDiv.innerText = "Pembuat Web"; 
+            roleDiv.style.display = 'inline-block'; 
+        } 
         else if (s.role) {
-            roleDiv.innerText = s.role; roleDiv.style.display = 'inline-block';
-            if (s.role.includes('Ketua')) { profileCard.classList.add('ketua-profile'); roleDiv.classList.add('ketua-role-tag'); } 
-            else if (s.role === "Wakil IF2") { profileCard.classList.add('wakil-if2-profile'); roleDiv.style.background = "#fff"; roleDiv.style.color = "#00c6fb"; } 
-            else if (s.role === "Wakil 1 IF1") { profileCard.classList.add('wakil1-profile'); roleDiv.style.background = "#fff"; roleDiv.style.color = "#8e44ad"; } 
-            else if (s.role === "Wakil 2 IF1") { profileCard.classList.add('wakil2-profile'); roleDiv.style.background = "#fff"; roleDiv.style.color = "#e67e22"; } 
-            else if (s.role === "Keamanan IF1") { profileCard.classList.add('keamanan-profile'); roleDiv.style.background = "#000"; roleDiv.style.color = "#ff0000"; roleDiv.style.border = "1px solid red"; } 
+            roleDiv.innerText = s.role; 
+            roleDiv.style.display = 'inline-block';
+            
+            // Cek string role untuk menerapkan tema
+            if (s.role.includes('Ketua')) { 
+                profileCard.classList.add('ketua-profile'); 
+                roleDiv.classList.add('ketua-role-tag'); 
+            } 
+            else if (s.role === "Wakil IF2") { 
+                profileCard.classList.add('wakil-if2-profile'); 
+                roleDiv.style.background = "#fff"; roleDiv.style.color = "#00c6fb"; 
+            } 
+            else if (s.role === "Wakil 1 IF1") { 
+                profileCard.classList.add('wakil1-profile'); 
+                roleDiv.style.background = "#fff"; roleDiv.style.color = "#8e44ad"; 
+            } 
+            else if (s.role === "Wakil 2 IF1") { 
+                profileCard.classList.add('wakil2-profile'); 
+                roleDiv.style.background = "#fff"; roleDiv.style.color = "#e67e22"; 
+            } 
+            else if (s.role === "Keamanan IF1") { 
+                profileCard.classList.add('keamanan-profile'); 
+                roleDiv.style.background = "#000"; roleDiv.style.color = "#ff0000"; roleDiv.style.border = "1px solid red"; 
+            } 
             else if (s.role === "PJ Matkul") {
-                if(s.name.includes("Leni")) { profileCard.classList.add('pj-leni-profile'); roleDiv.style.background = "#ff6f91"; roleDiv.style.color = "#fff"; } 
-                else { profileCard.classList.add('pj-nirwanda-profile'); roleDiv.style.background = "#fff"; roleDiv.style.color = "#800020"; }
+                if(s.name.includes("Leni")) { 
+                    profileCard.classList.add('pj-leni-profile'); 
+                    roleDiv.style.background = "#ff6f91"; roleDiv.style.color = "#fff"; 
+                } 
+                else { 
+                    // Asumsi PJ Nirwanda
+                    profileCard.classList.add('pj-nirwanda-profile'); 
+                    roleDiv.style.background = "#fff"; roleDiv.style.color = "#800020"; 
+                }
             }
-        } else { roleDiv.style.display = 'none'; }
+        } else { 
+            // Mahasiswa Biasa (Tanpa Role)
+            roleDiv.style.display = 'none'; 
+        }
 
         document.getElementById('daily-quote').innerText = `"${quotes[Math.floor(Math.random()*quotes.length)]}"`;
+        
+        // Animasi Buka
         document.getElementById('main-view').style.opacity = '0';
-        setTimeout(() => { document.getElementById('main-view').style.display = 'none'; document.getElementById('profile-view').style.display = 'block'; setTimeout(() => document.getElementById('profile-view').style.opacity = '1', 50); }, 300);
+        setTimeout(() => { 
+            document.getElementById('main-view').style.display = 'none'; 
+            document.getElementById('profile-view').style.display = 'block'; 
+            setTimeout(() => document.getElementById('profile-view').style.opacity = '1', 50); 
+        }, 300);
     }
 
     function closeProfile() {
@@ -1334,6 +1707,15 @@
     const ipkSchedule = { 2: new Date('2026-07-05'), 3: new Date('2027-01-24'), 4: new Date('2027-07-04'), 5: new Date('2028-01-23'), 6: new Date('2028-07-09') };
     let editingSem = 0;
 
+    // --- FUNGSI FIX TOMBOL TUTUP IPK ---
+    
+    // 1. Fungsi Tutup Modal (Pastikan ini ada di Global Scope)
+    function closeIPKModal() { 
+        console.log("Tombol Tutup Diklik"); // Debugging
+        document.getElementById('ipkModal').classList.remove('active'); 
+    }
+
+    // 2. Update Fungsi Open IPK Modal (Opsional: Memaksa Event Listener)
     function openIPKModal() {
         if (!currentProfile) return;
         const modal = document.getElementById('ipkModal');
@@ -1343,61 +1725,106 @@
         const today = new Date();
 
         for (let i = 1; i <= 6; i++) {
-            let storedIPK = localStorage.getItem(`ipk_val_sem${i}_${currentProfile.nim}`);
-            let nilai = storedIPK ? storedIPK : (i === 1 && currentProfile.ipk1 ? currentProfile.ipk1 : "0.00");
-            let hasScore = parseFloat(nilai) > 0;
-            let editButtonHtml = ""; let canEdit = false;
-
-            if (i === 1) {
-                const isEdited = localStorage.getItem(`ipk_edited_sem1_${currentProfile.nim}`);
-                if (!isEdited) canEdit = true;
-            } else {
-                if (today >= ipkSchedule[i]) {
-                    const isEdited = localStorage.getItem(`ipk_edited_sem${i}_${currentProfile.nim}`);
-                    if (!isEdited) canEdit = true;
-                }
+            let nilai = currentProfile[`ipk${i}`] ? currentProfile[`ipk${i}`] : "0.00";
+            // Cek properti legacy ipk1 jika belum ada di format baru
+            if (i === 1 && !currentProfile[`ipk${i}`] && currentProfile.ipk1) {
+                nilai = currentProfile.ipk1;
             }
-            if (canEdit) { editButtonHtml = `<button class="ipk-edit-btn" onclick="openIpkInputModal(${i})"><i class="fas fa-pencil-alt"></i></button>`; }
+            
+            let hasScore = parseFloat(nilai) > 0;
+            let editButtonHtml = ""; 
+            let canEdit = true;
+
+            if (hasScore) canEdit = false;
+            if (i > 1 && today < ipkSchedule[i]) canEdit = false;
+
+            if (canEdit) { 
+                editButtonHtml = `<button class="ipk-edit-btn" onclick="openIpkInputModal(${i})"><i class="fas fa-pencil-alt"></i></button>`; 
+            }
+            
             const row = document.createElement('div');
             row.className = `semester-row ${hasScore ? 'has-score' : ''}`;
             row.innerHTML = `<span>Semester ${i}</span><span>${nilai}${editButtonHtml}</span>`;
             listContainer.appendChild(row);
         }
+        
+        // FIX TAMBAHAN: Pastikan tombol tutup memiliki event listener yang benar setiap kali modal dibuka
+        const closeBtn = modal.querySelector('.close-ipk');
+        if(closeBtn) {
+            closeBtn.onclick = closeIPKModal;
+        }
+
         modal.classList.add('active');
     }
 
     function openIpkInputModal(sem) { editingSem = sem; document.getElementById('modern-ipk-input').value = ""; document.getElementById('ipkModal').classList.remove('active'); document.getElementById('ipkInputModal').classList.add('active'); }
     function closeIpkInputModal() { document.getElementById('ipkInputModal').classList.remove('active'); document.getElementById('ipkModal').classList.add('active'); }
-    function confirmIPKInput() {
+    
+    async function confirmIPKInput() {
         const input = document.getElementById('modern-ipk-input');
         const val = parseFloat(input.value);
-        if (isNaN(val) || val < 1.00 || val > 4.00) { alert("Nilai tidak valid! Masukkan angka antara 1.00 sampai 4.00"); return; }
+        if (isNaN(val) || val < 1.00 || val > 4.00) { 
+            showNotification("Nilai tidak valid! Masukkan angka antara 1.00 sampai 4.00", "warning"); 
+            return; 
+        }
         const fixedVal = val.toFixed(2);
-        localStorage.setItem(`ipk_val_sem${editingSem}_${currentProfile.nim}`, fixedVal);
-        localStorage.setItem(`ipk_edited_sem${editingSem}_${currentProfile.nim}`, "true");
-        alert(`IPK Semester ${editingSem} berhasil disimpan!`);
-        closeIpkInputModal(); openIPKModal();
+        
+        input.value = "Menyimpan...";
+        input.disabled = true;
+
+        try {
+            const response = await fetch('/api/update-ipk', {
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    nim: currentProfile.nim, 
+                    semester: editingSem, 
+                    newIpk: fixedVal, 
+                    repoOwner: REPO_CONFIG.owner, 
+                    repoName: REPO_CONFIG.name 
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok) {
+                currentProfile[`ipk${editingSem}`] = fixedVal;
+                
+                const targetData = (currentClassLabel === "IF 1") ? dataIF1 : dataIF2;
+                const index = targetData.findIndex(s => s.nim === currentProfile.nim);
+                if (index !== -1) targetData[index][`ipk${editingSem}`] = fixedVal;
+
+                showNotification(`IPK Semester ${editingSem} berhasil disimpan permanen!`, "success");
+                closeIpkInputModal(); 
+                openIPKModal();
+            } else { 
+                throw new Error(result.message); 
+            }
+        } catch (error) { 
+            showNotification("Error: " + error.message, "error"); 
+            input.value = ""; 
+        } finally {
+            input.disabled = false;
+            if (input.value === "Menyimpan...") input.value = "";
+        }
     }
-    function closeIPKModal() { document.getElementById('ipkModal').classList.remove('active'); }
 
     // --- VARIABEL COUNTDOWN & SURRENDER ---
     const targetDate = new Date("February 15, 2026 15:00:00").getTime();
     let stegoInterval;
 
-    function openEventModal() {
+        function openEventModal() {
         const modal = document.getElementById('eventModal');
         const list = document.getElementById('eventListContainer');
         list.innerHTML = "";
         
+        // Loop Event (TETAP ADA)
         eventsData.forEach(ev => {
             const item = document.createElement('div');
             
             if (ev.theme === 'fire') { 
                 item.className = 'event-item fire-theme'; 
-                
-                // LOGIKA KHUSUS TAMPILAN STEGANOGRAPHY
-                // Ambil jumlah yang nyerah dari LocalStorage
-                let surrenderCount = localStorage.getItem('stego_surrender_count') || 0;
+                let surrenderCount = globalStats.stego_surrender_count;
 
                 item.innerHTML = `
                 <div class="event-item-content">
@@ -1414,27 +1841,26 @@
                     </div>
                 </div>`;
                 
-                // Jalankan Countdown
                 startStegoCountdown();
 
             } else { 
-                // Tampilan Event Biasa
                 item.className = 'event-item'; 
                 item.innerHTML = `<div class="event-title">${ev.title}</div><div class="event-prize">Hadiah: ${ev.prize}</div>`;
             }
             
-            // Klik Handler
             if (ev.title === "Steganography") { 
-                item.onclick = (e) => {
-                    // Mencegah klik jika yang diklik adalah area timer (opsional, tapi bagus UX nya)
-                    openStegoModal(); 
-                }; 
+                item.onclick = (e) => { openStegoModal(); }; 
             } else { 
                 item.onclick = openChallengeModal; 
             }
 
             list.appendChild(item);
         });
+
+        // --- BAGIAN YANG DIHAPUS ---
+        // (Hapus kode: const clueBtn = document.createElement('button')...)
+        // (Hapus kode: list.appendChild(clueBtn)...)
+        // ---------------------------
         
         modal.classList.add('active');
     }
@@ -1452,7 +1878,7 @@
             const distance = targetDate - now;
             const timerElement = document.getElementById("stego-countdown");
 
-            if (!timerElement) return; // Mencegah error jika modal ditutup
+            if (!timerElement) return;
 
             if (distance < 0) {
                 clearInterval(stegoInterval);
@@ -1466,63 +1892,186 @@
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            // Format: 5d 12h 30m 45s
             timerElement.innerHTML = `${days}h ${hours}j ${minutes}m ${seconds}d`;
         };
 
-        updateTimer(); // Jalankan langsung biar gak nunggu 1 detik
+        updateTimer();
         stegoInterval = setInterval(updateTimer, 1000);
     }
 
     // --- LOGIKA MENYERAH ---
     function openSurrenderModal() {
-        document.getElementById('stegoModal').classList.remove('active'); // Tutup modal password
-        document.getElementById('surrenderModal').classList.add('active'); // Buka modal nyerah
+        document.getElementById('stegoModal').classList.remove('active'); 
+        document.getElementById('surrenderModal').classList.add('active'); 
     }
 
     function closeSurrenderModal() {
         document.getElementById('surrenderModal').classList.remove('active');
-        document.getElementById('stegoModal').classList.add('active'); // Balik lagi ke modal password
+        document.getElementById('stegoModal').classList.add('active'); 
     }
 
-    function confirmSurrender() {
-        // 1. Tambah Counter di LocalStorage
-        let count = parseInt(localStorage.getItem('stego_surrender_count') || 0);
-        count++;
-        localStorage.setItem('stego_surrender_count', count);
+    async function confirmSurrender() {
+        const btn = document.querySelector('.btn-giveup');
+        const originalText = btn.innerText;
+        btn.innerText = "Menyimpan kekalahanmu...";
+        btn.disabled = true;
 
-        // 2. Tutup Semua Modal
-        document.getElementById('surrenderModal').classList.remove('active');
-        
-        // 3. Refresh Event Modal untuk update angka counter secara visual
-        // Kita tutup dulu sebentar lalu buka lagi (atau langsung refresh kontennya)
-        openEventModal(); 
+        try {
+            const response = await fetch('/api/update-surrender', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    repoOwner: REPO_CONFIG.owner,
+                    repoName: REPO_CONFIG.name
+                })
+            });
 
-        alert("Yahhh cupu... 🏳️ Jumlah yang nyerah bertambah!");
+            const result = await response.json();
+
+            if (response.ok) {
+                globalStats.stego_surrender_count = result.newCount;
+                document.getElementById('surrenderModal').classList.remove('active');
+                openEventModal();
+                showNotification(`Yahhh cupu... 🏳️ Total ${result.newCount} orang nyerah!`, "warning");
+            } else {
+                throw new Error(result.message);
+            }
+        } catch (error) {
+            showNotification("Gagal memproses penyerahan: " + error.message, "error");
+            document.getElementById('surrenderModal').classList.remove('active');
+            document.getElementById('stegoModal').classList.add('active'); 
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
     }
 
-    // Edit DOB
-    let selectedDobValue = "";
+    // --- LOGIKA CUSTOM DATE PICKER (BARU) ---
+    
+    let selectedDobValue = ""; // Variabel penyimpan hasil akhir
+    let tempDate = { d: null, m: null, y: null };
+    const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+
     function initEditDOB() {
-        if (localStorage.getItem(`dob_edited_${currentProfile.nim}`) === "true") { alert("Tanggal Lahir di Profil ini sudah pernah diubah"); return; }
-        document.getElementById('newDobInput').value = ""; document.getElementById('datePickerModal').classList.add('active');
+        if (localStorage.getItem(`dob_edited_${currentProfile.nim}`) === "true") { 
+            showNotification("Tanggal Lahir di Profil ini sudah pernah diubah", "warning"); 
+            return; 
+        }
+        
+        // Reset Data & UI
+        tempDate = { d: null, m: null, y: null };
+        resetPickerUI();
+        document.getElementById('datePickerModal').classList.add('active');
     }
-    function closeDatePicker() { document.getElementById('datePickerModal').classList.remove('active'); }
+
+    function resetPickerUI() {
+        // 1. Generate Tombol Tanggal (1-31)
+        const dateGrid = document.getElementById('grid-dates');
+        dateGrid.innerHTML = "";
+        for (let i = 1; i <= 31; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'picker-btn';
+            btn.innerText = i;
+            btn.onclick = () => selectStepDate(i);
+            dateGrid.appendChild(btn);
+        }
+
+        // 2. Generate Tombol Bulan (Jan-Des)
+        const monthGrid = document.getElementById('grid-months');
+        monthGrid.innerHTML = "";
+        monthNames.forEach((m, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'picker-btn';
+            btn.innerText = m;
+            btn.onclick = () => selectStepMonth(index);
+            monthGrid.appendChild(btn);
+        });
+
+        // 3. Generate Tombol Tahun (2000-2010)
+        const yearGrid = document.getElementById('grid-years');
+        yearGrid.innerHTML = "";
+        for (let i = 2000; i <= 2010; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'picker-btn';
+            btn.innerText = i;
+            btn.onclick = () => selectStepYear(i);
+            yearGrid.appendChild(btn);
+        }
+
+        // Mulai dari Step 1
+        showStep('date');
+    }
+
+    function showStep(step) {
+        // Sembunyikan semua step dulu
+        document.getElementById('step-date').style.display = 'none';
+        document.getElementById('step-month').style.display = 'none';
+        document.getElementById('step-year').style.display = 'none';
+        document.getElementById('btn-back-step').style.display = 'none';
+
+        if (step === 'date') {
+            document.getElementById('step-date').style.display = 'block';
+            document.getElementById('picker-title-step').innerText = "Pilih Tanggal (1-31)";
+        } else if (step === 'month') {
+            document.getElementById('step-month').style.display = 'block';
+            document.getElementById('picker-title-step').innerText = `Tanggal ${tempDate.d} - Pilih Bulan`;
+            document.getElementById('btn-back-step').style.display = 'block';
+            document.getElementById('btn-back-step').onclick = () => showStep('date');
+        } else if (step === 'year') {
+            document.getElementById('step-year').style.display = 'block';
+            document.getElementById('picker-title-step').innerText = `${tempDate.d} ${monthNames[tempDate.m]} - Pilih Tahun`;
+            document.getElementById('btn-back-step').style.display = 'block';
+            document.getElementById('btn-back-step').onclick = () => showStep('month');
+        }
+    }
+
+    function selectStepDate(val) {
+        tempDate.d = val;
+        showStep('month');
+    }
+
+    function selectStepMonth(val) {
+        tempDate.m = val; // Index 0-11
+        showStep('year');
+    }
+
+    function selectStepYear(val) {
+        tempDate.y = val;
+        processFinalDate();
+    }
+
+    function processFinalDate() {
+        // Gabungkan jadi format: "20 Mei 2005"
+        selectedDobValue = `${tempDate.d} ${monthNames[tempDate.m]} ${tempDate.y}`;
+        
+        document.getElementById('conf-dob-display').innerText = selectedDobValue;
+        document.getElementById('datePickerModal').classList.remove('active');
+        document.getElementById('dateConfirmModal').classList.add('active');
+    }
+
+    function closeDatePicker() {
+        document.getElementById('datePickerModal').classList.remove('active');
+    }
+
+    function closeDateConfirm() {
+        // Kalau batal konfirmasi, kembali ke picker custom
+        document.getElementById('dateConfirmModal').classList.remove('active');
+        document.getElementById('datePickerModal').classList.add('active');
+    }
     function formatIndoDate(dateString) { const date = new Date(dateString); return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }); }
     function confirmDateSelection() {
         const inputVal = document.getElementById('newDobInput').value;
-        if (!inputVal) { alert("Pilih tanggal terlebih dahulu!"); return; }
+        if (!inputVal) { showNotification("Pilih tanggal terlebih dahulu!", "warning"); return; }
         selectedDobValue = formatIndoDate(inputVal);
         document.getElementById('conf-dob-display').innerText = selectedDobValue;
         document.getElementById('datePickerModal').classList.remove('active'); document.getElementById('dateConfirmModal').classList.add('active');
     }
-    function closeDateConfirm() { document.getElementById('dateConfirmModal').classList.remove('active'); document.getElementById('datePickerModal').classList.add('active'); }
     function initVerification() { document.getElementById('dateConfirmModal').classList.remove('active'); document.getElementById('verifyModal').classList.add('active'); document.getElementById('nim-verify-input').value = ""; document.getElementById('nim-verify-input').focus(); }
     function closeVerifyModal() { document.getElementById('verifyModal').classList.remove('active'); document.getElementById('dateConfirmModal').classList.add('active'); }
     function submitVerification() {
         const input = document.getElementById('nim-verify-input').value;
         const correctSuffix = currentProfile.nim.slice(-2);
-        if (input === correctSuffix) { finalUpdateDOB(); } else { alert("Verifikasi Gagal! 2 Digit terakhir NIM salah."); }
+        if (input === correctSuffix) { finalUpdateDOB(); } else { showNotification("Verifikasi Gagal! 2 Digit terakhir NIM salah.", "error"); }
     }
     async function finalUpdateDOB() {
         const dobElement = document.getElementById('p-dob');
@@ -1536,16 +2085,16 @@
             });
             const result = await response.json();
             if (response.ok) {
-                alert("Berhasil disimpan! Data di GitHub akan terupdate.");
+                showNotification("Berhasil disimpan! Data di GitHub akan terupdate.", "success");
                 localStorage.setItem(`dob_edited_${currentProfile.nim}`, "true");
                 const dobIcon = document.getElementById('dob-edit-icon');
-                dobIcon.classList.add('faded'); dobIcon.onclick = function() { alert("Tanggal Lahir di Profil ini sudah pernah diubah"); };
+                dobIcon.classList.add('faded'); dobIcon.onclick = function() { showNotification("Tanggal Lahir di Profil ini sudah pernah diubah", "warning"); };
                 dobElement.innerText = selectedDobValue; currentProfile.dob = selectedDobValue;
                 const targetData = (currentClassLabel === "IF 1") ? dataIF1 : dataIF2;
                 const index = targetData.findIndex(s => s.nim === currentProfile.nim);
                 if (index !== -1) targetData[index].dob = selectedDobValue;
             } else { throw new Error(result.message || "Gagal menyimpan."); }
-        } catch (error) { alert("Error: " + error.message); dobElement.innerText = originalText; }
+        } catch (error) { showNotification("Gagal menyimpan: " + error.message, "error"); dobElement.innerText = originalText; }
     }
 
     // Jodoh Logic
@@ -1654,7 +2203,7 @@
     }
 
     // Steganography Logic
-    const SECRET_HASH_CODE = "-21234316"; 
+    const SECRET_HASH_CODE = "438201956"; 
     const SETUP_MODE = false; 
 
     function generateSafeHash(str) {
@@ -1682,15 +2231,159 @@
         if (userHash === SECRET_HASH_CODE) {
             document.getElementById('stegoModal').classList.remove('active'); document.getElementById('stegoSuccessModal').classList.add('active');
         } else {
-            alert("Jawaban Salah! Coba cari petunjuk lagi.");
+            showNotification("Jawaban Salah! Coba cari petunjuk lagi.", "error");
             document.getElementById('stegoAnswerInput').style.border = "2px solid red";
             setTimeout(() => { document.getElementById('stegoAnswerInput').style.border = "none"; }, 1000);
         }
     }
-    function openStegoImage() { document.getElementById('stegoImageModal').classList.add('active'); }
-    function closeStegoImage() { document.getElementById('stegoImageModal').classList.remove('active'); }
-    function closeStegoSuccess() { document.getElementById('stegoSuccessModal').classList.remove('active'); }
+    function openStegoImage() { 
+        document.getElementById('stegoImageModal').classList.add('active'); 
+    }
+    
+    function closeStegoImage(e) { 
+        // Hanya tutup modal jika yang diklik adalah background hitam (overlay-nya)
+        // Mencegah modal tertutup saat mengklik gambar atau tombol
+        if (e && e.target.id !== 'stegoImageModal') return;
+        document.getElementById('stegoImageModal').classList.remove('active'); 
+    }
+
+    function openImageTab(e, url) {
+        if (e) e.stopPropagation(); // Mencegah klik tembus ke background penutup
+        window.open(url, '_blank');
+    }
+
+    async function downloadImage(e, url) {
+        if (e) e.stopPropagation(); // Mencegah klik tembus ke background penutup
+        
+        showNotification("Mendownload gambar...", "info");
+        try {
+            // Fetch gambar sebagai Blob (data biner) agar bisa dipaksa download
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = URL.createObjectURL(blob);
+            
+            // Buat elemen link (a) sementara untuk memicu download
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = 'Clue_Steganography.png'; // Nama file saat disimpan
+            document.body.appendChild(link);
+            link.click();
+            
+            // Bersihkan sisa link dan blob
+            document.body.removeChild(link);
+            URL.revokeObjectURL(blobUrl);
+            
+            showNotification("Gambar berhasil didownload!", "success");
+        } catch (error) {
+            // Jika server gambar menolak fetch (masalah CORS), beri instruksi manual
+            showNotification("Gagal mendownload otomatis. Klik 'Buka Gambar' lalu simpan manual.", "error");
+        }
+    }
+    
+    // --- FITUR EASTER EGG (KONAMI CODE) ---
+    // Sequence: Up, Up, Down, Down, Left, Right, Left, Right, B, A
+    const konamiCode = [
+        "ArrowUp", "ArrowUp", "ArrowDown", "ArrowDown", 
+        "ArrowLeft", "ArrowRight", "ArrowLeft", "ArrowRight", 
+        "b", "a"
+    ];
+    let konamiIndex = 0;
+
+    document.addEventListener('keydown', (e) => {
+        // Cek apakah tombol yang ditekan sesuai urutan
+        if (e.key.toLowerCase() === konamiCode[konamiIndex].toLowerCase() || e.key === konamiCode[konamiIndex]) {
+            konamiIndex++;
+            
+            // Jika urutan lengkap
+            if (konamiIndex === konamiCode.length) {
+                activateKonamiMode();
+                konamiIndex = 0; // Reset
+            }
+        } else {
+            konamiIndex = 0; // Salah tombol, ulang dari awal
+        }
+    });
+
+    function activateKonamiMode() {
+        showNotification("KONAMI CODE ACTIVATED! MODUS PARTY DIMULAI!", "party");
+
+        // 1. Ubah Body jadi Rainbow
+        document.body.classList.add('konami-active');
+
+        // 2. Putar Lagu Party (Ganti lagu saat ini)
+        // Lagu contoh: Jedag Jedug atau Meme Song
+        // Saya pakai link mp3 lucu (Running in the 90s atau sejenisnya)
+        const funnySong = "https://od.lk/s/NjhfMTYyNzYyNDIwXw/Alur%20Cerita%20FB%20CUT.mp3"; // Menggunakan lagu S_FUNNY yg sudah ada
+        
+        bgmAudio.src = funnySong;
+        bgmAudio.volume = 1.0;
+        bgmAudio.loop = true;
+        bgmAudio.play();
+        updateNPUI("MODUS PARTY AKTIF 🤣");
+
+        // 3. Ubah Semua Kartu & Avatar
+        const cards = document.querySelectorAll('.card');
+        const funnyGif = "https://media.tenor.com/5EYt5mnIMvwAAAAi/silly-cat-dance.gif"; // Bisa ganti GIF kucing
+
+        cards.forEach(card => {
+            // Tambah efek putar
+            card.classList.add('konami-spin');
+            
+            // Ganti Avatar jadi GIF
+            const avatar = card.querySelector('.avatar');
+            if (avatar) {
+                avatar.innerHTML = `<img src="https://media.tenor.com/5EYt5mnIMvwAAAAi/silly-cat-dance.gif" class="konami-avatar-img">`;
+                avatar.style.background = "transparent";
+                avatar.style.boxShadow = "none";
+            }
+        });
+
+        // 4. Ubah Judul
+        document.querySelector('h1').innerText = "KELAS INFORMATIKA PARTY!!";
+    }
+    
+// --- KONFIGURASI CLUE (ISI KATA-KATANYA DI SINI) ---
+    const STEGO_CLUES = [
+        "Clue 1: Coba perhatikan baik-baik gambar pantai tersebut, coba zoom dan temukan sesuatu di gambarnya.",
+        "Clue 2: Jika sudah menemukan sesuatu di gambar pantai, akali agar bisa digunakan.",
+        "Clue 3: Apa yang kamu baca disitu hanyalah pengalihan dan tidak berhubungan apa-apa dengan jawaban.",
+        "Clue 4: Judul event mungkin bisa membantumu"
+    ];
+
+    // --- LOGIKA CLUE SYSTEM ---
+
+    function openClueSelection() {
+        // Tutup modal event utama, buka modal pemilihan clue
+        document.getElementById('eventModal').classList.remove('active');
+        document.getElementById('clueSelectionModal').classList.add('active');
+    }
+
+    function closeClueSelection() {
+        // Kembali ke modal event utama
+        document.getElementById('clueSelectionModal').classList.remove('active');
+        document.getElementById('eventModal').classList.add('active');
+    }
+
+    function openStegoClueList() {
+        const container = document.getElementById('clue-container-list');
+        container.innerHTML = ""; // Bersihkan isi lama
+
+        // Render Clue dari Array
+        STEGO_CLUES.forEach((text, index) => {
+            const div = document.createElement('div');
+            div.className = 'clue-item';
+            div.innerHTML = `<span class="clue-number">Petunjuk #${index + 1}</span>${text}`;
+            container.appendChild(div);
+        });
+
+        document.getElementById('clueSelectionModal').classList.remove('active');
+        document.getElementById('clueListModal').classList.add('active');
+    }
+
+    function backToClueSelection() {
+        document.getElementById('clueListModal').classList.remove('active');
+        document.getElementById('clueSelectionModal').classList.add('active');
+    }
 </script>
 </body>
 </html>
-
