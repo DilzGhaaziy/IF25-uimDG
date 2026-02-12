@@ -7,18 +7,17 @@ export default async function handler(req, res) {
 
   const { nim, newDOB, repoOwner, repoName } = req.body;
   
-  // Pastikan Anda sudah setting GITHUB_TOKEN di Environment Variables Vercel
   const token = process.env.GITHUB_TOKEN; 
-  const path = 'index.html'; // Nama file utama Anda
+  const path = 'students.json'; // TARGET DIUBAH KE JSON (BUKAN HTML LAGI)
 
   if (!token) {
     return res.status(500).json({ message: 'Server Error: GITHUB_TOKEN is missing.' });
   }
 
   try {
-    // 1. GET file content dari GitHub
     const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
     
+    // 1. Ambil file students.json dari GitHub
     const getResponse = await fetch(url, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -27,30 +26,39 @@ export default async function handler(req, res) {
     });
 
     if (!getResponse.ok) {
-      throw new Error(`Gagal mengambil file dari GitHub: ${getResponse.statusText}`);
+      throw new Error(`Gagal mengambil data dari GitHub: ${getResponse.statusText}`);
     }
 
     const data = await getResponse.json();
     
-    // Decode konten dari Base64 ke UTF-8
+    // 2. Decode Base64 ke UTF-8 dan ubah string jadi Object JSON
     const content = Buffer.from(data.content, 'base64').toString('utf-8');
+    let studentsData = JSON.parse(content);
 
-    // 2. Regex untuk mencari dan mengganti Tanggal Lahir berdasarkan NIM
-    // Pola ini mencari: nim: "X", ... dob: "Y" (mengabaikan spasi/baris baru diantaranya)
-    // Penjelasan Regex:
-    // (nim:\s*["']${nim}["'][\s\S]*?dob:\s*["']) -> Group 1: Cari NIM sampai ketemu awal 'dob:'
-    // ([^"']*) -> Group 2: Isi Tanggal Lahir lama (yang akan diganti)
-    // (["'])   -> Group 3: Tanda kutip penutup
+    // 3. Cari dan update Tanggal Lahir (dob) berdasarkan NIM
+    let studentFound = false;
+    const classes = ['IF1', 'IF2']; // Cek di kedua kelas
     
-    const regex = new RegExp(`(nim:\\s*["']${nim}["'][\\s\\S]*?dob:\\s*["'])([^"']*)(["'])`);
-    
-    if (!regex.test(content)) {
-      return res.status(404).json({ message: 'NIM tidak ditemukan dalam data script.' });
+    for (const className of classes) {
+      if (studentsData[className]) {
+        const studentIndex = studentsData[className].findIndex(s => s.nim === nim);
+        if (studentIndex !== -1) {
+          // UPDATE DATA DOB DI SINI
+          studentsData[className][studentIndex].dob = newDOB;
+          studentFound = true;
+          break;
+        }
+      }
     }
 
-    const newContent = content.replace(regex, `$1${newDOB}$3`);
+    if (!studentFound) {
+      return res.status(404).json({ message: 'NIM tidak ditemukan dalam data students.json' });
+    }
 
-    // 3. PUT (Update) file kembali ke GitHub
+    // 4. Ubah kembali Object JSON menjadi String yang rapi
+    const newContent = JSON.stringify(studentsData, null, 2);
+
+    // 5. Simpan (PUT) kembali ke GitHub
     const putResponse = await fetch(url, {
       method: 'PUT',
       headers: {
@@ -58,9 +66,9 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message: `Update DOB for NIM ${nim} via Web`, // Pesan commit otomatis
-        content: Buffer.from(newContent).toString('base64'), // Encode kembali ke Base64
-        sha: data.sha, // SHA wajib disertakan untuk update file
+        message: `Update DOB for NIM ${nim} via Web`, 
+        content: Buffer.from(newContent).toString('base64'),
+        sha: data.sha, 
       }),
     });
 
@@ -69,7 +77,7 @@ export default async function handler(req, res) {
       throw new Error(`Gagal menyimpan ke GitHub: ${errData.message}`);
     }
 
-    return res.status(200).json({ message: 'Berhasil diupdate!', newDOB });
+    return res.status(200).json({ message: 'Tanggal Lahir Berhasil diupdate!', newDOB });
 
   } catch (error) {
     console.error(error);
