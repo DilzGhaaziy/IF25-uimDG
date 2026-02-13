@@ -764,6 +764,13 @@
             -webkit-animation-play-state: paused !important;
         }
 
+        /* --- UPDATE: EXCLUDE MUSIC PLAYER FROM PAUSE (Supaya Musik Tetap Muter) --- */
+        body.stop-anim .np-icon, 
+        body.stop-anim .now-playing-box,
+        body.stop-anim .track-item.playing .track-icon {
+            animation-play-state: running !important;
+        }
+
         /* Sembunyikan efek blur berat saat popup muncul untuk performa maksimal */
         body.stop-anim .glow {
             opacity: 0.3;
@@ -1140,7 +1147,7 @@
 
 <script>
      // --- KONFIGURASI VERSI WEB ---
-    const APP_VERSION = "1.0"; 
+    const APP_VERSION = "3.0"; 
 
     // --- FITUR AUTO-UPDATE SCRIPT ---
     (async function checkAppVersion() {
