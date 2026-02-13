@@ -751,6 +751,24 @@
             50% { border-color: #00ffea; box-shadow: 0 0 15px rgba(0, 255, 234, 0.5); }
             100% { border-color: #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
         }
+
+        /* --- [FITUR ANTI LAG: PAUSE ANIMASI] --- */
+        body.stop-anim .glow,
+        body.stop-anim .stars-bg,
+        body.stop-anim .stars-sm-bg,
+        body.stop-anim .star-layer,
+        body.stop-anim .meteor,
+        body.stop-anim .card.owner-card, 
+        body.stop-anim #fireflies-container {
+            animation-play-state: paused !important; /* Membekukan gerakan */
+            -webkit-animation-play-state: paused !important;
+        }
+
+        /* Sembunyikan efek blur berat saat popup muncul untuk performa maksimal */
+        body.stop-anim .glow {
+            opacity: 0.3;
+            filter: blur(20px); /* Blur lebih ringan */
+        }
     </style>
 </head>
 <body>
@@ -2384,6 +2402,55 @@
         document.getElementById('clueListModal').classList.remove('active');
         document.getElementById('clueSelectionModal').classList.add('active');
     }
+
+    // --- [FITUR ANTI LAG: SYSTEM PAUSE ANIMASI] ---
+    document.addEventListener("DOMContentLoaded", () => {
+        const body = document.body;
+        
+        // Daftar semua class/ID modal yang kamu miliki di HTML
+        const allModals = document.querySelectorAll(`
+            .modal-overlay, 
+            .event-modal, 
+            .ipk-modal, 
+            .ipk-input-modal,
+            .date-picker-overlay, 
+            .date-confirm-overlay, 
+            .verify-modal, 
+            .jodoh-modal, 
+            .event-challenge-modal,
+            #clueSelectionModal,
+            #clueListModal,
+            #profile-view
+        `);
+
+        // Fungsi Observer (Pemantau)
+        const observer = new MutationObserver((mutations) => {
+            let isAnyModalOpen = false;
+
+            allModals.forEach(modal => {
+                // Cek apakah modal punya class 'active' atau style display block/visible
+                if (modal.classList.contains('active') || modal.style.display === 'block' || modal.style.visibility === 'visible') {
+                    isAnyModalOpen = true;
+                }
+            });
+
+            // Jika ada satu saja modal terbuka, tambahkan class 'stop-anim' ke body
+            if (isAnyModalOpen) {
+                if (!body.classList.contains('stop-anim')) {
+                    body.classList.add('stop-anim');
+                }
+            } else {
+                if (body.classList.contains('stop-anim')) {
+                    body.classList.remove('stop-anim');
+                }
+            }
+        });
+
+        // Mulai memantau perubahan pada setiap modal
+        allModals.forEach(modal => {
+            observer.observe(modal, { attributes: true, attributeFilter: ['class', 'style'] });
+        });
+    });
 </script>
 </body>
 </html>
