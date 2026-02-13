@@ -58,7 +58,7 @@
             z-index: -9999;
             overflow: hidden;
             pointer-events: none;
-            transform: translateZ(0); 
+            transform: translateZ(0);
         }
 
         #bg-light-mode {
@@ -699,11 +699,11 @@
             top: 20px;
             left: 50%;
             transform: translateX(-50%);
-            z-index: 10005; 
+            z-index: 10005; /* Harus paling atas melebihi modal */
             display: flex;
             flex-direction: column;
             gap: 10px;
-            pointer-events: none; 
+            pointer-events: none; /* Agar area kosong tidak memblokir klik */
             align-items: center;
         }
 
@@ -718,12 +718,12 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            border-left: 5px solid #3498db; 
+            border-left: 5px solid #3498db; /* Default Biru */
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             animation: slideInDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             max-width: 90vw;
-            pointer-events: auto; 
+            pointer-events: auto; /* Boksnya tetap bisa diklik/disentuh */
             border-right: 1px solid rgba(255,255,255,0.2);
             border-top: 1px solid rgba(255,255,255,0.2);
             border-bottom: 1px solid rgba(255,255,255,0.2);
@@ -750,18 +750,6 @@
             0% { border-color: #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
             50% { border-color: #00ffea; box-shadow: 0 0 15px rgba(0, 255, 234, 0.5); }
             100% { border-color: #ff0055; box-shadow: 0 0 15px rgba(255, 0, 85, 0.5); }
-        }
-
-        /* --- OPTIMASI PERFORMA: PAUSE ANIMASI SAAT MODAL DIBUKA --- */
-        body.pause-animations .glow-1,
-        body.pause-animations .glow-2,
-        body.pause-animations .stars-bg,
-        body.pause-animations .stars-sm-bg,
-        body.pause-animations .layer-1,
-        body.pause-animations .layer-2,
-        body.pause-animations .layer-3,
-        body.pause-animations .meteor {
-            animation-play-state: paused !important;
         }
     </style>
 </head>
@@ -1025,7 +1013,7 @@
         </p>
         
         <div class="stego-hint-wrapper">
-            <div class="stego-hint-text">(Step 1) CARI SESUATU DI GAMBAR INI</div>
+            <div class="stego-hint-text">(Step 1)CARI SESUATU DI GAMBAR INI</div>
             <i class="fas fa-arrow-right arrow-anim"></i>
             
             <img src="https://od.lk/s/NjhfMTYyNzY1NzQ0Xw/Step%201.png" 
@@ -1196,39 +1184,11 @@
 
     let dataIF1 = [], dataIF2 = [], allStudents = [];
     let globalStats = { stego_surrender_count: 0 };
-    let isTabActive = true;
-    let meteorTimeout;
-
-    // --- ROBOT PENGINTAI (AUTO-PAUSE ANIMASI BACKGROUND) ---
-    // Mencegah HP lag saat membuka pop up / profil
-    const observer = new MutationObserver(() => {
-        // Cek apakah ada elemen modal yang memiliki class 'active'
-        const isModalOpen = document.querySelectorAll('.active').length > 0;
-        
-        // Cek apakah halaman profil sedang terbuka (display: block)
-        const profileView = document.getElementById('profile-view');
-        const isProfileOpen = profileView && profileView.style.display === 'block';
-        
-        // Jika ada modal atau profil yang terbuka, pause animasi!
-        if (isModalOpen || isProfileOpen) {
-            document.body.classList.add('pause-animations');
-        } else {
-            document.body.classList.remove('pause-animations');
-        }
-    });
 
     // Gunakan DOMContentLoaded agar Modal muncul INSTAN
     document.addEventListener('DOMContentLoaded', () => {
         // Tampilkan modal pemilih kelas langsung
         document.getElementById('selectionModal').classList.add('active');
-        
-        // Mulai mengintai perubahan atribut 'class' dan 'style' di seluruh halaman
-        observer.observe(document.body, { 
-            childList: true, 
-            subtree: true, 
-            attributes: true, 
-            attributeFilter: ['class', 'style'] 
-        });
         
         // Setup awal tema & layout
         if(localStorage.getItem('theme')==='dark') { 
@@ -1255,7 +1215,7 @@
             dataIF2 = data.IF2;
             allStudents = [ ...dataIF1.map(s => ({...s, class:'IF 1'})), ...dataIF2.map(s => ({...s, class:'IF 2'})) ];
 
-            // 2. Ambil Data Statistik (Surrender Count)
+            // 2. Ambil Data Statistik (Surrender Count) - TAMBAHAN BARU
             const statsResponse = await fetch('stats.json?t=' + new Date().getTime());
             if (statsResponse.ok) {
                 const stats = await statsResponse.json();
@@ -1350,12 +1310,15 @@
         container.appendChild(fragment);
     }
 
+    // Meteor: Hanya berjalan di Dark Mode & Tab Aktif
+    let isTabActive = true;
+    let meteorTimeout;
+    const scene = document.getElementById('bg-dark-mode'); 
+
     document.addEventListener('visibilitychange', () => {
         isTabActive = !document.hidden;
         if (isTabActive) meteorLoop();
     });
-
-    const scene = document.getElementById('bg-dark-mode'); 
 
     function spawnMeteor() {
         if (!isTabActive || !document.body.classList.contains('dark-mode')) return;
@@ -1389,14 +1352,9 @@
 
     function meteorLoop() {
         clearTimeout(meteorTimeout);
-        
-        // Cek 3 hal: Tab harus aktif, mode dark, dan animasi TIDAK SEDANG DI-PAUSE
-        const isPaused = document.body.classList.contains('pause-animations');
-        
-        if (isTabActive && document.body.classList.contains('dark-mode') && !isPaused) {
+        if (isTabActive && document.body.classList.contains('dark-mode')) {
             spawnMeteor();
         }
-        
         // Interval acak
         const randomDelay = Math.random() * 2000 + 500;
         meteorTimeout = setTimeout(meteorLoop, randomDelay);
@@ -1899,6 +1857,11 @@
             list.appendChild(item);
         });
 
+        // --- BAGIAN YANG DIHAPUS ---
+        // (Hapus kode: const clueBtn = document.createElement('button')...)
+        // (Hapus kode: list.appendChild(clueBtn)...)
+        // ---------------------------
+        
         modal.classList.add('active');
     }
 
