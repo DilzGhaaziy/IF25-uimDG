@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // Hanya izinkan method POST
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
@@ -8,68 +7,75 @@ export default async function handler(req, res) {
   const token = process.env.GITHUB_TOKEN; 
   const path = 'leaderboard.json'; 
 
-  if (!token) {
-    return res.status(500).json({ message: 'Server Error: GITHUB_TOKEN is missing.' });
-  }
+  if (!token) return res.status(500).json({ message: 'Server Error: GITHUB_TOKEN is missing.' });
 
   try {
-    // 1. Ambil data leaderboard saat ini dari GitHub
     const url = `https://api.github.com/repos/${repoOwner}/${repoName}/contents/${path}`;
+    
+    // 1. Ambil Data Lama
     const getResponse = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: 'application/vnd.github.v3+json',
-      },
+      headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' }
     });
 
-    if (!getResponse.ok) {
-      throw new Error('Gagal mengambil leaderboard.json');
-    }
+    if (!getResponse.ok) throw new Error('Gagal mengambil leaderboard.json');
 
     const data = await getResponse.json();
     const content = Buffer.from(data.content, 'base64').toString('utf-8');
     let leaderboard = JSON.parse(content);
 
-    // 2. Tambahkan Skor Baru ke Array
-    const newEntry = {
-      name: name || "Anonymous",
-      score: parseInt(score),
-      device: device || "Unknown Device",
-      date: new Date().toISOString().split('T')[0] // Format YYYY-MM-DD
-    };
+    // --- LOGIKA BARU: CEK DUPLIKASI ---
+    const existingPlayerIndex = leaderboard.findIndex(p => p.name === name);
+    const newScore = parseInt(score);
+    const todayDate = new Date().toISOString().split('T')[0];
 
-    leaderboard.push(newEntry);
+    let dataChanged = false;
 
-    // 3. Sorting (Urutkan dari Skor Tertinggi ke Terendah)
-    leaderboard.sort((a, b) => b.score - a.score);
-
-    // 4. Batasi hanya Top 10 Juara (Supaya file tidak berat)
-    const top10 = leaderboard.slice(0, 10);
-
-    // 5. Simpan kembali ke GitHub
-    const newContent = JSON.stringify(top10, null, 2);
-    
-    const putResponse = await fetch(url, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message: `New High Score: ${newEntry.name} (${newEntry.score})`, 
-        content: Buffer.from(newContent).toString('base64'),
-        sha: data.sha, 
-      }),
-    });
-
-    if (!putResponse.ok) {
-      throw new Error('Gagal menyimpan update ke GitHub.');
+    if (existingPlayerIndex !== -1) {
+        // KONDISI A: Pemain sudah ada
+        if (newScore > leaderboard[existingPlayerIndex].score) {
+            // Update HANYA jika skor baru lebih tinggi (High Score)
+            leaderboard[existingPlayerIndex].score = newScore;
+            leaderboard[existingPlayerIndex].device = device;
+            leaderboard[existingPlayerIndex].date = todayDate;
+            dataChanged = true;
+        } 
+        // Jika skor lebih rendah/sama, JANGAN lakukan apa-apa (biarkan skor lama tertulis)
+    } else {
+        // KONDISI B: Pemain belum ada -> Tambahkan baru
+        leaderboard.push({
+            name: name || "Anonymous",
+            score: newScore,
+            device: device || "Unknown Device",
+            date: todayDate
+        });
+        dataChanged = true;
     }
 
-    // Kembalikan data terbaru ke frontend agar langsung update tanpa refresh
+    // 2. Sorting & Slicing
+    leaderboard.sort((a, b) => b.score - a.score);
+    
+    // Kita ambil Top 50 dulu biar aman, nanti frontend yang tampilkan sedikit
+    // atau tetap Top 10 sesuai preferensi
+    const finalLeaderboard = leaderboard.slice(0, 20); 
+
+    // 3. Simpan ke GitHub (Hanya jika ada perubahan data)
+    if (dataChanged) {
+        const newContent = JSON.stringify(finalLeaderboard, null, 2);
+        
+        await fetch(url, {
+            method: 'PUT',
+            headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: `Update Score: ${name}`, 
+                content: Buffer.from(newContent).toString('base64'),
+                sha: data.sha, 
+            }),
+        });
+    }
+
     return res.status(200).json({ 
-        message: 'Leaderboard Updated!', 
-        data: top10 
+        message: 'Leaderboard Processed', 
+        data: finalLeaderboard 
     });
 
   } catch (error) {
