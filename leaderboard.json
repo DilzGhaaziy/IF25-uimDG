@@ -40,5 +40,11 @@
     "score": 1,
     "device": "PC Windows",
     "date": "2026-02-14"
+  },
+  {
+    "name": "Player 123",
+    "score": 1,
+    "device": "PC",
+    "date": "2026-02-14"
   }
 ]
