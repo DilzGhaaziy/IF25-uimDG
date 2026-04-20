@@ -1,15 +1,15 @@
 [
   {
+    "name": "Player 532",
+    "score": 11,
+    "device": "Android",
+    "date": "2026-04-20"
+  },
+  {
     "name": "Sepuh TicTacToe",
     "score": 10,
     "device": "Server",
     "date": "2026-02-14"
-  },
-  {
-    "name": "Player 532",
-    "score": 10,
-    "device": "Android",
-    "date": "2026-04-20"
   },
   {
     "name": "Player 749",
