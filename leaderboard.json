@@ -18,6 +18,12 @@
     "date": "2026-02-14"
   },
   {
+    "name": "Player 532",
+    "score": 4,
+    "device": "Android",
+    "date": "2026-04-20"
+  },
+  {
     "name": "Player Awal",
     "score": 3,
     "device": "Server",
@@ -28,12 +34,6 @@
     "score": 3,
     "device": "PC",
     "date": "2026-04-02"
-  },
-  {
-    "name": "Player 532",
-    "score": 3,
-    "device": "Android",
-    "date": "2026-04-20"
   },
   {
     "name": "Player 99",
