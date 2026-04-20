@@ -36,6 +36,12 @@
     "date": "2026-02-14"
   },
   {
+    "name": "Player 532",
+    "score": 2,
+    "device": "Android",
+    "date": "2026-04-20"
+  },
+  {
     "name": "Player 99",
     "score": 1,
     "device": "PC Windows",
@@ -58,11 +64,5 @@
     "score": 1,
     "device": "Android",
     "date": "2026-02-14"
-  },
-  {
-    "name": "Player 532",
-    "score": 1,
-    "device": "Android",
-    "date": "2026-04-20"
   }
 ]
